@@ -1,5 +1,5 @@
 UV ?= $(HOME)/.local/bin/uv
-PYTHON ?= $(UV) run python
+PYTHON ?= PYTHONPATH=. $(UV) run python
 PYTEST ?= $(UV) run pytest
 RUFF ?= $(UV) run ruff
 
@@ -20,7 +20,7 @@ check: lint test
 	@echo "=== make check: PASSED ==="
 
 sim:
-	@echo "Simulation target: placeholder for T1.4"
+	@$(PYTHON) scripts/run_toy_sim.py
 
 regression:
 	@echo "Regression target: placeholder for T6.6"
