@@ -29,7 +29,7 @@ synth:
 	@echo "Synthesis target: placeholder for T7.1"
 
 demo-toy:
-	@echo "Demo toy: placeholder for T1.6"
+	@$(PYTHON) examples/compile_linear.py --toy
 
 demo:
 	@echo "Demo target: placeholder for T8.2"
