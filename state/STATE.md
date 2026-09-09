@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
 
 ## Handoff note (rewrite at the end of every session)
-- Done this session: Phase 1 (Walking skeleton) complete. Minimal LinearOp IR implemented, combinational fixed-weight Verilog-2001 codegen, vector writer, self-checking testbench, simulation runner with negative control, mutation testing suite M1–M3 with 100% kill rate, `make demo-toy` operational, Gate G1 report compiled.
-- Next action (exact first step): Tag gate-G1 and plan Phase 2 (T2.1: pinned SmolLM2-135M model loader).
-- Gotchas / things I learned: Generated combinational core adheres to explicit signed arithmetic (8'sd, 16'sd, 32'sd) with zero-weight term pruning and zero weight ports.
+- Done this session: Phase 2 (Frontend and Real Weights) completed. Pinned model loading (SmolLM2-135M at `93efa2f097d5`), linear layer extraction (all 210 projections categorized across 30 layers), model profiling (`docs/model_facts.md` 100% match with spec, 0 biases), artifact serialization (`weight.npy`, `meta.json` with SHA256), deterministic activation capture (fixed seed 42), mathematical validation (`X @ W.T == module(X)` across all 7 projection types $\le 10^{-5}$ error), Gate G2 report (`results/gates/G2.md`), and walkthrough (`docs/walkthroughs/P2.md`). 58 tests green.
+- Next action (exact first step): Tag `gate-G2`, initialize Phase 3 backlog (`tasks/T3.1.md` through `tasks/T3.7.md`, `tasks/T3.G.md`), and start T3.1 (Complete IR and serialization).
+- Gotchas / things I learned: SmolLM2-135M has strictly 0 linear biases across all 30 layers; PyTorch `Linear` stores weights as `[out_features, in_features]`, requiring transpose `X @ W.T` for row-major sequence tensors.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P1 (ready for P2)   Current task: T1.G (done)
-- Last green commit: e028f10    Last gate tag: gate-G1
-- Gates passed: G0, G1
+- Current phase: P2 (complete, ready for P3)   Current task: T2.G (done)
+- Last green commit: 105980d    Last gate tag: gate-G2
+- Gates passed: G0, G1, G2
 
 ## Next 3 tasks
-1. T2.1 (Pinned SmolLM2-135M model loader)
-2. T2.2 (Architecture parser & 7 projection types extractor)
-3. T2.3 (docs/model_facts.md reconciliation)
+1. T3.1 (Complete IR dataclasses, tensor/operators/graph, serialization)
+2. T3.2 (Symmetric INT8 weight quantization per rule N2)
+3. T3.3 (Activation calibration per rule N3)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
@@ -45,7 +45,7 @@
 - Model: SmolLM2-135M, revision pinned
 
 ## Budgets (filled when measured; frozen after)
-- `make check` runtime: ~0.1s      `make regression` runtime: TBD
+- `make check` runtime: ~8.0s      `make regression` runtime: TBD
 - Full 576×576 layer generation time / RTL size: <T4.5>
 - Synthesis timeout per run: <s>
 

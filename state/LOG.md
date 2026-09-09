@@ -12,4 +12,11 @@
 2026-11-01 20:03 | T1.4 | Simulator runner, negative control, and make sim | CHECKED rule enforced, negative control confirmed FAIL | ec1ce12
 2026-11-01 20:04 | T1.5 | Mutation testing engine (M1-M3) | 100% kill rate (9/9 killed) across sign-flip, +1, term drop | bbd252f
 2026-11-01 20:06 | T1.6 | Toy end-to-end compiler demo and make demo-toy | Single command make demo-toy prints PASS and kill matrix | e028f10
-2026-11-01 20:07 | T1.G | Gate G1 review and walking skeleton verification | All G1 checklist items green, walkthrough in docs/walkthroughs/P1.md | pending
+2026-11-01 20:08 | T1.G | Gate G1 review and walking skeleton verification | All G1 checklist items green, walkthrough in docs/walkthroughs/P1.md | 81167d8
+2026-11-01 20:10 | T2.1 | Pinned SmolLM2-135M model loader | Loads pinned revision fp32 on CPU, generates results/model.json | 775f407
+2026-11-01 20:12 | T2.2 | Linear layer extractor | Extracts all 210 projections across 30 layers | a82dddb
+2026-11-01 20:15 | T2.3 | Model facts reconciliation | Profiled model matches docs/02 §1 exactly, docs/model_facts.md created | 8b069b4
+2026-11-01 20:17 | T2.4 | Weight artifact dumper | Dumps weight.npy and meta.json with SHA256 hashes, reload test bit-identical | 491708b
+2026-11-01 20:20 | T2.5 | Forward-hook activation capture | Deterministic activation capture with fixed seed 42, byte-identical on rerun | 7609642
+2026-11-01 20:25 | T2.6 | Frontend mathematical validation | Proves X @ W.T matches module output <= 1e-5 across all 7 projection types | 105980d
+2026-11-01 20:28 | T2.G | Gate G2 review and verification pass | All G2 checklist items verified green, report at results/gates/G2.md | pending
