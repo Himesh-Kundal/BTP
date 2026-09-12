@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
 
 ## Handoff note (rewrite at the end of every session)
-- Done this session: Phase 2 (Frontend and Real Weights) completed. Pinned model loading (SmolLM2-135M at `93efa2f097d5`), linear layer extraction (all 210 projections categorized across 30 layers), model profiling (`docs/model_facts.md` 100% match with spec, 0 biases), artifact serialization (`weight.npy`, `meta.json` with SHA256), deterministic activation capture (fixed seed 42), mathematical validation (`X @ W.T == module(X)` across all 7 projection types $\le 10^{-5}$ error), Gate G2 report (`results/gates/G2.md`), and walkthrough (`docs/walkthroughs/P2.md`). 58 tests green.
-- Next action (exact first step): Tag `gate-G2`, initialize Phase 3 backlog (`tasks/T3.1.md` through `tasks/T3.7.md`, `tasks/T3.G.md`), and start T3.1 (Complete IR and serialization).
-- Gotchas / things I learned: SmolLM2-135M has strictly 0 linear biases across all 30 layers; PyTorch `Linear` stores weights as `[out_features, in_features]`, requiring transpose `X @ W.T` for row-major sequence tensors.
+- Done this session: Gate G2 passed and tagged `gate-G2`. Phase 3 backlog initialized (`tasks/T3.1.md` through `tasks/T3.7.md`, `tasks/T3.G.md`). T3.1 completed: complete IR specification (`ir/tensor.py`, `ir/operators.py`, `ir/linear.py`, `ir/graph.py`), lossless JSON + `.npy` sidecar serialization with SHA256 integrity checks, and direct artifact loading. 64 tests green.
+- Next action (exact first step): Start T3.2 (Symmetric INT8 weight quantization per rule N2) on branch `t3.2-weight-quant`.
+- Gotchas / things I learned: IR separates metadata into JSON and raw tensor data into portable `.npy` sidecars; `TensorRef` implements array interface and lazy loading with SHA256 validation.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P2 (complete, ready for P3)   Current task: T2.G (done)
-- Last green commit: 105980d    Last gate tag: gate-G2
+- Current phase: P3 (IR, quantization, calibration)   Current task: T3.1 (done, ready for T3.2)
+- Last green commit: 87bfd42    Last gate tag: gate-G2
 - Gates passed: G0, G1, G2
 
 ## Next 3 tasks
-1. T3.1 (Complete IR dataclasses, tensor/operators/graph, serialization)
-2. T3.2 (Symmetric INT8 weight quantization per rule N2)
-3. T3.3 (Activation calibration per rule N3)
+1. T3.2 (Symmetric INT8 weight quantization per rule N2)
+2. T3.3 (Activation calibration per rule N3)
+3. T3.4 (Synthetic bias quantization per rule N5)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
