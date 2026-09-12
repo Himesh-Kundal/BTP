@@ -18,5 +18,7 @@
 2026-11-01 20:15 | T2.3 | Model facts reconciliation | Profiled model matches docs/02 §1 exactly, docs/model_facts.md created | 8b069b4
 2026-11-01 20:17 | T2.4 | Weight artifact dumper | Dumps weight.npy and meta.json with SHA256 hashes, reload test bit-identical | 491708b
 2026-11-01 20:20 | T2.5 | Forward-hook activation capture | Deterministic activation capture with fixed seed 42, byte-identical on rerun | 7609642
+2026-11-01 20:25 | T2.6 | Frontend mathematical validation | Proves X @ W.T matches module output <= 1e-5 across all 7 projection types | 105980d
 2026-11-01 20:28 | T2.G | Gate G2 review and verification pass | All G2 checklist items verified green, report at results/gates/G2.md | 24743bc
 2026-11-01 20:35 | T3.1 | Complete IR dataclasses, serialization, and artifact loading | TensorRef, LinearOp, Graph, lossless JSON + .npy round-trip, I1-I5 verified | 87bfd42
+2026-11-01 20:38 | T3.2 | Symmetric INT8 weight quantization per rule N2 | Property tests pass, range [-127, 127], zero-row scale 1.0, error bound verified | 2f20b12

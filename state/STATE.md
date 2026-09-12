@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
 
 ## Handoff note (rewrite at the end of every session)
-- Done this session: Gate G2 passed and tagged `gate-G2`. Phase 3 backlog initialized (`tasks/T3.1.md` through `tasks/T3.7.md`, `tasks/T3.G.md`). T3.1 completed: complete IR specification (`ir/tensor.py`, `ir/operators.py`, `ir/linear.py`, `ir/graph.py`), lossless JSON + `.npy` sidecar serialization with SHA256 integrity checks, and direct artifact loading. 64 tests green.
-- Next action (exact first step): Start T3.2 (Symmetric INT8 weight quantization per rule N2) on branch `t3.2-weight-quant`.
-- Gotchas / things I learned: IR separates metadata into JSON and raw tensor data into portable `.npy` sidecars; `TensorRef` implements array interface and lazy loading with SHA256 validation.
+- Done this session: Gate G2 passed (`gate-G2`). Phase 3 tasks underway: T3.1 completed (complete IR specification, serialization, artifact loading). T3.2 completed: symmetric INT8 weight quantization per rule N2 (`compiler/quantization.py`), round-half-to-even float64, zero-row scale 1.0, mathematical bound property verified, real SmolLM2 weights quantized cleanly. 70 tests green.
+- Next action (exact first step): Start T3.3 (Activation calibration and quantization per rule N3) on branch `t3.3-act-calib`.
+- Gotchas / things I learned: Rule N2 requires float64 precision for scale computation, round-half-to-even tie-breaking, strict clipping to [-127, 127] rejecting -128, and fallback to scale 1.0 for zero rows.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P3 (IR, quantization, calibration)   Current task: T3.1 (done, ready for T3.2)
-- Last green commit: 87bfd42    Last gate tag: gate-G2
+- Current phase: P3 (IR, quantization, calibration)   Current task: T3.2 (done, ready for T3.3)
+- Last green commit: 2f20b12    Last gate tag: gate-G2
 - Gates passed: G0, G1, G2
 
 ## Next 3 tasks
-1. T3.2 (Symmetric INT8 weight quantization per rule N2)
-2. T3.3 (Activation calibration per rule N3)
-3. T3.4 (Synthetic bias quantization per rule N5)
+1. T3.3 (Activation calibration and quantization per rule N3)
+2. T3.4 (Synthetic bias quantization per rule N5)
+3. T3.5 (Accumulator bound pass per rule N4)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
