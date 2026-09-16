@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
 
 ## Handoff note (rewrite at the end of every session)
-- Done this session: Gate G2 passed (`gate-G2`). Phase 3 underway: T3.1 completed (complete IR specification, serialization, artifact loading). T3.2 completed (symmetric INT8 weight quantization per rule N2). T3.3 completed: static activation calibration and symmetric INT8 quantization per rule N3 (`compiler/calibration.py`), absmax and percentile methods, deterministic scale and quantized activations. 76 tests green.
-- Next action (exact first step): Start T3.4 (Synthetic bias quantization per rule N5) on branch `t3.4-bias-quant`.
-- Gotchas / things I learned: Activation calibration uses a per-tensor scalar scale $s_x = \text{stat} / 127.0$, while weights use per-channel vector scales $s_w[n]$. Bias quantization (Rule N5) couples both scales as $s_b[n] = s_x \cdot s_w[n]$.
+- Done this session: Gate G2 passed (`gate-G2`). Phase 3 underway: T3.1 completed (complete IR specification, serialization, artifact loading). T3.2 completed (symmetric INT8 weight quantization per rule N2). T3.3 completed (static activation calibration and symmetric INT8 quantization per rule N3). T3.4 completed: synthetic bias quantization per rule N5 (`compiler/quantization.py`), scaling $s_b = s_x \cdot s_w[n]$, 32-bit clipping, bit-exact verified against reference integer oracle. 82 tests green.
+- Next action (exact first step): Start T3.5 (Accumulator bound pass per rule N4) on branch `t3.5-acc-bound`.
+- Gotchas / things I learned: Bias quantization scales directly with $s_x \cdot s_w[n]$ to match the accumulator domain; NumPy array operations on `int8` wrap around unless explicitly promoted to `int64`.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P3 (IR, quantization, calibration)   Current task: T3.3 (done, ready for T3.4)
-- Last green commit: 1cb6000    Last gate tag: gate-G2
+- Current phase: P3 (IR, quantization, calibration)   Current task: T3.4 (done, ready for T3.5)
+- Last green commit: a6fb082    Last gate tag: gate-G2
 - Gates passed: G0, G1, G2
 
 ## Next 3 tasks
-1. T3.4 (Synthetic bias quantization per rule N5)
-2. T3.5 (Accumulator bound pass per rule N4)
-3. T3.6 (Quantization quality evaluation Claim C2 and thresholds)
+1. T3.5 (Accumulator bound pass per rule N4)
+2. T3.6 (Quantization quality evaluation Claim C2 and thresholds)
+3. T3.7 (End-to-end compiler pipeline driver)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
