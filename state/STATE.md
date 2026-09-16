@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
 
 ## Handoff note (rewrite at the end of every session)
-- Done this session: Gate G2 passed (`gate-G2`). Phase 3 underway: T3.1 completed (complete IR specification, serialization, artifact loading). T3.2 completed (symmetric INT8 weight quantization per rule N2). T3.3 completed (static activation calibration and symmetric INT8 quantization per rule N3). T3.4 completed (synthetic bias quantization per rule N5). T3.5 completed (accumulator bound analysis per rule N4). T3.6 completed: Claim C2 evaluation across all 21 configurations (`results/quant_quality.json`), thresholds frozen via ADR-0001 (cosine sim >= 0.98, SQNR >= 15.0 dB, rel-L2 <= 0.18). 91 tests green.
-- Next action (exact first step): Start T3.7 (End-to-end compiler pipeline driver) on branch `t3.7-compiler-pipeline`.
-- Gotchas / things I learned: Claim C2 quantization quality exhibits high directional preservation across all 21 configurations (mean cosine sim 0.9979, mean SQNR 26.93 dB); thresholds are empirically grounded and frozen by ADR.
+- Done this session: Phase 3 (IR, Quantization, Calibration) complete. T3.1 (IR & serialization), T3.2 (Rule N2 weight quant), T3.3 (Rule N3 activation calib), T3.4 (Rule N5 bias quant), T3.5 (Rule N4 accumulator bound check), T3.6 (Claim C2 quality evaluation across 21 configs, ADR-0001 frozen), T3.7 (compiler pipeline driver), and T3.G (Gate G3 review and Numeric checklist audit). 95 tests green. Gate G3 passed.
+- Next action (exact first step): Tag `gate-G3`, populate Phase 4 task backlog (`tasks/T4.1.md` through `tasks/T4.7.md`, `tasks/T4.G.md`), and start T4.1 (constant weights marking).
+- Gotchas / things I learned: Rule N2, N3, N4, N5 contracts verified with 100% mathematical precision; per-channel weight scaling adds zero area in hardware; worst-case dot product for K=1536 utilizes only 1.16% of INT32 capacity.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P3 (IR, quantization, calibration)   Current task: T3.6 (done, ready for T3.7)
-- Last green commit: 4c7679a    Last gate tag: gate-G2
-- Gates passed: G0, G1, G2
+- Current phase: P3 (complete, ready for P4)   Current task: T3.G (done)
+- Last green commit: 07cdb3e    Last gate tag: gate-G3
+- Gates passed: G0, G1, G2, G3
 
 ## Next 3 tasks
-1. T3.7 (End-to-end compiler pipeline driver)
-2. T3.G (Gate G3 review and verifier check)
-3. T4.1 (Constant weights marking for backend F)
+1. T4.1 (`constant_weights.py`: mark weights CONSTANT, strip weight input notion)
+2. T4.2 (`tiling.py` + tile manifest; padding)
+3. T4.3 (`weight_encoder.py`: int8 -> Verilog literals, sparsity-aware term omission)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
