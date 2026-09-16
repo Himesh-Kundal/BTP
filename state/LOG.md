@@ -24,3 +24,4 @@
 2026-11-01 20:38 | T3.2 | Symmetric INT8 weight quantization per rule N2 | Property tests pass, range [-127, 127], zero-row scale 1.0, error bound verified | 2f20b12
 2026-11-01 20:40 | T3.3 | Activation calibration and quantization per rule N3 | Absmax & percentile calibration, deterministic scale and quantized activations | 1cb6000
 2026-11-01 20:43 | T3.4 | Synthetic bias quantization per rule N5 | Scaling sb = sx * sw, 32-bit clipping, bit-exact against reference oracle | a6fb082
+2026-11-01 20:45 | T3.5 | Accumulator bound pass per rule N4 | K*128*127 + |bq|max < 2^31 enforced, acc_bits_min annotated on IR | 3ebee29

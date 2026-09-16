@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
 
 ## Handoff note (rewrite at the end of every session)
-- Done this session: Gate G2 passed (`gate-G2`). Phase 3 underway: T3.1 completed (complete IR specification, serialization, artifact loading). T3.2 completed (symmetric INT8 weight quantization per rule N2). T3.3 completed (static activation calibration and symmetric INT8 quantization per rule N3). T3.4 completed: synthetic bias quantization per rule N5 (`compiler/quantization.py`), scaling $s_b = s_x \cdot s_w[n]$, 32-bit clipping, bit-exact verified against reference integer oracle. 82 tests green.
-- Next action (exact first step): Start T3.5 (Accumulator bound pass per rule N4) on branch `t3.5-acc-bound`.
-- Gotchas / things I learned: Bias quantization scales directly with $s_x \cdot s_w[n]$ to match the accumulator domain; NumPy array operations on `int8` wrap around unless explicitly promoted to `int64`.
+- Done this session: Gate G2 passed (`gate-G2`). Phase 3 underway: T3.1 completed (complete IR specification, serialization, artifact loading). T3.2 completed (symmetric INT8 weight quantization per rule N2). T3.3 completed (static activation calibration and symmetric INT8 quantization per rule N3). T3.4 completed (synthetic bias quantization per rule N5). T3.5 completed: accumulator bound analysis pass per rule N4 (`compiler/accumulator.py`), worst-case bound $K \cdot 128 \cdot 127 + |b_q|_{\max} < 2^{31}$ enforced, minimal bitwidth `acc_bits_min` annotated. 87 tests green.
+- Next action (exact first step): Start T3.6 (Quantization quality evaluation Claim C2 and thresholds) on branch `t3.6-quant-quality`.
+- Gotchas / things I learned: SmolLM2 dimensions ($K=576$ requiring 25 bits, $K=1536$ requiring 26 bits) easily fit into 32-bit signed accumulators without overflow risk; $K \ge 132105$ triggers overflow rejection.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P3 (IR, quantization, calibration)   Current task: T3.4 (done, ready for T3.5)
-- Last green commit: a6fb082    Last gate tag: gate-G2
+- Current phase: P3 (IR, quantization, calibration)   Current task: T3.5 (done, ready for T3.6)
+- Last green commit: 3ebee29    Last gate tag: gate-G2
 - Gates passed: G0, G1, G2
 
 ## Next 3 tasks
-1. T3.5 (Accumulator bound pass per rule N4)
-2. T3.6 (Quantization quality evaluation Claim C2 and thresholds)
-3. T3.7 (End-to-end compiler pipeline driver)
+1. T3.6 (Quantization quality evaluation Claim C2 and thresholds)
+2. T3.7 (End-to-end compiler pipeline driver)
+3. T3.G (Gate G3 review and verifier check)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
