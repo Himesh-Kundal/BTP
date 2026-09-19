@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
-
+ 
 ## Handoff note (rewrite at the end of every session)
-- Done this session: Phase 3 (IR, Quantization, Calibration) complete. T3.1 (IR & serialization), T3.2 (Rule N2 weight quant), T3.3 (Rule N3 activation calib), T3.4 (Rule N5 bias quant), T3.5 (Rule N4 accumulator bound check), T3.6 (Claim C2 quality evaluation across 21 configs, ADR-0001 frozen), T3.7 (compiler pipeline driver), and T3.G (Gate G3 review and Numeric checklist audit). 95 tests green. Gate G3 passed.
-- Next action (exact first step): Tag `gate-G3`, populate Phase 4 task backlog (`tasks/T4.1.md` through `tasks/T4.7.md`, `tasks/T4.G.md`), and start T4.1 (constant weights marking).
-- Gotchas / things I learned: Rule N2, N3, N4, N5 contracts verified with 100% mathematical precision; per-channel weight scaling adds zero area in hardware; worst-case dot product for K=1536 utilizes only 1.16% of INT32 capacity.
+- Done this session: T4.1 complete. Specialized constant weights in backend/constant_weights.py, enforced Invariant I3, zero runtime weight ports guaranteed, tests in test_constant_weights.py passing.
+- Next action (exact first step): Start T4.2 (matrix tiling, zero-padding, manifest generation).
+- Gotchas / things I learned: Design F interface contracts defined for both combinational cores and registered wrappers. Port audit rejects all w_* signals.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P3 (complete, ready for P4)   Current task: T3.G (done)
-- Last green commit: 07cdb3e    Last gate tag: gate-G3
+- Current phase: P4 (Specialization, Tiling, Backend F)   Current task: T4.1 (done)
+- Last green commit: 8af4847    Last gate tag: gate-G3
 - Gates passed: G0, G1, G2, G3
 
 ## Next 3 tasks
-1. T4.1 (`constant_weights.py`: mark weights CONSTANT, strip weight input notion)
-2. T4.2 (`tiling.py` + tile manifest; padding)
-3. T4.3 (`weight_encoder.py`: int8 -> Verilog literals, sparsity-aware term omission)
+1. T4.2 (`tiling.py` + tile manifest; padding)
+2. T4.3 (`weight_encoder.py`: int8 -> Verilog literals, sparsity-aware term omission)
+3. T4.4 (`verilog_codegen.py`: tile core for arbitrary `Nt x Kt`)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
