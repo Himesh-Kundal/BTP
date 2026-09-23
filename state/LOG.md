@@ -31,3 +31,4 @@
 2026-11-01 20:58 | T4.1 | specialize constant weights and port stripping | tests/test_constant_weights.py PASS (6/6), make check PASS (101/101), Invariant I3 enforced | 578a176
 2026-11-01 21:02 | T4.2 | matrix tiling, zero-padding, manifest generation | tests/test_tiling.py PASS (6/6), make check PASS (107/107), property tests green | 03166c9
 2026-11-01 21:06 | T4.3 | weight literal encoder and sparsity optimization | tests/test_weight_encoder.py PASS (7/7), make check PASS (114/114), Verilog-2001 signed conventions | d2db0ba
+2026-11-01 21:12 | T4.4 | parametric tile core codegen | tests/test_verilog_codegen.py PASS (3/3), make check PASS (117/117), iverilog and verilator lint clean | pending

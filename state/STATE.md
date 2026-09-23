@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: T4.3 complete. Implemented backend/weight_encoder.py with signed Verilog literals, zero-weight term omission, multiplier-free +-1 pass-through/negation wires, and sign-extended accumulation expressions.
-- Next action (exact first step): Start T4.4 (parametric Verilog tile core codegen).
-- Gotchas / things I learned: Verilog-2001 signed literals carry 'sd' syntax (-8'sd127). Sign-extension explicitly uses replication operator {{16{p[15]}}, p} to prevent implicit signedness conversion bugs.
+- Done this session: T4.4 complete. Implemented backend/verilog_codegen.py with parametric (Nt, Kt) tile core generator, Verilog-2001 signed conventions, zero weight ports, and clean iverilog/verilator lint.
+- Next action (exact first step): Start T4.5 (full module generator, tile instantiation, adder trees, registered wrapper, budget measurement).
+- Gotchas / things I learned: Scoped Verilator lint pragmas (/* verilator lint_save/restore */) cleanly handle unary minus in signed multiplier contexts without suppressing project-wide linting.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P4 (Specialization, Tiling, Backend F)   Current task: T4.3 (done)
-- Last green commit: d2db0ba    Last gate tag: gate-G3
+- Current phase: P4 (Specialization, Tiling, Backend F)   Current task: T4.4 (done)
+- Last green commit: 18e56c7    Last gate tag: gate-G3
 - Gates passed: G0, G1, G2, G3
 
 ## Next 3 tasks
-1. T4.4 (`verilog_codegen.py`: tile core for arbitrary `Nt x Kt`)
-2. T4.5 (`module_generator.py`: tile instantiation, adder trees, wrapper)
-3. T4.6 (`weight_audit.py`: interface conformance & weight audit)
+1. T4.5 (`module_generator.py`: tile instantiation, adder trees, wrapper, budgets)
+2. T4.6 (`weight_audit.py`: interface conformance & weight audit)
+3. T4.7 (`test_determinism.py`: RTL generation determinism)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none

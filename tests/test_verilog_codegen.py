@@ -64,10 +64,10 @@ def test_tile_core_iverilog_and_verilator_lint(tmp_path: Path):
 
     # 1. Icarus Verilog lint
     cmd_iverilog = ["iverilog", "-g2005", "-Wall", "-t", "null", str(rtl_file)]
-    res_iv = subprocess.run(cmd_iverilog, capture_output=True, text=True)
+    res_iv = subprocess.run(cmd_iverilog, check=False, capture_output=True, text=True)
     assert res_iv.returncode == 0, f"iverilog failed:\nSTDOUT: {res_iv.stdout}\nSTDERR: {res_iv.stderr}"
 
     # 2. Verilator lint
     cmd_verilator = ["verilator", "--lint-only", "-Wall", str(rtl_file)]
-    res_vl = subprocess.run(cmd_verilator, capture_output=True, text=True)
+    res_vl = subprocess.run(cmd_verilator, check=False, capture_output=True, text=True)
     assert res_vl.returncode == 0, f"verilator failed:\nSTDOUT: {res_vl.stdout}\nSTDERR: {res_vl.stderr}"
