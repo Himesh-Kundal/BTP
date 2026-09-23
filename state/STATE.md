@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: T4.2 complete. Implemented backend/tiling.py with matrix tiling, zero-padding for non-multiples, and TileManifest with SHA256 integrity hashes. Property tests green.
-- Next action (exact first step): Start T4.3 (weight literal encoder and sparsity optimization).
-- Gotchas / things I learned: Padding lanes in W and X are verified strictly 0; unpadding output channels preserves exact bit identity; full 576x576 produces 2592 tiles of 8x16.
+- Done this session: T4.3 complete. Implemented backend/weight_encoder.py with signed Verilog literals, zero-weight term omission, multiplier-free +-1 pass-through/negation wires, and sign-extended accumulation expressions.
+- Next action (exact first step): Start T4.4 (parametric Verilog tile core codegen).
+- Gotchas / things I learned: Verilog-2001 signed literals carry 'sd' syntax (-8'sd127). Sign-extension explicitly uses replication operator {{16{p[15]}}, p} to prevent implicit signedness conversion bugs.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P4 (Specialization, Tiling, Backend F)   Current task: T4.2 (done)
+- Current phase: P4 (Specialization, Tiling, Backend F)   Current task: T4.3 (done)
 - Last green commit: 03166c9    Last gate tag: gate-G3
 - Gates passed: G0, G1, G2, G3
 
 ## Next 3 tasks
-1. T4.3 (`weight_encoder.py`: int8 -> Verilog literals, sparsity-aware term omission)
-2. T4.4 (`verilog_codegen.py`: tile core for arbitrary `Nt x Kt`)
-3. T4.5 (`module_generator.py`: tile instantiation, adder trees, wrapper)
+1. T4.4 (`verilog_codegen.py`: tile core for arbitrary `Nt x Kt`)
+2. T4.5 (`module_generator.py`: tile instantiation, adder trees, wrapper)
+3. T4.6 (`weight_audit.py`: interface conformance & weight audit)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
