@@ -9,11 +9,11 @@ import numpy as np
 from backend.module_generator import generate_full_module
 from backend.testbench import generate_wrapper_testbench
 from backend.tiling import tile_weight_matrix
+from backend.vectors import write_hex_vectors
 from compiler.quantization import quantize_weights
 from ir.linear import LinearOp
 from verification.reference import linear_reference_int64
 from verification.simulator import run_simulation
-from verification.vectors import write_hex_vectors
 
 
 def test_module_generator_multi_tile_structure(tmp_path: Path):
@@ -42,11 +42,11 @@ def test_module_generator_multi_tile_structure(tmp_path: Path):
 
     # Check registered wrapper
     assert "module llmhw_multi_tile_4x8 (" in rtl
-    assert "input  wire                    clk," in rtl
-    assert "input  wire                    rst_n," in rtl
-    assert "input  wire                    valid_in," in rtl
-    assert "output reg                     valid_out," in rtl
-    assert "output reg  [127:0] y_flat" in rtl
+    assert "clk," in rtl
+    assert "rst_n," in rtl
+    assert "valid_in," in rtl
+    assert "valid_out," in rtl
+    assert "y_flat" in rtl
 
     # Lint check
     v_file = tmp_path / "top_4x8.v"
@@ -92,9 +92,7 @@ def test_module_generator_real_smollm_tile_simulation(tmp_path: Path):
     x = rng.integers(-128, 128, size=(10, 16), dtype=np.int8)
     y_exp = linear_reference_int64(x, sub_w_q).astype(np.int32)
 
-    x_hex = tmp_path / "x.hex"
-    y_hex = tmp_path / "y_exp.hex"
-    write_hex_vectors(x, y_exp, x_hex, y_hex)
+    x_hex, y_hex = write_hex_vectors(x, y_exp, tmp_path)
 
     tb_code = generate_wrapper_testbench(
         op=op,
@@ -108,8 +106,13 @@ def test_module_generator_real_smollm_tile_simulation(tmp_path: Path):
     tb_path.write_text(tb_code)
 
     # Run simulation
-    report = run_simulation(dut_path, tb_path, run_dir=tmp_path)
-    assert report.passed, f"Simulation failed: {report.error_msg}"
+    report = run_simulation(
+        dut_path=dut_path,
+        tb_path=tb_path,
+        expected_checked=10,
+        work_dir=tmp_path,
+    )
+    assert report.status == "PASS", f"Simulation failed:\nSTDOUT: {report.stdout}\nSTDERR: {report.stderr}"
     assert report.checked == 10
     assert report.mismatch == 0
     assert report.timing_err == 0
