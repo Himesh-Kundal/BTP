@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: T4.5 complete. Implemented backend/module_generator.py with complete Design F hierarchy (all tile cores, reduction adder trees over j, registered wrapper with latency L=1 and synchronous reset). Simulated real SmolLM2 8x16 tile in Icarus with zero mismatch/timing error. Measured and froze full 576x576 layer budgets.
-- Next action (exact first step): Start T4.6 (interface conformance test and weight port audit).
-- Gotchas / things I learned: 2592 tile cores for full 576x576 generate in 0.17s and 7.33MB; iverilog compiles all 224,750 lines cleanly without warnings.
+- Done this session: T4.6 complete. Implemented verification/weight_audit.py static audit engine. Verified 0 weight ports, 0 w_* signals, and 0 memory arrays on generated Design F RTL. Negative controls successfully killed injected weight ports, storage, and simulation delays.
+- Next action (exact first step): Start T4.7 (RTL generation determinism test).
+- Gotchas / things I learned: Comments must be stripped before regex audit to avoid false positives on docstrings/headers while catching all syntactically active signals.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P4 (Specialization, Tiling, Backend F)   Current task: T4.5 (done)
+- Current phase: P4 (Specialization, Tiling, Backend F)   Current task: T4.6 (done)
 - Last green commit: c252d12    Last gate tag: gate-G3
 - Gates passed: G0, G1, G2, G3
 
 ## Next 3 tasks
-1. T4.6 (`weight_audit.py`: interface conformance & weight audit)
-2. T4.7 (`test_determinism.py`: RTL generation determinism)
-3. T4.G (Gate G4 review and RTL checklist audit)
+1. T4.7 (`test_determinism.py`: RTL generation determinism)
+2. T4.G (Gate G4 review and RTL checklist audit)
+3. T5.1 (Design P baseline generator)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
