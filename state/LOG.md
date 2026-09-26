@@ -33,3 +33,4 @@
 2026-11-01 21:06 | T4.3 | weight literal encoder and sparsity optimization | tests/test_weight_encoder.py PASS (7/7), make check PASS (114/114), Verilog-2001 signed conventions | d2db0ba
 2026-11-01 21:12 | T4.4 | parametric tile core codegen | tests/test_verilog_codegen.py PASS (3/3), make check PASS (117/117), iverilog and verilator lint clean | 8745851
 2026-11-01 21:20 | T4.5 | full module generator and budgets | tests/test_module_generator.py PASS (3/3), make check PASS (120/120), real 8x16 sim PASS, 576x576 budget frozen (0.17s, 7.33MB) | c252d12
+2026-11-01 21:23 | T4.6 | interface conformance & weight audit | tests/test_interface_conformance.py PASS (6/6), make check PASS (126/126), negative controls killed | pending
