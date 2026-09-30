@@ -8,7 +8,7 @@ import numpy as np
 
 from backend.module_generator import generate_full_module
 from backend.testbench import generate_wrapper_testbench
-from backend.tiling import tile_weight_matrix
+from backend.tiling import pad_activations, tile_weight_matrix, unpad_outputs
 from backend.vectors import write_hex_vectors
 from compiler.quantization import quantize_weights
 from ir.linear import LinearOp
@@ -148,3 +148,67 @@ def test_module_generator_full_576x576_layer_benchmark(tmp_path: Path):
     cmd = ["iverilog", "-g2005", "-Wall", "-t", "null", str(out_file)]
     res = subprocess.run(cmd, check=False, capture_output=True, text=True)
     assert res.returncode == 0, f"iverilog failed on full layer:\n{res.stderr}"
+
+
+def test_module_generator_non_multiple_shape_simulation(tmp_path: Path):
+    """Simulate a non-multiple synthetic shape (N=5, K=11 with tile 4x8 -> N'=8, K'=16) in Icarus."""
+    rng = np.random.default_rng(888)
+    # N=5, K=11: padded to N'=8, K'=16
+    w = rng.integers(-127, 127, size=(5, 11), dtype=np.int8)
+
+    op = LinearOp(
+        name="non_multiple_5x11",
+        in_features=11,
+        out_features=5,
+        weight=w,
+        is_quantized=True,
+    )
+    manifest, _ = tile_weight_matrix(w, tile_n=4, tile_k=8, layer_name=op.name)
+    assert manifest.n_padded == 8
+    assert manifest.k_padded == 16
+
+    rtl = generate_full_module(op, manifest, tile_n=4, tile_k=8, latency=1)
+    dut_path = tmp_path / "dut_non_mult.v"
+    dut_path.write_text(rtl)
+
+    # 10 input vectors of dimension K=11
+    x = rng.integers(-128, 128, size=(10, 11), dtype=np.int8)
+    # Golden output on original unpadded shape
+    y_gold_unpad = linear_reference_int64(x, w).astype(np.int32)
+
+    # Pad inputs to K'=16
+    x_pad, _ = pad_activations(x, tile_k=8)
+    assert x_pad.shape == (10, 16)
+
+    # Padded expected output (N'=8)
+    w_pad = np.zeros((8, 16), dtype=np.int8)
+    w_pad[:5, :11] = w
+    y_exp_pad = linear_reference_int64(x_pad, w_pad).astype(np.int32)
+
+    # Verify unpadding property
+    np.testing.assert_array_equal(unpad_outputs(y_exp_pad, original_n=5), y_gold_unpad)
+
+    x_hex, y_hex = write_hex_vectors(x_pad, y_exp_pad, tmp_path)
+
+    tb_code = generate_wrapper_testbench(
+        op=LinearOp(name=op.name, in_features=16, out_features=8, weight=w_pad, is_quantized=True),
+        num_vectors=10,
+        x_hex_path=str(x_hex),
+        y_hex_path=str(y_hex),
+        module_name=f"llmhw_{op.name}",
+        latency=1,
+    )
+    tb_path = tmp_path / "tb_non_mult.v"
+    tb_path.write_text(tb_code)
+
+    report = run_simulation(
+        dut_path=dut_path,
+        tb_path=tb_path,
+        expected_checked=10,
+        work_dir=tmp_path,
+    )
+    assert report.status == "PASS", f"Simulation failed:\nSTDOUT: {report.stdout}\nSTDERR: {report.stderr}"
+    assert report.checked == 10
+    assert report.mismatch == 0
+    assert report.timing_err == 0
+
