@@ -46,3 +46,34 @@ def write_hex_vectors(
         f.writelines(f"{int(val) & 0xFFFFFFFF:08x}\n" for val in y_arr.flat)
 
     return x_file, y_file
+
+
+def write_weight_hex_vectors(
+    w: np.ndarray,
+    out_dir: str | Path,
+) -> Path:
+    """Write weight hex vector file for Design P loading.
+
+    Per spec docs/02 §7:
+    - w.hex: N' * K' lines, row-major, 2 hex digits per int8 (two's complement)
+
+    Args:
+        w: Weight array of shape [N', K'] in int8.
+        out_dir: Directory where w.hex will be written.
+
+    Returns:
+        Path to w.hex.
+    """
+    out_path = Path(out_dir)
+    out_path.mkdir(parents=True, exist_ok=True)
+
+    w_arr = np.asarray(w, dtype=np.int8)
+    if w_arr.ndim != 2:
+        raise ValueError(f"w must be 2D [N', K'], got shape {w_arr.shape}")
+
+    w_file = out_path / "w.hex"
+    with open(w_file, "w", encoding="utf-8") as f:
+        f.writelines(f"{int(val) & 0xFF:02x}\n" for val in w_arr.flat)
+
+    return w_file
+
