@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: Gate G4 review complete and passed. Tag `gate-G4` applied. Audited all 13 RTL review items and 5 G4 checklist criteria in `results/gates/G4.md`. Drafted `docs/walkthroughs/P4.md` addressing viva questions. Added non-multiple shape simulation in Icarus (`test_module_generator_non_multiple_shape_simulation`). Full regression suite green (130/130).
-- Next action (exact first step): Start T5.1 (Design P baseline generator with W_reg array and load port, plus P_bus variant).
-- Gotchas / things I learned: Scoped Verilator pragmas keep strict linting active while silencing benign unary negation width expansions. Zero-padding weights and inputs to tile multiples guarantees exact integer math when slicing back to original out_features.
+- Done this session: T5.1 complete. Implemented `backend/baseline_p.py` for Design P (with `W_reg` array and serial load port) and `P_bus` variant (logic-only primary bus). Verified Rule N10 width conformance against Design F and linting under iverilog, Verilator, and Yosys check -assert. Regression suite green (134/134).
+- Next action (exact first step): Start T5.2 (Testbench support for P weight-load phase with `w.hex` generation and simulation).
+- Gotchas / things I learned: TileManifest uses `n_padded` and `k_padded`. Wrapper output bus `y_flat` spans full `acc_bits * n_padded` bits per docs/02 §6 with valid_in register clock gating.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P5 (Baseline P)                              Current task: T5.1 (todo)
-- Last green commit: 7211ef0                                  Last gate tag: gate-G4
+- Current phase: P5 (Baseline P)                              Current task: T5.1 (done)
+- Last green commit: fb0b883                                  Last gate tag: gate-G4
 - Gates passed: G0, G1, G2, G3, G4
 
 ## Next 3 tasks
-1. T5.1 (Design P baseline generator with W_reg and load port, plus P_bus)
-2. T5.2 (Testbench support for P weight-load phase)
-3. T5.3 (Differential verification Y_F == Y_P == Y_ref across >= 5 shapes)
+1. T5.2 (Testbench support for P weight-load phase)
+2. T5.3 (Differential verification Y_F == Y_P == Y_ref across >= 5 shapes)
+3. T5.G (Gate G5 review)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
