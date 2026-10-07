@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: T5.1 complete. Implemented `backend/baseline_p.py` for Design P (with `W_reg` array and serial load port) and `P_bus` variant (logic-only primary bus). Verified Rule N10 width conformance against Design F and linting under iverilog, Verilator, and Yosys check -assert. Regression suite green (134/134).
-- Next action (exact first step): Start T5.2 (Testbench support for P weight-load phase with `w.hex` generation and simulation).
-- Gotchas / things I learned: TileManifest uses `n_padded` and `k_padded`. Wrapper output bus `y_flat` spans full `acc_bits * n_padded` bits per docs/02 §6 with valid_in register clock gating.
+- Done this session: T5.2 complete. Implemented `write_weight_hex_vectors` in `backend/vectors.py` and `generate_wrapper_testbench_p` in `backend/testbench.py`. Verified simulation of toy module and real SmolLM2 Layer 0 8x16 tile in Icarus with bit-exact match against INT64 reference oracle. Negative control killed. Regression suite green (138/138).
+- Next action (exact first step): Start T5.3 (Differential verification Y_F == Y_P == Y_ref across >= 5 shapes).
+- Gotchas / things I learned: Testbench checking process must synchronize to `@(negedge w_we)` then `@(posedge clk)` so it samples `y_flat` aligned with `valid_out` at latency L=1.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P5 (Baseline P)                              Current task: T5.1 (done)
-- Last green commit: fb0b883                                  Last gate tag: gate-G4
+- Current phase: P5 (Baseline P)                              Current task: T5.2 (done)
+- Last green commit: cbb115b                                  Last gate tag: gate-G4
 - Gates passed: G0, G1, G2, G3, G4
 
 ## Next 3 tasks
-1. T5.2 (Testbench support for P weight-load phase)
-2. T5.3 (Differential verification Y_F == Y_P == Y_ref across >= 5 shapes)
-3. T5.G (Gate G5 review)
+1. T5.3 (Differential verification Y_F == Y_P == Y_ref across >= 5 shapes)
+2. T5.G (Gate G5 review)
+3. T6.1 (Test-matrix generator for verification hardening)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
