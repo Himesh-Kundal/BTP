@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: Gate G5 completed and tagged `gate-G5`. Baseline Design P generator, testbench loading, and end-to-end differential verification ($Y_F == Y_P == Y_{\text{ref}}$) complete and audited. Gate report at `results/gates/G5.md`, walkthrough at `docs/walkthroughs/P5.md`. Full test suite green (144/144).
-- Next action (exact first step): Start Phase 6 (Verification Hardening) task T6.1: generate test matrix across shapes, tile sizes, weight classes, and input classes per docs/06 §A.
-- Gotchas / things I learned: generate_full_module now takes tile_n and tile_k defaults directly from manifest, ensuring non-multiple shapes seamlessly connect slice widths in both Design F and Design P.
+- Done this session: T6.1 complete. Implemented test-matrix generator in `verification/test_matrix.py` covering 8 weight classes, 6 input classes, dimension/tile grid for Level L1, and bias handling (synthetic & extreme). All 14 tests in `tests/test_test_matrix.py` pass. Full regression green (158/158).
+- Next action (exact first step): Start T6.2 (Real-layer tests: slices of all 7 types from first, middle, last layer with real captured activations).
+- Gotchas / things I learned: TestMatrixConfig requires __test__ = False to prevent pytest collection warnings when imported into test modules.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P6 (Verification Hardening)                   Current task: T6.1 (todo)
-- Last green commit: a61755b                                  Last gate tag: gate-G5
+- Current phase: P6 (Verification Hardening)                   Current task: T6.1 (done)
+- Last green commit: bef2695                                  Last gate tag: gate-G5
 - Gates passed: G0, G1, G2, G3, G4, G5
 
 ## Next 3 tasks
-1. T6.1 (Test-matrix generator for verification hardening across dimensions x tiles x weight/input classes)
-2. T6.2 (Real-layer tests across all 7 types from first, middle, last layers)
-3. T6.3 (Verilator lint -Wall clean, Verilator build/run, cross-simulator equality check)
+1. T6.2 (Real-layer tests across all 7 types from first, middle, last layers)
+2. T6.3 (Verilator lint -Wall clean, Verilator build/run, cross-simulator equality check)
+3. T6.4 (Static weight audit tool verification/weight_audit.py)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
