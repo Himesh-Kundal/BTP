@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: T6.1 complete. Implemented test-matrix generator in `verification/test_matrix.py` covering 8 weight classes, 6 input classes, dimension/tile grid for Level L1, and bias handling (synthetic & extreme). All 14 tests in `tests/test_test_matrix.py` pass. Full regression green (158/158).
-- Next action (exact first step): Start T6.2 (Real-layer tests: slices of all 7 types from first, middle, last layer with real captured activations).
-- Gotchas / things I learned: TestMatrixConfig requires __test__ = False to prevent pytest collection warnings when imported into test modules.
+- Done this session: T6.2 complete. Verified bit-exact Claim C1 across all 21 real SmolLM2-135M projection types (7 types: `q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj` at layers 0, 14, 29) on real weights and captured prompt activations, plus 3 multi-tile L3 configurations. All 24 tests pass. Full regression green (182/182 in 27.91s).
+- Next action (exact first step): Start T6.3 (Verilator lint clean, Verilator build/run, cross-simulator equality check: iverilog vs verilator).
+- Gotchas / things I learned: Loading real model weights and captured activations runs in ~2.8s across all 21 projection instances, making full real-weight verification fast enough for every make check run.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P6 (Verification Hardening)                   Current task: T6.1 (done)
-- Last green commit: bef2695                                  Last gate tag: gate-G5
+- Current phase: P6 (Verification Hardening)                   Current task: T6.2 (done)
+- Last green commit: 6d9d1ed                                  Last gate tag: gate-G5
 - Gates passed: G0, G1, G2, G3, G4, G5
 
 ## Next 3 tasks
-1. T6.2 (Real-layer tests across all 7 types from first, middle, last layers)
-2. T6.3 (Verilator lint -Wall clean, Verilator build/run, cross-simulator equality check)
-3. T6.4 (Static weight audit tool verification/weight_audit.py)
+1. T6.3 (Verilator lint -Wall clean, Verilator build/run, cross-simulator equality check)
+2. T6.4 (Static weight audit tool verification/weight_audit.py)
+3. T6.5 (Extend mutation suite to M1-M9)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
