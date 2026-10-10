@@ -1,8 +1,8 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: T5.3 complete. Implemented differential verification suite in `tests/test_differential_f_p.py` proving $Y_F == Y_P == Y_{\text{ref}}$ across 5 distinct matrix/tile geometries (toy 1x3, square 8x8, rectangular 16x32, non-multiple 5x11, and real SmolLM2 Layer 0 8x16 tile) with 0 bit errors. Negative control killed. Regression suite green (144/144).
-- Next action (exact first step): Start T5.G (Gate G5 review: audit G5 checklist items, draft results/gates/G5.md and docs/walkthroughs/P5.md, tag gate-G5).
+- Done this session: Gate G5 completed and tagged `gate-G5`. Baseline Design P generator, testbench loading, and end-to-end differential verification ($Y_F == Y_P == Y_{\text{ref}}$) complete and audited. Gate report at `results/gates/G5.md`, walkthrough at `docs/walkthroughs/P5.md`. Full test suite green (144/144).
+- Next action (exact first step): Start Phase 6 (Verification Hardening) task T6.1: generate test matrix across shapes, tile sizes, weight classes, and input classes per docs/06 §A.
 - Gotchas / things I learned: generate_full_module now takes tile_n and tile_k defaults directly from manifest, ensuring non-multiple shapes seamlessly connect slice widths in both Design F and Design P.
 
 ## Project
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P5 (Baseline P)                              Current task: T5.3 (done)
-- Last green commit: afc7284                                  Last gate tag: gate-G4
-- Gates passed: G0, G1, G2, G3, G4
+- Current phase: P6 (Verification Hardening)                   Current task: T6.1 (todo)
+- Last green commit: a61755b                                  Last gate tag: gate-G5
+- Gates passed: G0, G1, G2, G3, G4, G5
 
 ## Next 3 tasks
-1. T5.G (Gate G5 review and verification pass)
-2. T6.1 (Test-matrix generator for verification hardening)
-3. T6.2 (Real-layer tests across all 7 types)
+1. T6.1 (Test-matrix generator for verification hardening across dimensions x tiles x weight/input classes)
+2. T6.2 (Real-layer tests across all 7 types from first, middle, last layers)
+3. T6.3 (Verilator lint -Wall clean, Verilator build/run, cross-simulator equality check)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none

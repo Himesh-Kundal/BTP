@@ -39,3 +39,4 @@
 2026-11-01 21:40 | T5.1 | Design P baseline generator (W_reg & P_bus) | tests/test_baseline_p.py PASS (4/4), make check PASS (134/134), Rule N10 verified | fb0b883
 2026-11-01 21:47 | T5.2 | Testbench support for Design P weight loading | tests/test_testbench_p.py PASS (4/4), make check PASS (138/138), w.hex and sim verified | cbb115b
 2026-11-01 21:53 | T5.3 | Differential verification Y_F == Y_P == Y_ref across 5 shapes | tests/test_differential_f_p.py PASS (6/6), make check PASS (144/144) | afc7284
+2026-11-01 21:57 | T5.G | Gate G5 review, Phase 5 walkthrough, tag gate-G5 | results/gates/G5.md PASS, docs/walkthroughs/P5.md, tag gate-G5, make check 144/144 | a61755b
