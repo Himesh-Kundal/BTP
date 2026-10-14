@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: T6.2 complete. Verified bit-exact Claim C1 across all 21 real SmolLM2-135M projection types (7 types: `q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj` at layers 0, 14, 29) on real weights and captured prompt activations, plus 3 multi-tile L3 configurations. All 24 tests pass. Full regression green (182/182 in 27.91s).
-- Next action (exact first step): Start T6.3 (Verilator lint clean, Verilator build/run, cross-simulator equality check: iverilog vs verilator).
-- Gotchas / things I learned: Loading real model weights and captured activations runs in ~2.8s across all 21 projection instances, making full real-weight verification fast enough for every make check run.
+- Done this session: T6.3 complete. Implemented `lint_verilator` and `run_verilator_simulation` using Verilator 5.032 `--binary` mode. Verified Design F, P, and P_bus pass `verilator --lint-only -Wall` cleanly. Proved cross-simulator equality ($Y_{\text{iverilog}} == Y_{\text{verilator}} == Y_{\text{ref\_int64}}$) across square, rectangular, and non-multiple shapes and real SmolLM2 Layer 0 `q_proj` slice. Negative control killed. Full regression green (189/189 in 56.29s).
+- Next action (exact first step): Start T6.4 (Static weight audit tool `verification/weight_audit.py`: parse RTL constants, compare against $W_q$ and SHA256, verify negative control on injected changes).
+- Gotchas / things I learned: Verilator 5.032 --binary compiles Verilog-2001 testbenches directly into native binaries without custom C++ wrappers.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P6 (Verification Hardening)                   Current task: T6.2 (done)
-- Last green commit: 6d9d1ed                                  Last gate tag: gate-G5
+- Current phase: P6 (Verification Hardening)                   Current task: T6.3 (done)
+- Last green commit: 9359666                                  Last gate tag: gate-G5
 - Gates passed: G0, G1, G2, G3, G4, G5
 
 ## Next 3 tasks
-1. T6.3 (Verilator lint -Wall clean, Verilator build/run, cross-simulator equality check)
-2. T6.4 (Static weight audit tool verification/weight_audit.py)
-3. T6.5 (Extend mutation suite to M1-M9)
+1. T6.4 (Static weight audit tool verification/weight_audit.py)
+2. T6.5 (Extend mutation suite to M1-M9)
+3. T6.6 (Regression runner and results/regression.json)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
