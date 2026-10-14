@@ -43,3 +43,4 @@
 2026-11-01 22:05 | T6.1 | Test-matrix generator across dims, tiles, weights, inputs | tests/test_test_matrix.py PASS (14/14), make check PASS (158/158), C1 verified | bef2695
 2026-11-01 22:09 | T6.2 | Real-layer tests across 7 types at layers 0, 14, 29 | tests/test_real_layer_verification.py PASS (24/24), make check PASS (182/182) | 6d9d1ed
 2026-11-01 22:15 | T6.3 | Verilator runner and cross-simulator equality check | tests/test_cross_simulator.py PASS (7/7), make check PASS (189/189), Y_iv==Y_vl | 9359666
+2026-11-01 22:21 | T6.4 | Static weight audit tool and constant parser | tests/test_weight_audit.py PASS (7/7), make check PASS (196/196), 100% neg killed | 9971c80

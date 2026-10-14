@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: T6.3 complete. Implemented `lint_verilator` and `run_verilator_simulation` using Verilator 5.032 `--binary` mode. Verified Design F, P, and P_bus pass `verilator --lint-only -Wall` cleanly. Proved cross-simulator equality ($Y_{\text{iverilog}} == Y_{\text{verilator}} == Y_{\text{ref\_int64}}$) across square, rectangular, and non-multiple shapes and real SmolLM2 Layer 0 `q_proj` slice. Negative control killed. Full regression green (189/189 in 56.29s).
-- Next action (exact first step): Start T6.4 (Static weight audit tool `verification/weight_audit.py`: parse RTL constants, compare against $W_q$ and SHA256, verify negative control on injected changes).
-- Gotchas / things I learned: Verilator 5.032 --binary compiles Verilog-2001 testbenches directly into native binaries without custom C++ wrappers.
+- Done this session: T6.4 complete. Implemented static weight parser and integrity auditor `verification/weight_audit.py` (`parse_rtl_weights` and `audit_weights_match`). Statically extracts $W_{\text{RTL}}$ from generated tile modules and single-module cores, validates bit-for-bit against $W_q$ and SHA256 manifest hash. 100% of negative control mutations killed. Full regression green (196/196 in 53.22s).
+- Next action (exact first step): Start T6.5 (Extend mutation suite to M1–M9 per docs/06 §A6, verify 100% kill rate, save results/mutation_matrix.json).
+- Gotchas / things I learned: Static parsing of constant-coefficient wire expressions provides an independent, instantaneous audit vector that directly proves Invariant I3.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P6 (Verification Hardening)                   Current task: T6.3 (done)
-- Last green commit: 9359666                                  Last gate tag: gate-G5
+- Current phase: P6 (Verification Hardening)                   Current task: T6.4 (done)
+- Last green commit: 9971c80                                  Last gate tag: gate-G5
 - Gates passed: G0, G1, G2, G3, G4, G5
 
 ## Next 3 tasks
-1. T6.4 (Static weight audit tool verification/weight_audit.py)
-2. T6.5 (Extend mutation suite to M1-M9)
-3. T6.6 (Regression runner and results/regression.json)
+1. T6.5 (Extend mutation suite to M1-M9 and kill matrix)
+2. T6.6 (Regression runner and results/regression.json)
+3. T6.7 (Waveform walkthrough docs/walkthroughs/waveforms.md)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
