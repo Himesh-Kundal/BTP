@@ -45,3 +45,4 @@
 2026-11-01 22:15 | T6.3 | Verilator runner and cross-simulator equality check | tests/test_cross_simulator.py PASS (7/7), make check PASS (189/189), Y_iv==Y_vl | 9359666
 2026-11-01 22:21 | T6.4 | Static weight audit tool and constant parser | tests/test_weight_audit.py PASS (7/7), make check PASS (196/196), 100% neg killed | 9971c80
 2026-11-01 22:26 | T6.5 | Mutation suite extension (M1-M9) & kill matrix | tests/test_mutation_hardening.py PASS (2/2), 100% kill rate (9/9), results/mutation_matrix.json | be622c6
+2026-11-01 22:46 | T6.6 | Standalone regression runner & results/regression.json | make regression PASS (124/124), make check PASS (200/200), budget 22.2s frozen | 11a37b6

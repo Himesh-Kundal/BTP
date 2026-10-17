@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: T6.5 complete. Extended mutation suite to cover all 9 fault injection categories M1–M9 per docs/06 §A6. Proved 100% kill rate (9/9 killed, 0 survivors) across timing, functional, arithmetic, and padding mutants. Generated `results/mutation_matrix.json`. Full test suite green (198/198 in 54.46s).
-- Next action (exact first step): Start T6.6 (Implement regression runner `verification/regression_runner.py` and `results/regression.json`, add `make regression`).
-- Gotchas / things I learned: M9 timing fault is killed specifically by testbench monitor timing checks (`TIMING_ERR=14`), proving testbench asserts cycle-level protocol conformance. M4 (lane swap) requires one-hot vectors to catch.
+- Done this session: T6.6 complete. Implemented standalone regression runner `verification/regression_runner.py` and `results/regression.json`. Executed full verification hardening matrix (7 suites, 124 tests, 853 vectors checked) cleanly in 22.23s via `make regression`. Proved Golden Rule 5 compliance (0 torch imports, 0 hardcoded model strings). Full regression and test suite green (`make regression` 124/124, `make check` 200/200).
+- Next action (exact first step): Start T6.7 (Waveform walkthrough with VCD dumps for passing and deliberately failing cases in `docs/walkthroughs/waveforms.md`).
+- Gotchas / things I learned: Verilator compilation dominates cross-sim runtime; non-multiple shapes require padded activations when driving testbench vectors; `gpg-preset-passphrase` with `allow-preset-passphrase` in `~/.gnupg/gpg-agent.conf` cleanly handles signed git commits.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P6 (Verification Hardening)                   Current task: T6.5 (done)
-- Last green commit: d8715f5                                  Last gate tag: gate-G5
+- Current phase: P6 (Verification Hardening)                   Current task: T6.6 (done)
+- Last green commit: cdee52c                                  Last gate tag: gate-G5
 - Gates passed: G0, G1, G2, G3, G4, G5
 
 ## Next 3 tasks
-1. T6.6 (Regression runner and results/regression.json)
-2. T6.7 (Waveform walkthrough docs/walkthroughs/waveforms.md)
-3. T6.G (Gate G6 review and Phase 6 walkthrough)
+1. T6.7 (Waveform walkthrough docs/walkthroughs/waveforms.md)
+2. T6.G (Gate G6 review, G6.md report, Phase 6 walkthrough P6.md, tag gate-G6)
+3. T7.1 (Yosys synthesis flow scripts for Design F and Design P)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
@@ -45,7 +45,7 @@
 - Model: SmolLM2-135M, revision pinned
 
 ## Budgets (filled when measured; frozen after)
-- `make check` runtime: ~25.0s      `make regression` runtime: TBD
+- `make check` runtime: ~97s (full pytest suite)      `make regression` runtime: 22.2s [FROZEN T6.6]
 - Full 576×576 layer generation time / RTL size: 0.168s / 7.33 MB (224,750 lines) [FROZEN T4.5]
 - Synthesis timeout per run: <s>
 
