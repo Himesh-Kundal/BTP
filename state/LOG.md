@@ -44,3 +44,4 @@
 2026-11-01 22:09 | T6.2 | Real-layer tests across 7 types at layers 0, 14, 29 | tests/test_real_layer_verification.py PASS (24/24), make check PASS (182/182) | 6d9d1ed
 2026-11-01 22:15 | T6.3 | Verilator runner and cross-simulator equality check | tests/test_cross_simulator.py PASS (7/7), make check PASS (189/189), Y_iv==Y_vl | 9359666
 2026-11-01 22:21 | T6.4 | Static weight audit tool and constant parser | tests/test_weight_audit.py PASS (7/7), make check PASS (196/196), 100% neg killed | 9971c80
+2026-11-01 22:26 | T6.5 | Mutation suite extension (M1-M9) & kill matrix | tests/test_mutation_hardening.py PASS (2/2), 100% kill rate (9/9), results/mutation_matrix.json | be622c6

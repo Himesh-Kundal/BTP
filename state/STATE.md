@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: T6.4 complete. Implemented static weight parser and integrity auditor `verification/weight_audit.py` (`parse_rtl_weights` and `audit_weights_match`). Statically extracts $W_{\text{RTL}}$ from generated tile modules and single-module cores, validates bit-for-bit against $W_q$ and SHA256 manifest hash. 100% of negative control mutations killed. Full regression green (196/196 in 53.22s).
-- Next action (exact first step): Start T6.5 (Extend mutation suite to M1–M9 per docs/06 §A6, verify 100% kill rate, save results/mutation_matrix.json).
-- Gotchas / things I learned: Static parsing of constant-coefficient wire expressions provides an independent, instantaneous audit vector that directly proves Invariant I3.
+- Done this session: T6.5 complete. Extended mutation suite to cover all 9 fault injection categories M1–M9 per docs/06 §A6. Proved 100% kill rate (9/9 killed, 0 survivors) across timing, functional, arithmetic, and padding mutants. Generated `results/mutation_matrix.json`. Full test suite green (198/198 in 54.46s).
+- Next action (exact first step): Start T6.6 (Implement regression runner `verification/regression_runner.py` and `results/regression.json`, add `make regression`).
+- Gotchas / things I learned: M9 timing fault is killed specifically by testbench monitor timing checks (`TIMING_ERR=14`), proving testbench asserts cycle-level protocol conformance. M4 (lane swap) requires one-hot vectors to catch.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P6 (Verification Hardening)                   Current task: T6.4 (done)
-- Last green commit: 9971c80                                  Last gate tag: gate-G5
+- Current phase: P6 (Verification Hardening)                   Current task: T6.5 (done)
+- Last green commit: d8715f5                                  Last gate tag: gate-G5
 - Gates passed: G0, G1, G2, G3, G4, G5
 
 ## Next 3 tasks
-1. T6.5 (Extend mutation suite to M1-M9 and kill matrix)
-2. T6.6 (Regression runner and results/regression.json)
-3. T6.7 (Waveform walkthrough docs/walkthroughs/waveforms.md)
+1. T6.6 (Regression runner and results/regression.json)
+2. T6.7 (Waveform walkthrough docs/walkthroughs/waveforms.md)
+3. T6.G (Gate G6 review and Phase 6 walkthrough)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
