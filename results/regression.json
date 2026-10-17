@@ -1,0 +1,1227 @@
+{
+  "metadata": {
+    "git_commit": "90c928f90e3b975b2da712cd65bd513b0750af0f",
+    "git_branch": "t6.6-regression-runner",
+    "timestamp": "2026-11-01T17:12:08.074848+00:00",
+    "platform": "Linux-6.12.111+deb13-amd64-x86_64-with-glibc2.41",
+    "tools": {
+      "python": "3.13.5",
+      "numpy": "2.5.4",
+      "iverilog": "Icarus Verilog version 12.0 (stable) ()",
+      "verilator": "Verilator 5.032 2025-01-01 rev (Debian 5.032-1+b2)",
+      "yosys": "Yosys 0.52 (git sha1 fee39a3284c90249e1d9684cf6944ffbbcbb8f90)"
+    },
+    "fast_mode": false
+  },
+  "summary": {
+    "status": "PASS",
+    "total_suites": 7,
+    "total_tests": 124,
+    "passed_tests": 124,
+    "failed_tests": 0,
+    "total_vectors_checked": 853,
+    "wall_time_seconds": 22.23
+  },
+  "suites": [
+    {
+      "name": "L0_toy",
+      "description": "Level L0 toy combinational and registered cores",
+      "status": "PASS",
+      "tests_run": 2,
+      "passed": 2,
+      "failed": 0,
+      "vectors_checked": 7,
+      "duration_seconds": 0.022732019424438477,
+      "cases": [
+        {
+          "name": "toy_1x3_combinational",
+          "status": "PASS",
+          "checked": 4,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.011285066604614258,
+          "details": ""
+        },
+        {
+          "name": "reg_2x4_wrapper",
+          "status": "PASS",
+          "checked": 3,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.01143503189086914,
+          "details": ""
+        }
+      ]
+    },
+    {
+      "name": "L1_synthetic",
+      "description": "Level L1 synthetic dimensions, tile grids, weight and input classes",
+      "status": "PASS",
+      "tests_run": 81,
+      "passed": 81,
+      "failed": 0,
+      "vectors_checked": 539,
+      "duration_seconds": 3.7728822231292725,
+      "cases": [
+        {
+          "name": "n1_k1_t1x1_uniform_random_class1_random_int8_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.014503002166748047,
+          "details": ""
+        },
+        {
+          "name": "n1_k1_t4x16_all_zero_class1_random_int8_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.010389328002929688,
+          "details": ""
+        },
+        {
+          "name": "n1_k1_t8x16_uniform_random_class1_random_int8_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.009624719619750977,
+          "details": ""
+        },
+        {
+          "name": "n1_k1_t8x8_uniform_random_class1_random_int8_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.011527538299560547,
+          "details": ""
+        },
+        {
+          "name": "n1_k5_t1x1_all_zero_class3_extremes_none",
+          "status": "PASS",
+          "checked": 3,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.010967731475830078,
+          "details": ""
+        },
+        {
+          "name": "n1_k5_t4x16_uniform_random_class3_extremes_none",
+          "status": "PASS",
+          "checked": 3,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.011659860610961914,
+          "details": ""
+        },
+        {
+          "name": "n1_k5_t8x16_all_zero_class3_extremes_none",
+          "status": "PASS",
+          "checked": 3,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.011269569396972656,
+          "details": ""
+        },
+        {
+          "name": "n1_k5_t8x8_all_zero_class3_extremes_none",
+          "status": "PASS",
+          "checked": 3,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.011909246444702148,
+          "details": ""
+        },
+        {
+          "name": "n1_k16_t4x16_extremes_alt_class4_one_hot_none",
+          "status": "PASS",
+          "checked": 16,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.013904809951782227,
+          "details": ""
+        },
+        {
+          "name": "n1_k16_t8x16_near_gaussian_class4_one_hot_none",
+          "status": "PASS",
+          "checked": 16,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.016347408294677734,
+          "details": ""
+        },
+        {
+          "name": "n1_k16_t8x8_near_gaussian_class4_one_hot_none",
+          "status": "PASS",
+          "checked": 16,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.013973236083984375,
+          "details": ""
+        },
+        {
+          "name": "n1_k17_t4x16_all_zero_class3_extremes_none",
+          "status": "PASS",
+          "checked": 3,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.012630462646484375,
+          "details": ""
+        },
+        {
+          "name": "n1_k17_t8x16_uniform_random_class3_extremes_none",
+          "status": "PASS",
+          "checked": 3,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.02296757698059082,
+          "details": ""
+        },
+        {
+          "name": "n1_k17_t8x8_uniform_random_class3_extremes_none",
+          "status": "PASS",
+          "checked": 3,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.01918816566467285,
+          "details": ""
+        },
+        {
+          "name": "n1_k33_t4x16_all_zero_class5_worst_case_none",
+          "status": "PASS",
+          "checked": 2,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.011716842651367188,
+          "details": ""
+        },
+        {
+          "name": "n1_k33_t8x16_uniform_random_class5_worst_case_none",
+          "status": "PASS",
+          "checked": 2,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.027475357055664062,
+          "details": ""
+        },
+        {
+          "name": "n1_k33_t8x8_uniform_random_class5_worst_case_none",
+          "status": "PASS",
+          "checked": 2,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.029278039932250977,
+          "details": ""
+        },
+        {
+          "name": "n3_k1_t1x1_sparse_random_class3_extremes_synthetic",
+          "status": "PASS",
+          "checked": 3,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.01612067222595215,
+          "details": ""
+        },
+        {
+          "name": "n3_k1_t4x16_extremes_neg_class3_extremes_synthetic",
+          "status": "PASS",
+          "checked": 3,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.011734485626220703,
+          "details": ""
+        },
+        {
+          "name": "n3_k1_t8x16_sparse_random_class3_extremes_synthetic",
+          "status": "PASS",
+          "checked": 3,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.010582923889160156,
+          "details": ""
+        },
+        {
+          "name": "n3_k1_t8x8_sparse_random_class3_extremes_synthetic",
+          "status": "PASS",
+          "checked": 3,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.010528802871704102,
+          "details": ""
+        },
+        {
+          "name": "n3_k5_t1x1_extremes_neg_class5_worst_case_synthetic",
+          "status": "PASS",
+          "checked": 6,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.014512062072753906,
+          "details": ""
+        },
+        {
+          "name": "n3_k5_t4x16_sparse_random_class5_worst_case_synthetic",
+          "status": "PASS",
+          "checked": 6,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.011350631713867188,
+          "details": ""
+        },
+        {
+          "name": "n3_k5_t8x16_extremes_neg_class5_worst_case_synthetic",
+          "status": "PASS",
+          "checked": 6,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.02299666404724121,
+          "details": ""
+        },
+        {
+          "name": "n3_k5_t8x8_extremes_neg_class5_worst_case_synthetic",
+          "status": "PASS",
+          "checked": 6,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.025087833404541016,
+          "details": ""
+        },
+        {
+          "name": "n3_k16_t4x16_extremes_pos_class6_alternating_sparse_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.02556586265563965,
+          "details": ""
+        },
+        {
+          "name": "n3_k16_t8x16_single_nonzero_class6_alternating_sparse_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.013564586639404297,
+          "details": ""
+        },
+        {
+          "name": "n3_k16_t8x8_single_nonzero_class6_alternating_sparse_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.018979549407958984,
+          "details": ""
+        },
+        {
+          "name": "n3_k17_t4x16_extremes_neg_class5_worst_case_synthetic",
+          "status": "PASS",
+          "checked": 6,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.044200897216796875,
+          "details": ""
+        },
+        {
+          "name": "n3_k17_t8x16_sparse_random_class5_worst_case_synthetic",
+          "status": "PASS",
+          "checked": 6,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.024840831756591797,
+          "details": ""
+        },
+        {
+          "name": "n3_k17_t8x8_sparse_random_class5_worst_case_synthetic",
+          "status": "PASS",
+          "checked": 6,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.022091150283813477,
+          "details": ""
+        },
+        {
+          "name": "n3_k33_t4x16_extremes_neg_class1_random_int8_synthetic",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.05567812919616699,
+          "details": ""
+        },
+        {
+          "name": "n3_k33_t8x16_sparse_random_class1_random_int8_synthetic",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.021685361862182617,
+          "details": ""
+        },
+        {
+          "name": "n3_k33_t8x8_sparse_random_class1_random_int8_synthetic",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.02114558219909668,
+          "details": ""
+        },
+        {
+          "name": "n4_k1_t1x1_single_nonzero_class4_one_hot_none",
+          "status": "PASS",
+          "checked": 1,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.01016545295715332,
+          "details": ""
+        },
+        {
+          "name": "n4_k1_t4x16_extremes_pos_class4_one_hot_none",
+          "status": "PASS",
+          "checked": 1,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.013266801834106445,
+          "details": ""
+        },
+        {
+          "name": "n4_k1_t8x16_single_nonzero_class4_one_hot_none",
+          "status": "PASS",
+          "checked": 1,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.012464523315429688,
+          "details": ""
+        },
+        {
+          "name": "n4_k1_t8x8_single_nonzero_class4_one_hot_none",
+          "status": "PASS",
+          "checked": 1,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.010701656341552734,
+          "details": ""
+        },
+        {
+          "name": "n4_k5_t1x1_extremes_pos_class6_alternating_sparse_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.01648855209350586,
+          "details": ""
+        },
+        {
+          "name": "n4_k5_t4x16_single_nonzero_class6_alternating_sparse_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.013357877731323242,
+          "details": ""
+        },
+        {
+          "name": "n4_k5_t8x16_extremes_pos_class6_alternating_sparse_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.022243738174438477,
+          "details": ""
+        },
+        {
+          "name": "n4_k5_t8x8_extremes_pos_class6_alternating_sparse_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.02042388916015625,
+          "details": ""
+        },
+        {
+          "name": "n4_k16_t4x16_uniform_random_class1_random_int8_synthetic",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.04718446731567383,
+          "details": ""
+        },
+        {
+          "name": "n4_k16_t8x16_all_zero_class1_random_int8_synthetic",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.015008926391601562,
+          "details": ""
+        },
+        {
+          "name": "n4_k16_t8x8_all_zero_class1_random_int8_synthetic",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.025675535202026367,
+          "details": ""
+        },
+        {
+          "name": "n4_k17_t4x16_extremes_pos_class6_alternating_sparse_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.05236244201660156,
+          "details": ""
+        },
+        {
+          "name": "n4_k17_t8x16_single_nonzero_class6_alternating_sparse_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.016071081161499023,
+          "details": ""
+        },
+        {
+          "name": "n4_k17_t8x8_single_nonzero_class6_alternating_sparse_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.029536008834838867,
+          "details": ""
+        },
+        {
+          "name": "n4_k33_t4x16_extremes_pos_class2_quant_range_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.06081104278564453,
+          "details": ""
+        },
+        {
+          "name": "n4_k33_t8x16_single_nonzero_class2_quant_range_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.012810945510864258,
+          "details": ""
+        },
+        {
+          "name": "n4_k33_t8x8_single_nonzero_class2_quant_range_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.0200350284576416,
+          "details": ""
+        },
+        {
+          "name": "n8_k1_t4x16_single_nonzero_class2_quant_range_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.023031234741210938,
+          "details": ""
+        },
+        {
+          "name": "n8_k1_t8x16_extremes_pos_class2_quant_range_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.037870168685913086,
+          "details": ""
+        },
+        {
+          "name": "n8_k1_t8x8_extremes_pos_class2_quant_range_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.038451194763183594,
+          "details": ""
+        },
+        {
+          "name": "n8_k5_t4x16_extremes_pos_class4_one_hot_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.03676962852478027,
+          "details": ""
+        },
+        {
+          "name": "n8_k5_t8x16_single_nonzero_class4_one_hot_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.026302337646484375,
+          "details": ""
+        },
+        {
+          "name": "n8_k5_t8x8_single_nonzero_class4_one_hot_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.0201718807220459,
+          "details": ""
+        },
+        {
+          "name": "n8_k16_t4x16_all_zero_class5_worst_case_synthetic",
+          "status": "PASS",
+          "checked": 16,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.026813507080078125,
+          "details": ""
+        },
+        {
+          "name": "n8_k16_t8x16_uniform_random_class5_worst_case_synthetic",
+          "status": "PASS",
+          "checked": 16,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.3186948299407959,
+          "details": ""
+        },
+        {
+          "name": "n8_k16_t8x8_uniform_random_class5_worst_case_synthetic",
+          "status": "PASS",
+          "checked": 16,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.28255438804626465,
+          "details": ""
+        },
+        {
+          "name": "n8_k17_t4x16_single_nonzero_class4_one_hot_none",
+          "status": "PASS",
+          "checked": 17,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.015230655670166016,
+          "details": ""
+        },
+        {
+          "name": "n8_k17_t8x16_extremes_pos_class4_one_hot_none",
+          "status": "PASS",
+          "checked": 17,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.04198026657104492,
+          "details": ""
+        },
+        {
+          "name": "n8_k17_t8x8_extremes_pos_class4_one_hot_none",
+          "status": "PASS",
+          "checked": 17,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.03615617752075195,
+          "details": ""
+        },
+        {
+          "name": "n8_k33_t4x16_single_nonzero_class6_alternating_sparse_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.015018224716186523,
+          "details": ""
+        },
+        {
+          "name": "n8_k33_t8x16_extremes_pos_class6_alternating_sparse_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.14832687377929688,
+          "details": ""
+        },
+        {
+          "name": "n8_k33_t8x8_extremes_pos_class6_alternating_sparse_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.15447330474853516,
+          "details": ""
+        },
+        {
+          "name": "n9_k1_t4x16_all_zero_class3_extremes_none",
+          "status": "PASS",
+          "checked": 3,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.01383066177368164,
+          "details": ""
+        },
+        {
+          "name": "n9_k1_t8x16_uniform_random_class3_extremes_none",
+          "status": "PASS",
+          "checked": 3,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.03156638145446777,
+          "details": ""
+        },
+        {
+          "name": "n9_k1_t8x8_uniform_random_class3_extremes_none",
+          "status": "PASS",
+          "checked": 3,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.023926973342895508,
+          "details": ""
+        },
+        {
+          "name": "n9_k5_t4x16_uniform_random_class5_worst_case_none",
+          "status": "PASS",
+          "checked": 18,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.0435490608215332,
+          "details": ""
+        },
+        {
+          "name": "n9_k5_t8x16_all_zero_class5_worst_case_none",
+          "status": "PASS",
+          "checked": 18,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.01028752326965332,
+          "details": ""
+        },
+        {
+          "name": "n9_k5_t8x8_all_zero_class5_worst_case_none",
+          "status": "PASS",
+          "checked": 18,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.016787290573120117,
+          "details": ""
+        },
+        {
+          "name": "n9_k16_t4x16_extremes_alt_class6_alternating_sparse_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.06299710273742676,
+          "details": ""
+        },
+        {
+          "name": "n9_k16_t8x16_near_gaussian_class6_alternating_sparse_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.10135245323181152,
+          "details": ""
+        },
+        {
+          "name": "n9_k16_t8x8_near_gaussian_class6_alternating_sparse_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.09466171264648438,
+          "details": ""
+        },
+        {
+          "name": "n9_k17_t4x16_all_zero_class5_worst_case_none",
+          "status": "PASS",
+          "checked": 18,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.016570329666137695,
+          "details": ""
+        },
+        {
+          "name": "n9_k17_t8x16_uniform_random_class5_worst_case_none",
+          "status": "PASS",
+          "checked": 18,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.40573716163635254,
+          "details": ""
+        },
+        {
+          "name": "n9_k17_t8x8_uniform_random_class5_worst_case_none",
+          "status": "PASS",
+          "checked": 18,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.303966760635376,
+          "details": ""
+        },
+        {
+          "name": "n9_k33_t4x16_all_zero_class1_random_int8_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.014806747436523438,
+          "details": ""
+        },
+        {
+          "name": "n9_k33_t8x16_uniform_random_class1_random_int8_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.19089555740356445,
+          "details": ""
+        },
+        {
+          "name": "n9_k33_t8x8_uniform_random_class1_random_int8_none",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.1909945011138916,
+          "details": ""
+        }
+      ]
+    },
+    {
+      "name": "L2_real_tiles",
+      "description": "Level L2 8x16 real model tiles across 7 projection types and 3 depths",
+      "status": "PASS",
+      "tests_run": 21,
+      "passed": 21,
+      "failed": 0,
+      "vectors_checked": 105,
+      "duration_seconds": 1.7331573963165283,
+      "cases": [
+        {
+          "name": "L0_q_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.09573245048522949,
+          "details": ""
+        },
+        {
+          "name": "L0_k_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.09021592140197754,
+          "details": ""
+        },
+        {
+          "name": "L0_v_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.08215832710266113,
+          "details": ""
+        },
+        {
+          "name": "L0_o_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.06332659721374512,
+          "details": ""
+        },
+        {
+          "name": "L0_gate_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.12336087226867676,
+          "details": ""
+        },
+        {
+          "name": "L0_up_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.10937929153442383,
+          "details": ""
+        },
+        {
+          "name": "L0_down_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.06587481498718262,
+          "details": ""
+        },
+        {
+          "name": "L14_q_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.06697225570678711,
+          "details": ""
+        },
+        {
+          "name": "L14_k_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.0749199390411377,
+          "details": ""
+        },
+        {
+          "name": "L14_v_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.06429028511047363,
+          "details": ""
+        },
+        {
+          "name": "L14_o_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.06955862045288086,
+          "details": ""
+        },
+        {
+          "name": "L14_gate_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.0816185474395752,
+          "details": ""
+        },
+        {
+          "name": "L14_up_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.09020495414733887,
+          "details": ""
+        },
+        {
+          "name": "L14_down_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.07128214836120605,
+          "details": ""
+        },
+        {
+          "name": "L29_q_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.10630249977111816,
+          "details": ""
+        },
+        {
+          "name": "L29_k_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.09832167625427246,
+          "details": ""
+        },
+        {
+          "name": "L29_v_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.0959625244140625,
+          "details": ""
+        },
+        {
+          "name": "L29_o_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.07523584365844727,
+          "details": ""
+        },
+        {
+          "name": "L29_gate_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.0818488597869873,
+          "details": ""
+        },
+        {
+          "name": "L29_up_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.08410954475402832,
+          "details": ""
+        },
+        {
+          "name": "L29_down_proj",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.04240274429321289,
+          "details": ""
+        }
+      ]
+    },
+    {
+      "name": "L3_real_multi_tile",
+      "description": "Level L3 16x32 multi-tile slices (2x2 grid) across 3 depths",
+      "status": "PASS",
+      "tests_run": 3,
+      "passed": 3,
+      "failed": 0,
+      "vectors_checked": 15,
+      "duration_seconds": 0.7474818229675293,
+      "cases": [
+        {
+          "name": "L0_q_proj_multi",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.3107006549835205,
+          "details": ""
+        },
+        {
+          "name": "L14_gate_proj_multi",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.31055283546447754,
+          "details": ""
+        },
+        {
+          "name": "L29_down_proj_multi",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.12621307373046875,
+          "details": ""
+        }
+      ]
+    },
+    {
+      "name": "Cross_Simulator",
+      "description": "Verilator lint clean and Icarus vs Verilator cross-simulator equality",
+      "status": "PASS",
+      "tests_run": 4,
+      "passed": 4,
+      "failed": 0,
+      "vectors_checked": 10,
+      "duration_seconds": 15.739901065826416,
+      "cases": [
+        {
+          "name": "verilator_lint_wall_clean",
+          "status": "PASS",
+          "checked": 0,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.15281152725219727,
+          "details": "Design F, P, P_bus pass verilator --lint-only -Wall"
+        },
+        {
+          "name": "cross_sim_square_4x4",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 5.126221418380737,
+          "details": "iverilog=PASS, verilator=PASS"
+        },
+        {
+          "name": "cross_sim_non_multiple_3x5",
+          "status": "PASS",
+          "checked": 5,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 5.2657248973846436,
+          "details": "iverilog=PASS, verilator=PASS"
+        },
+        {
+          "name": "verilator_negative_control",
+          "status": "PASS",
+          "checked": 0,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 5.19511342048645,
+          "details": "Negative control correctly failed (mismatches=20)"
+        }
+      ]
+    },
+    {
+      "name": "Weight_Audit",
+      "description": "Static RTL constant parser vs W_q, manifest hash, and negative controls",
+      "status": "PASS",
+      "tests_run": 4,
+      "passed": 4,
+      "failed": 0,
+      "vectors_checked": 163,
+      "duration_seconds": 0.009431838989257812,
+      "cases": [
+        {
+          "name": "audit_toy_1x3",
+          "status": "PASS",
+          "checked": 3,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.0008673667907714844,
+          "details": "Bit-exact match on 1x3 toy core"
+        },
+        {
+          "name": "audit_multi_tile_4x8",
+          "status": "PASS",
+          "checked": 32,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.0009005069732666016,
+          "details": "Bit-exact match and manifest SHA256 verified"
+        },
+        {
+          "name": "audit_real_layer0_q_proj_tile",
+          "status": "PASS",
+          "checked": 128,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 0.007552385330200195,
+          "details": "Real layer slice matched bit-exact with SHA256 integrity"
+        },
+        {
+          "name": "audit_negative_controls",
+          "status": "PASS",
+          "checked": 0,
+          "mismatches": 0,
+          "timing_errors": 0,
+          "duration_seconds": 9.751319885253906e-05,
+          "details": "100% of injected weight corruptions detected by auditor"
+        }
+      ]
+    },
+    {
+      "name": "Mutation_Campaign",
+      "description": "M1-M9 fault injection campaign asserting 100% kill rate (0 survivors)",
+      "status": "PASS",
+      "tests_run": 9,
+      "passed": 9,
+      "failed": 0,
+      "vectors_checked": 14,
+      "duration_seconds": 0.1296095848083496,
+      "cases": [
+        {
+          "name": "M1_M1_line_46",
+          "status": "PASS",
+          "checked": 14,
+          "mismatches": 10,
+          "timing_errors": 0,
+          "duration_seconds": 0.0,
+          "details": "Line 46: flipped weight sign to -8'sd15 (status: FAIL)"
+        },
+        {
+          "name": "M2_M2_line_46",
+          "status": "PASS",
+          "checked": 14,
+          "mismatches": 10,
+          "timing_errors": 0,
+          "duration_seconds": 0.0,
+          "details": "Line 46: changed weight from 15 to 16 (status: FAIL)"
+        },
+        {
+          "name": "M3_M3_line_48_drop_term",
+          "status": "PASS",
+          "checked": 14,
+          "mismatches": 10,
+          "timing_errors": 0,
+          "duration_seconds": 0.0,
+          "details": "Line 48: dropped term '{{16{p_0_0[15]}}, p_0_0}' from sum (status: FAIL)"
+        },
+        {
+          "name": "M4_M4_swap_x_0_x_1",
+          "status": "PASS",
+          "checked": 14,
+          "mismatches": 18,
+          "timing_errors": 0,
+          "duration_seconds": 0.0,
+          "details": "Swapped input slice assignments between x_0 and x_1 (status: FAIL)"
+        },
+        {
+          "name": "M5_M5_reverse_output_pack",
+          "status": "PASS",
+          "checked": 14,
+          "mismatches": 18,
+          "timing_errors": 0,
+          "duration_seconds": 0.0,
+          "details": "Swapped packing sources between line 49 and line 55 (status: FAIL)"
+        },
+        {
+          "name": "M6_M6_line_48_trunc_acc",
+          "status": "PASS",
+          "checked": 14,
+          "mismatches": 4,
+          "timing_errors": 0,
+          "duration_seconds": 0.0,
+          "details": "Line 48: replaced sign extension with zero extension (16-bit truncation) (status: FAIL)"
+        },
+        {
+          "name": "M7_M7_line_46_unsigned_mult",
+          "status": "PASS",
+          "checked": 14,
+          "mismatches": 4,
+          "timing_errors": 0,
+          "duration_seconds": 0.0,
+          "details": "Line 46: made multiplication literal unsigned (8'sd -> 8'd) (status: FAIL)"
+        },
+        {
+          "name": "M8_M8_misroute_last_lane_x_tile_1",
+          "status": "PASS",
+          "checked": 14,
+          "mismatches": 24,
+          "timing_errors": 0,
+          "duration_seconds": 0.0,
+          "details": "Misrouted last lane x_tile_1 slice to x_0 (status: FAIL)"
+        },
+        {
+          "name": "M9_M9_line_162_latency_fault",
+          "status": "PASS",
+          "checked": 14,
+          "mismatches": 0,
+          "timing_errors": 14,
+          "duration_seconds": 0.0,
+          "details": "Line 162: delayed valid_out handshake violating L=1 latency contract (status: FAIL)"
+        }
+      ]
+    }
+  ]
+}

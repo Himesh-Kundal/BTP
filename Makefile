@@ -23,7 +23,7 @@ sim:
 	@$(PYTHON) scripts/run_toy_sim.py
 
 regression:
-	@echo "Regression target: placeholder for T6.6"
+	@$(PYTHON) -m verification.regression_runner
 
 synth:
 	@echo "Synthesis target: placeholder for T7.1"
