@@ -1,0 +1,101 @@
+{
+  "timestamp": "2026-11-01T16:55:49.286942+00:00",
+  "total": 9,
+  "killed": 9,
+  "survived": 0,
+  "kill_rate": 1.0,
+  "classes_tested": [
+    "M1",
+    "M2",
+    "M3",
+    "M4",
+    "M5",
+    "M6",
+    "M7",
+    "M8",
+    "M9"
+  ],
+  "mutants": [
+    {
+      "id": "M1_line_46",
+      "type": "M1",
+      "description": "Line 46: flipped weight sign to -8'sd15",
+      "killed": true,
+      "status": "FAIL",
+      "mismatch_count": 11,
+      "timing_err_count": 0
+    },
+    {
+      "id": "M2_line_46",
+      "type": "M2",
+      "description": "Line 46: changed weight from 15 to 16",
+      "killed": true,
+      "status": "FAIL",
+      "mismatch_count": 11,
+      "timing_err_count": 0
+    },
+    {
+      "id": "M3_line_48_drop_term",
+      "type": "M3",
+      "description": "Line 48: dropped term '{{16{p_0_0[15]}}, p_0_0}' from sum",
+      "killed": true,
+      "status": "FAIL",
+      "mismatch_count": 11,
+      "timing_err_count": 0
+    },
+    {
+      "id": "M4_swap_x_0_x_1",
+      "type": "M4",
+      "description": "Swapped input slice assignments between x_0 and x_1",
+      "killed": true,
+      "status": "FAIL",
+      "mismatch_count": 20,
+      "timing_err_count": 0
+    },
+    {
+      "id": "M5_reverse_output_pack",
+      "type": "M5",
+      "description": "Swapped packing sources between line 49 and line 55",
+      "killed": true,
+      "status": "FAIL",
+      "mismatch_count": 20,
+      "timing_err_count": 0
+    },
+    {
+      "id": "M6_line_48_trunc_acc",
+      "type": "M6",
+      "description": "Line 48: replaced sign extension with zero extension (16-bit truncation)",
+      "killed": true,
+      "status": "FAIL",
+      "mismatch_count": 5,
+      "timing_err_count": 0
+    },
+    {
+      "id": "M7_line_46_unsigned_mult",
+      "type": "M7",
+      "description": "Line 46: made multiplication literal unsigned (8'sd -> 8'd)",
+      "killed": true,
+      "status": "FAIL",
+      "mismatch_count": 5,
+      "timing_err_count": 0
+    },
+    {
+      "id": "M8_misroute_last_lane_x_tile_1",
+      "type": "M8",
+      "description": "Misrouted last lane x_tile_1 slice to x_0",
+      "killed": true,
+      "status": "FAIL",
+      "mismatch_count": 26,
+      "timing_err_count": 0
+    },
+    {
+      "id": "M9_line_162_latency_fault",
+      "type": "M9",
+      "description": "Line 162: delayed valid_out handshake violating L=1 latency contract",
+      "killed": true,
+      "status": "FAIL",
+      "mismatch_count": 0,
+      "timing_err_count": 14
+    }
+  ]
+}
