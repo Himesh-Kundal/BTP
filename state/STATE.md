@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: T6.7 complete. Implemented waveform walkthrough script `scripts/generate_waveforms.py` and documentation `docs/walkthroughs/waveforms.md`. Generated clean VCD dumps for passing transaction (L=1 delay), M1 sign-flip arithmetic fault, and M9 latency protocol fault. Documented cycle-by-cycle ASCII timing diagrams, picosecond event logs, and viva defense Q&A. Full test suite green (200/200 in 90.36s).
-- Next action (exact first step): Start T6.G (Gate G6 review, compile `results/gates/G6.md`, draft `docs/walkthroughs/P6.md`, tag `gate-G6`).
-- Gotchas / things I learned: Signal event logging directly from VCD confirms synchronous registered behavior; non-blocking signal comparisons cleanly distinguish arithmetic corruptions from timing/latency violations.
+- Done this session: Gate G6 complete and passed! Compiled Gate G6 report `results/gates/G6.md`, drafted Phase 6 walkthrough `docs/walkthroughs/P6.md`, tagged repository `gate-G6`. All 6 Gate G6 checklist criteria audited PASS (L1 matrix, real L2/L3 slices across 7 types at 3 depths, 100% M1-M9 mutation kill rate, Verilator clean & cross-sim parity, regression runner 22.2s budget frozen, waveform walkthrough). Full test suite green (200/200 in 90.36s).
+- Next action (exact first step): Start Phase 7 / Task T7.1 (Yosys synthesis flow scripts for Design F, Design P, and Design P_bus; parse `stat` and `ltp` to JSON).
+- Gotchas / things I learned: Verification hardening is complete and ironclad. Now transitioning into synthesis evaluation where fairness protocol (Rule N10, identical flags/widths/targets) is critical.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P6 (Verification Hardening)                   Current task: T6.7 (done)
-- Last green commit: 986e9ca                                  Last gate tag: gate-G5
-- Gates passed: G0, G1, G2, G3, G4, G5
+- Current phase: P7 (Synthesis Evaluation)                    Current task: T7.1
+- Last green commit: 8d31c76                                  Last gate tag: gate-G6
+- Gates passed: G0, G1, G2, G3, G4, G5, G6
 
 ## Next 3 tasks
-1. T6.G (Gate G6 review, G6.md report, Phase 6 walkthrough P6.md, tag gate-G6)
-2. T7.1 (Yosys synthesis flow scripts for Design F and Design P)
-3. T7.2 (Fairness protocol checklist implementation)
+1. T7.1 (Yosys synthesis flow scripts for Design F and Design P, generic gates + ice40 LUT proxy, parse stat/ltp to JSON)
+2. T7.2 (Fairness protocol checklist implementation in script)
+3. T7.3 (Experiments E1 and E3: area vs tile size, depth proxy, with >= 5 weight seeds)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
