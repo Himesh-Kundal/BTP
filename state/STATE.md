@@ -1,8 +1,8 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: T7.1 complete. Implemented automated Yosys synthesis flow `synth/yosys_runner.py` for generic gates and iCE40 LUT proxy. Parsed `stat -json` and `ltp` depth into structured `SynthesisResult`. Added `make synth`. Confirmed F vs P vs P_bus cell scaling: fixed-weights achieve ~3x cell reduction over runtime programmable baseline. Full test suite green (204/204 in 102.96s).
-- Next action (exact first step): Start T7.2 (Implement fairness protocol module `synth/fairness.py` and strict parity verification tests `tests/test_synthesis_fairness.py`).
+- Done this session: T7.2 complete. Implemented `synth/fairness.py` and unit tests in `tests/test_synthesis_fairness.py` enforcing exact signal widths (Rule N10: 8-bit inputs/weights, 16-bit prod, 32-bit acc), identical flags/wrapper, separate reporting for P_bus (logic-only) and P (storage-inclusive). Full test suite green (208/208 in 103.77s).
+- Next action (exact first step): Start T7.3 (Branch `t7.3-experiments-e1-e3`, implement `synth/experiments.py` for Experiments E1 area vs tile size and E3 depth proxy across tile grid, >= 5 seeds, output E1.csv and E3.csv).
 - Gotchas / things I learned: Yosys `opt` prunes provably unreachable upper accumulator flip-flops in Design F when constant weights have bounded dynamic range; Yosys `stat -json` begins with `"invocation": "stat -json "`.
 
 ## Project
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P7 (Synthesis Evaluation)                    Current task: T7.1 (done)
-- Last green commit: 36a9895                                  Last gate tag: gate-G6
+- Current phase: P7 (Synthesis Evaluation)                    Current task: T7.3 (not started)
+- Last green commit: 8e269c3                                  Last gate tag: gate-G6
 - Gates passed: G0, G1, G2, G3, G4, G5, G6
 
 ## Next 3 tasks
-1. T7.2 (Fairness protocol checklist implementation in script)
-2. T7.3 (Experiments E1 and E3: area vs tile size, depth proxy, with >= 5 weight seeds)
-3. T7.4 (Experiment E2: weight distribution effect)
+1. T7.3 (Experiments E1 and E3: area vs tile size, depth proxy, with >= 5 weight seeds)
+2. T7.4 (Experiment E2: weight distribution effect)
+3. T7.5 (Experiment E5: full-layer area extrapolation model and validation)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
