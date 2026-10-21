@@ -26,7 +26,7 @@ regression:
 	@$(PYTHON) -m verification.regression_runner
 
 synth:
-	@echo "Synthesis target: placeholder for T7.1"
+	@$(PYTHON) -m synth.yosys_runner
 
 demo-toy:
 	@$(PYTHON) examples/compile_linear.py --toy
