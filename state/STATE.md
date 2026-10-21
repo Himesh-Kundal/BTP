@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: Gate G6 complete and passed! Compiled Gate G6 report `results/gates/G6.md`, drafted Phase 6 walkthrough `docs/walkthroughs/P6.md`, tagged repository `gate-G6`. All 6 Gate G6 checklist criteria audited PASS (L1 matrix, real L2/L3 slices across 7 types at 3 depths, 100% M1-M9 mutation kill rate, Verilator clean & cross-sim parity, regression runner 22.2s budget frozen, waveform walkthrough). Full test suite green (200/200 in 90.36s).
-- Next action (exact first step): Start Phase 7 / Task T7.1 (Yosys synthesis flow scripts for Design F, Design P, and Design P_bus; parse `stat` and `ltp` to JSON).
-- Gotchas / things I learned: Verification hardening is complete and ironclad. Now transitioning into synthesis evaluation where fairness protocol (Rule N10, identical flags/widths/targets) is critical.
+- Done this session: T7.1 complete. Implemented automated Yosys synthesis flow `synth/yosys_runner.py` for generic gates and iCE40 LUT proxy. Parsed `stat -json` and `ltp` depth into structured `SynthesisResult`. Added `make synth`. Confirmed F vs P vs P_bus cell scaling: fixed-weights achieve ~3x cell reduction over runtime programmable baseline. Full test suite green (204/204 in 102.96s).
+- Next action (exact first step): Start T7.2 (Implement fairness protocol module `synth/fairness.py` and strict parity verification tests `tests/test_synthesis_fairness.py`).
+- Gotchas / things I learned: Yosys `opt` prunes provably unreachable upper accumulator flip-flops in Design F when constant weights have bounded dynamic range; Yosys `stat -json` begins with `"invocation": "stat -json "`.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P7 (Synthesis Evaluation)                    Current task: T7.1
-- Last green commit: 8d31c76                                  Last gate tag: gate-G6
+- Current phase: P7 (Synthesis Evaluation)                    Current task: T7.1 (done)
+- Last green commit: 36a9895                                  Last gate tag: gate-G6
 - Gates passed: G0, G1, G2, G3, G4, G5, G6
 
 ## Next 3 tasks
-1. T7.1 (Yosys synthesis flow scripts for Design F and Design P, generic gates + ice40 LUT proxy, parse stat/ltp to JSON)
-2. T7.2 (Fairness protocol checklist implementation in script)
-3. T7.3 (Experiments E1 and E3: area vs tile size, depth proxy, with >= 5 weight seeds)
+1. T7.2 (Fairness protocol checklist implementation in script)
+2. T7.3 (Experiments E1 and E3: area vs tile size, depth proxy, with >= 5 weight seeds)
+3. T7.4 (Experiment E2: weight distribution effect)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
