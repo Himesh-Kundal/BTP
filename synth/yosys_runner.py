@@ -248,6 +248,7 @@ def synthesize_design(
     flatten: bool = True,
     latency: int = 1,
     work_dir: Path | None = None,
+    timeout_seconds: float = 300.0,
 ) -> SynthesisResult:
     """Generate RTL for specified design type and execute Yosys synthesis flow."""
     if design_type not in {"F", "P", "P_bus"}:
@@ -281,6 +282,7 @@ def synthesize_design(
         target=target,
         flatten=flatten,
         work_dir=run_dir,
+        timeout_seconds=timeout_seconds,
     )
 
     if ctx is not None:
