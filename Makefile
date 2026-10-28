@@ -3,7 +3,7 @@ PYTHON ?= PYTHONPATH=. $(UV) run python
 PYTEST ?= $(UV) run pytest
 RUFF ?= $(UV) run ruff
 
-.PHONY: all env-check check lint test sim regression synth demo demo-toy clean
+.PHONY: all env-check check lint test sim regression synth report-figs demo demo-toy clean
 
 all: check
 
@@ -27,6 +27,9 @@ regression:
 
 synth:
 	@$(PYTHON) -m synth.yosys_runner
+
+report-figs:
+	@$(PYTHON) scripts/generate_report_figs.py
 
 demo-toy:
 	@$(PYTHON) examples/compile_linear.py --toy
