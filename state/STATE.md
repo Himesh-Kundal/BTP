@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: T7.4 complete. Executed Experiment E2 across 6 weight distribution classes (real, uniform-random, magnitude-matched, shuffled-real, all-zero, one-hot) with 5 seeds on identical (8, 16) tiles in `synth/experiments.py`. Output saved to `results/E2.csv`. Discovered: all-zero eliminates datapath logic completely (3 cells); real weights are ~23% smaller than uniform random INT8 due to lower average magnitude / bit-density; permutation (shuffled) and sign randomization (magnitude-matched) yield negligible difference (<2%). Full test suite green (212/212 in 144.48s).
-- Next action (exact first step): Start T7.5 (Branch `t7.5-extrapolation`, implement `synth/extrapolation.py` to fit area models for full layers, validate against synthesized larger points, compute error epsilon, and write `results/E5.json`).
-- Gotchas / things I learned: Real LLM weights are ~23% smaller in synthesizable logic than uniform random INT8 due to Gaussian-like concentration around 0; spatial shuffling has <1% impact on area.
+- Done this session: T7.5 complete. Implemented full-layer area extrapolation model and direct empirical validation in `synth/extrapolation.py`. Directly synthesized 16x32 multi-tile core with adder trees; empirical validation achieved estimation error epsilon = 10.82% for F (conservative overestimate), 1.37% for P, and 1.44% for P_bus. Extrapolated synthesis costs for all 7 projection types of SmolLM2-135M layer 0 (3,456 tiles) in `results/E5.json`. Confirmed full layer area reduction of 3.64x vs P (570.6M vs 2.075B cells) and 17.8x reduction in flops (1.68M vs 30.08M flops). All estimates strictly tagged "label": "estimate". Unit tests green in `tests/test_extrapolation.py` (3/3).
+- Next action (exact first step): Start T7.6 (Branch `t7.6-report-figs`, implement `scripts/generate_report_figs.py` generating figures in `results/figures/`, `results/synthesis_summary.md`, and Makefile target `make report-figs`).
+- Gotchas / things I learned: Direct multi-tile synthesis has <11% deviation from sum-of-tiles models; inter-tile adder tree overhead is modest (<1% of total tile cells) in large matrices.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P7 (Synthesis Evaluation)                    Current task: T7.5 (not started)
-- Last green commit: 1a3d3c2                                  Last gate tag: gate-G6
+- Current phase: P7 (Synthesis Evaluation)                    Current task: T7.6 (not started)
+- Last green commit: 9dd8781                                  Last gate tag: gate-G6
 - Gates passed: G0, G1, G2, G3, G4, G5, G6
 
 ## Next 3 tasks
-1. T7.5 (Experiment E5: full-layer area extrapolation model and validation)
-2. T7.6 (Plots and tables generator: make report-figs)
-3. T7.G (Gate G7 review & Phase 7 walkthrough)
+1. T7.6 (Plots and tables generator: make report-figs)
+2. T7.G (Gate G7 review & Phase 7 walkthrough)
+3. T8.1 (CLI interface: llmhw extract / compile / verify / synth)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none

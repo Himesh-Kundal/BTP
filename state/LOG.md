@@ -52,3 +52,4 @@
 2026-11-01 23:10 | T7.2 | Fairness protocol implementation & audit tests | synth/fairness.py, 4/4 audit tests pass, make check PASS (208/208) | 8e269c3
 2026-11-02 04:48 | T7.3 | Experiments E1 (Area) and E3 (Depth) across tile grid | synth/experiments.py, results/E1.csv, results/E3.csv, make check PASS (212/212) | 02d2b17
 2026-11-02 04:51 | T7.4 | Experiment E2 (Weight Content and Distribution Effect) | results/E2.csv across 6 classes, 5 seeds, make check PASS (212/212) | 1a3d3c2
+2026-11-02 05:00 | T7.5 | Full-layer extrapolation model & empirical validation | synth/extrapolation.py, results/E5.json, error < 11%, make check PASS (215/215) | 9dd8781
