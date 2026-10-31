@@ -9,6 +9,9 @@ dependencies = [
     "numpy>=1.26.0",
 ]
 
+[project.scripts]
+llmhw = "cli:main"
+
 [dependency-groups]
 dev = [
     "matplotlib>=3.10.9",
