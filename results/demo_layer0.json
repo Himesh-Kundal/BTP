@@ -1,0 +1,166 @@
+{
+  "timestamp": "2026-11-01T23:58:22Z",
+  "model": "HuggingFaceTB/SmolLM2-135M",
+  "layer": 0,
+  "all_passed": true,
+  "total_elapsed_seconds": 3.583731883999917,
+  "projections": [
+    {
+      "projection": "q_proj",
+      "orig_shape": [
+        576,
+        576
+      ],
+      "slice_shape": [
+        16,
+        32
+      ],
+      "num_tiles": 4,
+      "tile_grid": [
+        2,
+        2
+      ],
+      "status": "PASS",
+      "checked": 10,
+      "mismatch": 0,
+      "port_audit_passed": true,
+      "const_audit_passed": true,
+      "elapsed_seconds": 0.5351502499997878
+    },
+    {
+      "projection": "k_proj",
+      "orig_shape": [
+        192,
+        576
+      ],
+      "slice_shape": [
+        16,
+        32
+      ],
+      "num_tiles": 4,
+      "tile_grid": [
+        2,
+        2
+      ],
+      "status": "PASS",
+      "checked": 10,
+      "mismatch": 0,
+      "port_audit_passed": true,
+      "const_audit_passed": true,
+      "elapsed_seconds": 0.5626622680001674
+    },
+    {
+      "projection": "v_proj",
+      "orig_shape": [
+        192,
+        576
+      ],
+      "slice_shape": [
+        16,
+        32
+      ],
+      "num_tiles": 4,
+      "tile_grid": [
+        2,
+        2
+      ],
+      "status": "PASS",
+      "checked": 10,
+      "mismatch": 0,
+      "port_audit_passed": true,
+      "const_audit_passed": true,
+      "elapsed_seconds": 0.5077779769999324
+    },
+    {
+      "projection": "o_proj",
+      "orig_shape": [
+        576,
+        576
+      ],
+      "slice_shape": [
+        16,
+        32
+      ],
+      "num_tiles": 4,
+      "tile_grid": [
+        2,
+        2
+      ],
+      "status": "PASS",
+      "checked": 10,
+      "mismatch": 0,
+      "port_audit_passed": true,
+      "const_audit_passed": true,
+      "elapsed_seconds": 0.4174789540002166
+    },
+    {
+      "projection": "gate_proj",
+      "orig_shape": [
+        1536,
+        576
+      ],
+      "slice_shape": [
+        16,
+        32
+      ],
+      "num_tiles": 4,
+      "tile_grid": [
+        2,
+        2
+      ],
+      "status": "PASS",
+      "checked": 10,
+      "mismatch": 0,
+      "port_audit_passed": true,
+      "const_audit_passed": true,
+      "elapsed_seconds": 0.5173499530001209
+    },
+    {
+      "projection": "up_proj",
+      "orig_shape": [
+        1536,
+        576
+      ],
+      "slice_shape": [
+        16,
+        32
+      ],
+      "num_tiles": 4,
+      "tile_grid": [
+        2,
+        2
+      ],
+      "status": "PASS",
+      "checked": 10,
+      "mismatch": 0,
+      "port_audit_passed": true,
+      "const_audit_passed": true,
+      "elapsed_seconds": 0.5388016750002862
+    },
+    {
+      "projection": "down_proj",
+      "orig_shape": [
+        576,
+        1536
+      ],
+      "slice_shape": [
+        16,
+        32
+      ],
+      "num_tiles": 4,
+      "tile_grid": [
+        2,
+        2
+      ],
+      "status": "PASS",
+      "checked": 10,
+      "mismatch": 0,
+      "port_audit_passed": true,
+      "const_audit_passed": true,
+      "elapsed_seconds": 0.5042871989999185
+    }
+  ],
+  "claim_c1_verified": true,
+  "mutation_kill_rate": 1.0,
+  "synthesis_cell_ratio_f_vs_p": 0.26
+}
