@@ -54,3 +54,4 @@
 2026-11-02 04:51 | T7.4 | Experiment E2 (Weight Content and Distribution Effect) | results/E2.csv across 6 classes, 5 seeds, make check PASS (212/212) | 1a3d3c2
 2026-11-02 05:00 | T7.5 | Full-layer extrapolation model & empirical validation | synth/extrapolation.py, results/E5.json, error < 11%, make check PASS (215/215) | 9dd8781
 2026-11-02 05:07 | T7.6 | Report figures & synthesis summary generator | make report-figs, results/figures/ (4 figs, PNG+SVG), results/synthesis_summary.md, make check PASS (216/216) | dc79cd6
+2026-11-02 05:10 | T7.G | Gate G7 review, Phase 7 walkthrough, tag gate-G7 | results/gates/G7.md PASS, docs/walkthroughs/P7.md, tag gate-G7, make check 216/216 | d45c7b7
