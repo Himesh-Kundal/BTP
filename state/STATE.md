@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
 
 ## Handoff note (rewrite at the end of every session)
-- Done this session: Phase 0 (Bootstrap) complete. Environment locked with uv; EDA tools installed (iverilog, verilator, yosys); independent integer oracle implemented with 9 hand-verified test cases; architectural layering enforced; state tracking initialized; Gate G0 report compiled.
-- Next action (exact first step): Tag gate-G0 and start Phase 1 (T1.1: minimal LinearOp IR dataclass).
-- Gotchas / things I learned: Pinned PyTorch CPU index in pyproject.toml ensures minimal environment footprint on CPU-only machines.
+- Done this session: Phase 1 (Walking skeleton) complete. Minimal LinearOp IR implemented, combinational fixed-weight Verilog-2001 codegen, vector writer, self-checking testbench, simulation runner with negative control, mutation testing suite M1–M3 with 100% kill rate, `make demo-toy` operational, Gate G1 report compiled.
+- Next action (exact first step): Tag gate-G1 and plan Phase 2 (T2.1: pinned SmolLM2-135M model loader).
+- Gotchas / things I learned: Generated combinational core adheres to explicit signed arithmetic (8'sd, 16'sd, 32'sd) with zero-weight term pruning and zero weight ports.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P0 (ready for P1)   Current task: T0.G (done)
-- Last green commit: da904ef    Last gate tag: gate-G0
-- Gates passed: G0
+- Current phase: P1 (ready for P2)   Current task: T1.G (done)
+- Last green commit: e028f10    Last gate tag: gate-G1
+- Gates passed: G0, G1
 
 ## Next 3 tasks
-1. T1.1 (Minimal LinearOp IR dataclass)
-2. T1.2 (Codegen v0: combinational fixed-weight core)
-3. T1.3 (Vector writer and testbench generator)
+1. T2.1 (Pinned SmolLM2-135M model loader)
+2. T2.2 (Architecture parser & 7 projection types extractor)
+3. T2.3 (docs/model_facts.md reconciliation)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
