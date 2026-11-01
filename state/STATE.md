@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
 
 ## Handoff note (rewrite at the end of every session)
-- Done this session: Bootstrap environment with uv; EDA tools installed; independent integer oracle implemented with hand-verified tests; architectural layering tests active; state tracking initialized.
-- Next action (exact first step): Gate G0 review (T0.G) and verification pass.
-- Gotchas / things I learned: PyTorch CUDA dependencies are large; pinned CPU index in pyproject.toml keeps the virtual environment fast and lightweight for CPU-only laptop work.
+- Done this session: Phase 0 (Bootstrap) complete. Environment locked with uv; EDA tools installed (iverilog, verilator, yosys); independent integer oracle implemented with 9 hand-verified test cases; architectural layering enforced; state tracking initialized; Gate G0 report compiled.
+- Next action (exact first step): Tag gate-G0 and start Phase 1 (T1.1: minimal LinearOp IR dataclass).
+- Gotchas / things I learned: Pinned PyTorch CPU index in pyproject.toml ensures minimal environment footprint on CPU-only machines.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P0            Current task: T0.5
-- Last green commit: 26b7450    Last gate tag: none
-- Gates passed: none
+- Current phase: P0 (ready for P1)   Current task: T0.G (done)
+- Last green commit: da904ef    Last gate tag: gate-G0
+- Gates passed: G0
 
 ## Next 3 tasks
-1. T0.G (Gate G0 Review)
-2. T1.1 (Minimal LinearOp IR dataclass)
-3. T1.2 (Codegen v0: combinational fixed-weight core)
+1. T1.1 (Minimal LinearOp IR dataclass)
+2. T1.2 (Codegen v0: combinational fixed-weight core)
+3. T1.3 (Vector writer and testbench generator)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
