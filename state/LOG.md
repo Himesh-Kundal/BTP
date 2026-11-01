@@ -50,3 +50,4 @@
 2026-11-01 22:54 | T6.G | Gate G6 review, Phase 6 walkthrough, tag gate-G6 | results/gates/G6.md PASS, docs/walkthroughs/P6.md, tag gate-G6, make check 200/200 | c82db57
 2026-11-01 23:05 | T7.1 | Yosys synthesis flow & metric parser for F, P, P_bus | synth/yosys_runner.py, generic/ice40 flows, make synth PASS, make check PASS (204/204) | a7f392f
 2026-11-01 23:10 | T7.2 | Fairness protocol implementation & audit tests | synth/fairness.py, 4/4 audit tests pass, make check PASS (208/208) | 8e269c3
+2026-11-02 04:48 | T7.3 | Experiments E1 (Area) and E3 (Depth) across tile grid | synth/experiments.py, results/E1.csv, results/E3.csv, make check PASS (212/212) | 02d2b17
