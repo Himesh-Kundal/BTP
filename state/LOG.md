@@ -25,3 +25,4 @@
 2026-11-01 20:40 | T3.3 | Activation calibration and quantization per rule N3 | Absmax & percentile calibration, deterministic scale and quantized activations | 1cb6000
 2026-11-01 20:43 | T3.4 | Synthetic bias quantization per rule N5 | Scaling sb = sx * sw, 32-bit clipping, bit-exact against reference oracle | a6fb082
 2026-11-01 20:45 | T3.5 | Accumulator bound pass per rule N4 | K*128*127 + |bq|max < 2^31 enforced, acc_bits_min annotated on IR | 3ebee29
+2026-11-01 20:48 | T3.6 | Quantization quality evaluation (Claim C2) and thresholds | 21 configs evaluated, results/quant_quality.json, ADR-0001 frozen | 4c7679a
