@@ -4,11 +4,9 @@ import json
 from pathlib import Path
 
 import numpy as np
-import pytest
 
 from backend.tiling import (
     TileManifest,
-    TileSpec,
     pad_activations,
     pad_matrix,
     tile_weight_matrix,
