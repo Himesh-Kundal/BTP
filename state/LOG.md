@@ -41,3 +41,4 @@
 2026-11-01 21:53 | T5.3 | Differential verification Y_F == Y_P == Y_ref across 5 shapes | tests/test_differential_f_p.py PASS (6/6), make check PASS (144/144) | afc7284
 2026-11-01 21:57 | T5.G | Gate G5 review, Phase 5 walkthrough, tag gate-G5 | results/gates/G5.md PASS, docs/walkthroughs/P5.md, tag gate-G5, make check 144/144 | a61755b
 2026-11-01 22:05 | T6.1 | Test-matrix generator across dims, tiles, weights, inputs | tests/test_test_matrix.py PASS (14/14), make check PASS (158/158), C1 verified | bef2695
+2026-11-01 22:09 | T6.2 | Real-layer tests across 7 types at layers 0, 14, 29 | tests/test_real_layer_verification.py PASS (24/24), make check PASS (182/182) | 6d9d1ed
