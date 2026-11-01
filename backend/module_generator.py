@@ -20,8 +20,8 @@ from ir.tensor import TensorRef
 def generate_full_module(
     op: LinearOp,
     manifest: TileManifest,
-    tile_n: int = 8,
-    tile_k: int = 16,
+    tile_n: int | None = None,
+    tile_k: int | None = None,
     latency: int = 1,
     acc_bits: int = 32,
     module_name: str | None = None,
@@ -31,8 +31,8 @@ def generate_full_module(
     Args:
         op: Quantized LinearOp with weights and optional bias.
         manifest: TileManifest containing tiling geometry and individual TileSpecs.
-        tile_n: Height of tile (default 8).
-        tile_k: Width of tile (default 16).
+        tile_n: Height of tile (defaults to manifest.tile_n).
+        tile_k: Width of tile (defaults to manifest.tile_k).
         latency: Pipeline latency in cycles (default 1).
         acc_bits: Accumulator bit width (default 32).
         module_name: Optional top module name override.
@@ -41,6 +41,11 @@ def generate_full_module(
         Complete Verilog-2001 source code containing all tile cores,
         combinational top core, and registered wrapper.
     """
+    if tile_n is None:
+        tile_n = manifest.tile_n
+    if tile_k is None:
+        tile_k = manifest.tile_k
+
     if module_name is None:
         raw_name = f"llmhw_{op.name}"
     else:
