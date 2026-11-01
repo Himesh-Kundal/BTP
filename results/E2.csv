@@ -1,0 +1,7 @@
+weight_class,description,tile_rows,tile_cols,num_cells_total,num_cells_comb,num_cells_seq,num_lut4,ltp_depth,sparsity_pct,wall_time_s,sd_cells_total
+real,Layer 0 q_proj slice,8,16,22764,22536,226,0,57,0.0,5.17,0.0
+all_zero,All weights zero (100% sparse),8,16,3,0,1,0,1,100.0,0.09,0.0
+uniform_random,"Uniform random INT8 [-127, 127]",8,16,28005.8,27775.0,228.8,0.0,59.4,0.47,10.21,998.13
+magnitude_matched,"Preserved |w| histogram, randomized signs and spatial layout",8,16,23254.4,23025.8,226.6,0.0,56.8,0.0,8.14,598.57
+shuffled_real,"Exact real weights with permuted (n,k) positions",8,16,22918.4,22689.2,227.2,0.0,55.8,0.0,8.24,198.13
+one_hot,Single nonzero coefficient per row (+1 or -1),8,16,114.8,54.6,58.2,0.0,5.0,93.75,0.17,40.13
