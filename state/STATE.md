@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
 
 ## Handoff note (rewrite at the end of every session)
-- Done this session: Gate G2 passed (`gate-G2`). Phase 3 tasks underway: T3.1 completed (complete IR specification, serialization, artifact loading). T3.2 completed: symmetric INT8 weight quantization per rule N2 (`compiler/quantization.py`), round-half-to-even float64, zero-row scale 1.0, mathematical bound property verified, real SmolLM2 weights quantized cleanly. 70 tests green.
-- Next action (exact first step): Start T3.3 (Activation calibration and quantization per rule N3) on branch `t3.3-act-calib`.
-- Gotchas / things I learned: Rule N2 requires float64 precision for scale computation, round-half-to-even tie-breaking, strict clipping to [-127, 127] rejecting -128, and fallback to scale 1.0 for zero rows.
+- Done this session: Gate G2 passed (`gate-G2`). Phase 3 underway: T3.1 completed (complete IR specification, serialization, artifact loading). T3.2 completed (symmetric INT8 weight quantization per rule N2). T3.3 completed: static activation calibration and symmetric INT8 quantization per rule N3 (`compiler/calibration.py`), absmax and percentile methods, deterministic scale and quantized activations. 76 tests green.
+- Next action (exact first step): Start T3.4 (Synthetic bias quantization per rule N5) on branch `t3.4-bias-quant`.
+- Gotchas / things I learned: Activation calibration uses a per-tensor scalar scale $s_x = \text{stat} / 127.0$, while weights use per-channel vector scales $s_w[n]$. Bias quantization (Rule N5) couples both scales as $s_b[n] = s_x \cdot s_w[n]$.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P3 (IR, quantization, calibration)   Current task: T3.2 (done, ready for T3.3)
-- Last green commit: 2f20b12    Last gate tag: gate-G2
+- Current phase: P3 (IR, quantization, calibration)   Current task: T3.3 (done, ready for T3.4)
+- Last green commit: 1cb6000    Last gate tag: gate-G2
 - Gates passed: G0, G1, G2
 
 ## Next 3 tasks
-1. T3.3 (Activation calibration and quantization per rule N3)
-2. T3.4 (Synthetic bias quantization per rule N5)
-3. T3.5 (Accumulator bound pass per rule N4)
+1. T3.4 (Synthetic bias quantization per rule N5)
+2. T3.5 (Accumulator bound pass per rule N4)
+3. T3.6 (Quantization quality evaluation Claim C2 and thresholds)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none

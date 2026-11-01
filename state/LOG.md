@@ -22,3 +22,4 @@
 2026-11-01 20:28 | T2.G | Gate G2 review and verification pass | All G2 checklist items verified green, report at results/gates/G2.md | 24743bc
 2026-11-01 20:35 | T3.1 | Complete IR dataclasses, serialization, and artifact loading | TensorRef, LinearOp, Graph, lossless JSON + .npy round-trip, I1-I5 verified | 87bfd42
 2026-11-01 20:38 | T3.2 | Symmetric INT8 weight quantization per rule N2 | Property tests pass, range [-127, 127], zero-row scale 1.0, error bound verified | 2f20b12
+2026-11-01 20:40 | T3.3 | Activation calibration and quantization per rule N3 | Absmax & percentile calibration, deterministic scale and quantized activations | 1cb6000
