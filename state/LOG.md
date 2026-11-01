@@ -47,3 +47,4 @@
 2026-11-01 22:26 | T6.5 | Mutation suite extension (M1-M9) & kill matrix | tests/test_mutation_hardening.py PASS (2/2), 100% kill rate (9/9), results/mutation_matrix.json | be622c6
 2026-11-01 22:46 | T6.6 | Standalone regression runner & results/regression.json | make regression PASS (124/124), make check PASS (200/200), budget 22.2s frozen | 11a37b6
 2026-11-01 22:52 | T6.7 | Waveform walkthrough with VCD dumps and timing diagrams | docs/walkthroughs/waveforms.md, pass/fail VCDs, make check PASS (200/200) | f6dae80
+2026-11-01 22:54 | T6.G | Gate G6 review, Phase 6 walkthrough, tag gate-G6 | results/gates/G6.md PASS, docs/walkthroughs/P6.md, tag gate-G6, make check 200/200 | c82db57
