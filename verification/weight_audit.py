@@ -10,9 +10,12 @@ Statically inspects generated Verilog RTL to prove:
 
 from __future__ import annotations
 
+import hashlib
 import re
 from pathlib import Path
 from typing import Any
+
+import numpy as np
 
 
 def strip_verilog_comments(code: str) -> str:
@@ -168,3 +171,177 @@ def audit_rtl_file(
         strict=strict,
     )
     return report["passed"]
+
+
+def parse_rtl_weights(
+    rtl_content: str,
+    expected_n: int,
+    expected_k: int,
+    manifest: Any | None = None,
+) -> np.ndarray:
+    """Parse constant weight expressions from Verilog source and reconstruct W_RTL.
+
+    Supports both:
+    1. Multi-tile full modules containing sub-modules `llmhw_<layer>_tile_i{i}_j{j}`.
+    2. Single-module combinational cores containing `prod_{row}_{col}` lines.
+
+    Returns:
+        w_recon: np.ndarray of shape (expected_n, expected_k) with dtype int8.
+    """
+    clean_code = strip_verilog_comments(rtl_content)
+
+    # 1. Check for tile core modules
+    tile_pattern = re.compile(
+        r"module\s+(?P<mod_name>llmhw_\w+_tile_i(?P<i>\d+)_j(?P<j>\d+))\s*\((?P<ports>.*?)\);(?P<body>.*?)endmodule",
+        re.DOTALL,
+    )
+    tile_matches = list(tile_pattern.finditer(clean_code))
+
+    if tile_matches:
+        if manifest is not None:
+            tile_n = manifest.tile_n
+            tile_k = manifest.tile_k
+            n_padded = manifest.n_padded
+            k_padded = manifest.k_padded
+        else:
+            # Infer tile dimensions from ports and max indices
+            ports = tile_matches[0].group("ports")
+            in_match = re.search(r"input\s+wire\s+\[(\d+):0\]\s+x_flat", ports)
+            out_match = re.search(r"output\s+wire\s+\[(\d+):0\]\s+y_flat", ports)
+            tile_k = (int(in_match.group(1)) + 1) // 8 if in_match else expected_k
+            tile_n = (int(out_match.group(1)) + 1) // 32 if out_match else expected_n
+            max_i = max(int(m.group("i")) for m in tile_matches)
+            max_j = max(int(m.group("j")) for m in tile_matches)
+            n_padded = (max_i + 1) * tile_n
+            k_padded = (max_j + 1) * tile_k
+
+        w_padded = np.zeros((n_padded, k_padded), dtype=np.int8)
+
+        prod_pattern = re.compile(
+            r"wire\s+signed\s+\[15:0\]\s+p_(?P<row>\d+)_(?P<col>\d+)\s*=\s*(?P<rhs>[^;]+);"
+        )
+
+        for tm in tile_matches:
+            ti = int(tm.group("i"))
+            tj = int(tm.group("j"))
+            body = tm.group("body")
+
+            for pm in prod_pattern.finditer(body):
+                row = int(pm.group("row"))
+                col = int(pm.group("col"))
+                rhs = pm.group("rhs").strip()
+
+                mult_pos = re.search(r"\*\s*8'sd(\d+)", rhs)
+                mult_neg = re.search(r"\*\s*-8'sd(\d+)", rhs)
+
+                if mult_pos:
+                    w_val = int(mult_pos.group(1))
+                elif mult_neg:
+                    w_val = -int(mult_neg.group(1))
+                elif rhs.startswith("-"):
+                    w_val = -1
+                elif "x_" in rhs and "*" not in rhs:
+                    w_val = 1
+                elif rhs == "16'sd0":
+                    w_val = 0
+                else:
+                    raise ValueError(f"Unrecognized product expression in tile {ti},{tj}: {rhs}")
+
+                w_padded[ti * tile_n + row, tj * tile_k + col] = w_val
+
+        return w_padded[:expected_n, :expected_k]
+
+    # 2. Single-module combinational core
+    w_recon = np.zeros((expected_n, expected_k), dtype=np.int8)
+    prod_single = re.compile(
+        r"wire\s+signed\s+\[15:0\]\s+prod_(?P<row>\d+)_(?P<col>\d+)\s*=\s*(?P<rhs>[^;]+);"
+    )
+    for pm in prod_single.finditer(clean_code):
+        row = int(pm.group("row"))
+        col = int(pm.group("col"))
+        rhs = pm.group("rhs").strip()
+
+        mult_pos = re.search(r"\*\s*8'sd(\d+)", rhs)
+        mult_neg = re.search(r"\*\s*-8'sd(\d+)", rhs)
+
+        if mult_pos:
+            w_val = int(mult_pos.group(1))
+        elif mult_neg:
+            w_val = -int(mult_neg.group(1))
+        elif rhs.startswith("-"):
+            w_val = -1
+        elif "x_" in rhs and "*" not in rhs:
+            w_val = 1
+        elif rhs == "16'sd0":
+            w_val = 0
+        else:
+            raise ValueError(f"Unrecognized product expression: {rhs}")
+
+        w_recon[row, col] = w_val
+
+    return w_recon
+
+
+def audit_weights_match(
+    rtl_content: str,
+    expected_weights: np.ndarray,
+    manifest: Any | None = None,
+    strict: bool = True,
+) -> dict[str, Any]:
+    """Audit static weights parsed from RTL against expected quantized array and SHA256.
+
+    Args:
+        rtl_content: Verilog source code.
+        expected_weights: Golden INT8 weights array of shape (N, K).
+        manifest: Optional TileManifest containing tile hashes.
+        strict: If True, raises ValueError upon any discrepancy.
+
+    Returns:
+        Audit report dictionary with match details.
+    """
+    w_exp = np.asarray(expected_weights, dtype=np.int8)
+    n, k = w_exp.shape
+
+    w_recon = parse_rtl_weights(rtl_content, expected_n=n, expected_k=k, manifest=manifest)
+
+    mismatches = int(np.sum(w_recon != w_exp))
+    passed = mismatches == 0
+    violations: list[str] = []
+
+    if mismatches > 0:
+        violations.append(
+            f"Weight audit mismatch: {mismatches} elements differ between RTL and expected array."
+        )
+
+    # Integrity hash check
+    extracted_sha256 = hashlib.sha256(w_recon.tobytes()).hexdigest()
+    expected_sha256 = hashlib.sha256(w_exp.tobytes()).hexdigest()
+
+    if extracted_sha256 != expected_sha256:
+        passed = False
+        violations.append(
+            f"Weight SHA256 mismatch: extracted {extracted_sha256} != expected {expected_sha256}"
+        )
+
+    if (
+        manifest is not None
+        and getattr(manifest, "manifest_hash", None)
+        and manifest.manifest_hash
+        and manifest.manifest_hash not in rtl_content
+    ):
+        passed = False
+        violations.append(
+            f"Manifest hash '{manifest.manifest_hash}' not found in RTL header comment"
+        )
+
+    if strict and not passed:
+        raise ValueError("; ".join(violations))
+
+    return {
+        "passed": passed,
+        "mismatches": mismatches,
+        "total_weights_checked": n * k,
+        "reconstructed_weights": w_recon,
+        "extracted_sha256": extracted_sha256,
+        "violations": violations,
+    }
