@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: T4.1 complete. Specialized constant weights in backend/constant_weights.py, enforced Invariant I3, zero runtime weight ports guaranteed, tests in test_constant_weights.py passing.
-- Next action (exact first step): Start T4.2 (matrix tiling, zero-padding, manifest generation).
-- Gotchas / things I learned: Design F interface contracts defined for both combinational cores and registered wrappers. Port audit rejects all w_* signals.
+- Done this session: T4.2 complete. Implemented backend/tiling.py with matrix tiling, zero-padding for non-multiples, and TileManifest with SHA256 integrity hashes. Property tests green.
+- Next action (exact first step): Start T4.3 (weight literal encoder and sparsity optimization).
+- Gotchas / things I learned: Padding lanes in W and X are verified strictly 0; unpadding output channels preserves exact bit identity; full 576x576 produces 2592 tiles of 8x16.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P4 (Specialization, Tiling, Backend F)   Current task: T4.1 (done)
-- Last green commit: 578a176    Last gate tag: gate-G3
+- Current phase: P4 (Specialization, Tiling, Backend F)   Current task: T4.2 (done)
+- Last green commit: a186c2c    Last gate tag: gate-G3
 - Gates passed: G0, G1, G2, G3
 
 ## Next 3 tasks
-1. T4.2 (`tiling.py` + tile manifest; padding)
-2. T4.3 (`weight_encoder.py`: int8 -> Verilog literals, sparsity-aware term omission)
-3. T4.4 (`verilog_codegen.py`: tile core for arbitrary `Nt x Kt`)
+1. T4.3 (`weight_encoder.py`: int8 -> Verilog literals, sparsity-aware term omission)
+2. T4.4 (`verilog_codegen.py`: tile core for arbitrary `Nt x Kt`)
+3. T4.5 (`module_generator.py`: tile instantiation, adder trees, wrapper)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
