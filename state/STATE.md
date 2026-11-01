@@ -13,7 +13,7 @@
 
 ## Where we are
 - Current phase: P4 (Specialization, Tiling, Backend F)   Current task: T4.4 (done)
-- Last green commit: 18e56c7    Last gate tag: gate-G3
+- Last green commit: 8745851    Last gate tag: gate-G3
 - Gates passed: G0, G1, G2, G3
 
 ## Next 3 tasks
