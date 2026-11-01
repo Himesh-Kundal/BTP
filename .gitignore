@@ -1,0 +1,23 @@
+# Environments
+.venv/
+.python-version
+
+# Build & runtime artifacts (hashes tracked in results/)
+artifacts/
+build/
+*.vcd
+*.hex
+*.vvp
+*.o
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+
+# OS / Editor
+.DS_Store
+*.swp
+*.swo
