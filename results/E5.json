@@ -1,0 +1,143 @@
+{
+  "experiment": "E5",
+  "description": "Full-Layer Area Extrapolation Model and Validation",
+  "validation_evidence": {
+    "test_shape": [
+      16,
+      32
+    ],
+    "tile_shape": [
+      8,
+      16
+    ],
+    "num_tiles": 4,
+    "actual_cells_f": 83551,
+    "extrap_cells_f": 92592,
+    "error_f": 0.1082,
+    "actual_cells_p": 298733,
+    "extrap_cells_p": 302832,
+    "error_p": 0.0137,
+    "actual_cells_pbus": 293737,
+    "extrap_cells_pbus": 297976,
+    "error_pbus": 0.0144,
+    "actual_reduction_vs_p": 3.58,
+    "actual_reduction_vs_pbus": 3.52
+  },
+  "model_parameters": {
+    "tile_dimension": "16x64",
+    "base_cell_cost_f": 163708,
+    "base_cell_cost_p": 599085,
+    "base_cell_cost_p_bus": 589582,
+    "adder_tree_cell_cost_32bit": 96
+  },
+  "layer_estimates": {
+    "q_proj": {
+      "dimensions": "576x576",
+      "tile_shape": "16x64",
+      "grid": "36x9",
+      "total_tiles": 324,
+      "estimate_cells_f": 53483760,
+      "estimate_cells_p": 194545908,
+      "estimate_cells_p_bus": 191466936,
+      "estimate_flops_f": 158112,
+      "estimate_flops_p": 2820420,
+      "estimate_area_reduction_vs_p": "3.64x",
+      "estimate_area_reduction_vs_p_bus": "3.58x",
+      "label": "estimate"
+    },
+    "k_proj": {
+      "dimensions": "192x576",
+      "tile_shape": "16x64",
+      "grid": "12x9",
+      "total_tiles": 108,
+      "estimate_cells_f": 17827920,
+      "estimate_cells_p": 64848636,
+      "estimate_cells_p_bus": 63822312,
+      "estimate_flops_f": 52704,
+      "estimate_flops_p": 940140,
+      "estimate_area_reduction_vs_p": "3.64x",
+      "estimate_area_reduction_vs_p_bus": "3.58x",
+      "label": "estimate"
+    },
+    "v_proj": {
+      "dimensions": "192x576",
+      "tile_shape": "16x64",
+      "grid": "12x9",
+      "total_tiles": 108,
+      "estimate_cells_f": 17827920,
+      "estimate_cells_p": 64848636,
+      "estimate_cells_p_bus": 63822312,
+      "estimate_flops_f": 52704,
+      "estimate_flops_p": 940140,
+      "estimate_area_reduction_vs_p": "3.64x",
+      "estimate_area_reduction_vs_p_bus": "3.58x",
+      "label": "estimate"
+    },
+    "o_proj": {
+      "dimensions": "576x576",
+      "tile_shape": "16x64",
+      "grid": "36x9",
+      "total_tiles": 324,
+      "estimate_cells_f": 53483760,
+      "estimate_cells_p": 194545908,
+      "estimate_cells_p_bus": 191466936,
+      "estimate_flops_f": 158112,
+      "estimate_flops_p": 2820420,
+      "estimate_area_reduction_vs_p": "3.64x",
+      "estimate_area_reduction_vs_p_bus": "3.58x",
+      "label": "estimate"
+    },
+    "gate_proj": {
+      "dimensions": "1536x576",
+      "tile_shape": "16x64",
+      "grid": "96x9",
+      "total_tiles": 864,
+      "estimate_cells_f": 142623360,
+      "estimate_cells_p": 518789088,
+      "estimate_cells_p_bus": 510578496,
+      "estimate_flops_f": 421632,
+      "estimate_flops_p": 7521120,
+      "estimate_area_reduction_vs_p": "3.64x",
+      "estimate_area_reduction_vs_p_bus": "3.58x",
+      "label": "estimate"
+    },
+    "up_proj": {
+      "dimensions": "1536x576",
+      "tile_shape": "16x64",
+      "grid": "96x9",
+      "total_tiles": 864,
+      "estimate_cells_f": 142623360,
+      "estimate_cells_p": 518789088,
+      "estimate_cells_p_bus": 510578496,
+      "estimate_flops_f": 421632,
+      "estimate_flops_p": 7521120,
+      "estimate_area_reduction_vs_p": "3.64x",
+      "estimate_area_reduction_vs_p_bus": "3.58x",
+      "label": "estimate"
+    },
+    "down_proj": {
+      "dimensions": "576x1536",
+      "tile_shape": "16x64",
+      "grid": "36x24",
+      "total_tiles": 864,
+      "estimate_cells_f": 142715520,
+      "estimate_cells_p": 518881248,
+      "estimate_cells_p_bus": 510670656,
+      "estimate_flops_f": 421632,
+      "estimate_flops_p": 7521120,
+      "estimate_area_reduction_vs_p": "3.64x",
+      "estimate_area_reduction_vs_p_bus": "3.58x",
+      "label": "estimate"
+    }
+  },
+  "full_layer_totals": {
+    "total_tiles_per_layer": 3456,
+    "estimate_total_cells_f": 570585600,
+    "estimate_total_cells_p": 2075248512,
+    "estimate_total_cells_p_bus": 2042406144,
+    "estimate_overall_reduction_vs_p": "3.64x",
+    "estimate_overall_reduction_vs_p_bus": "3.58x",
+    "label": "estimate"
+  },
+  "caveat": "All extrapolated metrics are pre-layout logic-synthesis estimates; no placement, routing, or memory macros."
+}
