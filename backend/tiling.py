@@ -126,15 +126,22 @@ def pad_matrix(w: np.ndarray, tile_n: int, tile_k: int) -> tuple[np.ndarray, int
     Returns:
         Tuple of (w_padded, n_padded, k_padded).
     """
-    n, k = w.shape
+    if isinstance(w, np.ndarray):
+        w_arr = w
+    elif hasattr(w, "data") and isinstance(w.data, np.ndarray):
+        w_arr = w.data
+    else:
+        w_arr = np.asarray(w)
+
+    n, k = w_arr.shape
     n_padded = ((n + tile_n - 1) // tile_n) * tile_n
     k_padded = ((k + tile_k - 1) // tile_k) * tile_k
 
     if n_padded == n and k_padded == k:
-        return w.copy(), n, k
+        return w_arr.copy(), n, k
 
-    w_padded = np.zeros((n_padded, k_padded), dtype=w.dtype)
-    w_padded[:n, :k] = w
+    w_padded = np.zeros((n_padded, k_padded), dtype=w_arr.dtype)
+    w_padded[:n, :k] = w_arr
     return w_padded, n_padded, k_padded
 
 
