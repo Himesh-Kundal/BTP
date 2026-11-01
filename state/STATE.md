@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: T4.6 complete. Implemented verification/weight_audit.py static audit engine. Verified 0 weight ports, 0 w_* signals, and 0 memory arrays on generated Design F RTL. Negative controls successfully killed injected weight ports, storage, and simulation delays.
-- Next action (exact first step): Start T4.7 (RTL generation determinism test).
-- Gotchas / things I learned: Comments must be stripped before regex audit to avoid false positives on docstrings/headers while catching all syntactically active signals.
+- Done this session: T4.7 complete. Verified 100% byte-identical determinism on generated RTL and manifests. Verified headers omit timestamps and absolute paths.
+- Next action (exact first step): Start T4.G (Gate G4 review and RTL checklist audit).
+- Gotchas / things I learned: Determinism tests confirm neither random dictionary key order nor environment paths leak into RTL headers.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P4 (Specialization, Tiling, Backend F)   Current task: T4.6 (done)
+- Current phase: P4 (Specialization, Tiling, Backend F)   Current task: T4.7 (done)
 - Last green commit: 13bc0d2    Last gate tag: gate-G3
 - Gates passed: G0, G1, G2, G3
 
 ## Next 3 tasks
-1. T4.7 (`test_determinism.py`: RTL generation determinism)
-2. T4.G (Gate G4 review and RTL checklist audit)
-3. T5.1 (Design P baseline generator)
+1. T4.G (Gate G4 review and RTL checklist audit)
+2. T5.1 (Design P baseline generator)
+3. T5.2 (Testbench support for P weight-load phase)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
