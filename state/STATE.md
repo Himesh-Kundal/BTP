@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: T6.6 complete. Implemented standalone regression runner `verification/regression_runner.py` and `results/regression.json`. Executed full verification hardening matrix (7 suites, 124 tests, 853 vectors checked) cleanly in 22.23s via `make regression`. Proved Golden Rule 5 compliance (0 torch imports, 0 hardcoded model strings). Full regression and test suite green (`make regression` 124/124, `make check` 200/200).
-- Next action (exact first step): Start T6.7 (Waveform walkthrough with VCD dumps for passing and deliberately failing cases in `docs/walkthroughs/waveforms.md`).
-- Gotchas / things I learned: Verilator compilation dominates cross-sim runtime; non-multiple shapes require padded activations when driving testbench vectors; `gpg-preset-passphrase` with `allow-preset-passphrase` in `~/.gnupg/gpg-agent.conf` cleanly handles signed git commits.
+- Done this session: T6.7 complete. Implemented waveform walkthrough script `scripts/generate_waveforms.py` and documentation `docs/walkthroughs/waveforms.md`. Generated clean VCD dumps for passing transaction (L=1 delay), M1 sign-flip arithmetic fault, and M9 latency protocol fault. Documented cycle-by-cycle ASCII timing diagrams, picosecond event logs, and viva defense Q&A. Full test suite green (200/200 in 90.36s).
+- Next action (exact first step): Start T6.G (Gate G6 review, compile `results/gates/G6.md`, draft `docs/walkthroughs/P6.md`, tag `gate-G6`).
+- Gotchas / things I learned: Signal event logging directly from VCD confirms synchronous registered behavior; non-blocking signal comparisons cleanly distinguish arithmetic corruptions from timing/latency violations.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P6 (Verification Hardening)                   Current task: T6.6 (done)
-- Last green commit: cdee52c                                  Last gate tag: gate-G5
+- Current phase: P6 (Verification Hardening)                   Current task: T6.7 (done)
+- Last green commit: 986e9ca                                  Last gate tag: gate-G5
 - Gates passed: G0, G1, G2, G3, G4, G5
 
 ## Next 3 tasks
-1. T6.7 (Waveform walkthrough docs/walkthroughs/waveforms.md)
-2. T6.G (Gate G6 review, G6.md report, Phase 6 walkthrough P6.md, tag gate-G6)
-3. T7.1 (Yosys synthesis flow scripts for Design F and Design P)
+1. T6.G (Gate G6 review, G6.md report, Phase 6 walkthrough P6.md, tag gate-G6)
+2. T7.1 (Yosys synthesis flow scripts for Design F and Design P)
+3. T7.2 (Fairness protocol checklist implementation)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
