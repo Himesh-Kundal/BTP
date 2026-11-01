@@ -1,9 +1,9 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: T7.3 complete. Implemented synthesis experiment engine in `synth/experiments.py` with parallel execution via `ThreadPoolExecutor(max_workers=8)`. Executed Experiments E1 and E3 across tile grid (4,16), (8,16), (16,16), (16,64), (32,64) across Design F, P, and P_bus with real weights (`q_proj`, `gate_proj`, `down_proj`) and 5 random seeds. Produced `results/E1.csv` (52 records) and `results/E3.csv` (23 records). Confirmed 3.0x - 3.85x cell reduction in F vs P/P_bus, and 25-32% reduction in longest topological path depth (`ltp`). Full test suite green (212/212 in 144.48s).
-- Next action (exact first step): Start T7.4 (Branch `t7.4-experiment-e2`, execute Experiment E2 across 6 weight distribution classes in `synth/experiments.py`, generate `results/E2.csv`).
-- Gotchas / things I learned: Parallelizing Yosys synthesis over independent temporary directories scales near-linearly across CPU cores without shared state; constant-weight folding shortens critical paths by ~30% in generic gates.
+- Done this session: T7.4 complete. Executed Experiment E2 across 6 weight distribution classes (real, uniform-random, magnitude-matched, shuffled-real, all-zero, one-hot) with 5 seeds on identical (8, 16) tiles in `synth/experiments.py`. Output saved to `results/E2.csv`. Discovered: all-zero eliminates datapath logic completely (3 cells); real weights are ~23% smaller than uniform random INT8 due to lower average magnitude / bit-density; permutation (shuffled) and sign randomization (magnitude-matched) yield negligible difference (<2%). Full test suite green (212/212 in 144.48s).
+- Next action (exact first step): Start T7.5 (Branch `t7.5-extrapolation`, implement `synth/extrapolation.py` to fit area models for full layers, validate against synthesized larger points, compute error epsilon, and write `results/E5.json`).
+- Gotchas / things I learned: Real LLM weights are ~23% smaller in synthesizable logic than uniform random INT8 due to Gaussian-like concentration around 0; spatial shuffling has <1% impact on area.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
@@ -12,14 +12,14 @@
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
 
 ## Where we are
-- Current phase: P7 (Synthesis Evaluation)                    Current task: T7.4 (not started)
-- Last green commit: 02d2b17                                  Last gate tag: gate-G6
+- Current phase: P7 (Synthesis Evaluation)                    Current task: T7.5 (not started)
+- Last green commit: 1a3d3c2                                  Last gate tag: gate-G6
 - Gates passed: G0, G1, G2, G3, G4, G5, G6
 
 ## Next 3 tasks
-1. T7.4 (Experiment E2: weight distribution effect)
-2. T7.5 (Experiment E5: full-layer area extrapolation model and validation)
-3. T7.6 (Plots and tables generator: make report-figs)
+1. T7.5 (Experiment E5: full-layer area extrapolation model and validation)
+2. T7.6 (Plots and tables generator: make report-figs)
+3. T7.G (Gate G7 review & Phase 7 walkthrough)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
