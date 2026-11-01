@@ -1,0 +1,16 @@
+{
+  "model_id": "HuggingFaceTB/SmolLM2-135M",
+  "revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+  "model_type": "llama",
+  "architecture": "LlamaForCausalLM",
+  "config": {
+    "hidden_size": 576,
+    "intermediate_size": 1536,
+    "num_hidden_layers": 30,
+    "num_attention_heads": 9,
+    "num_key_value_heads": 3,
+    "head_dim": 64,
+    "tie_word_embeddings": true,
+    "vocab_size": 49152
+  }
+}
