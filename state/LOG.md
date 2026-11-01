@@ -29,4 +29,4 @@
 2026-11-01 20:50 | T3.7 | End-to-end compiler pipeline driver | Sequential passes, tested on real SmolLM2 layers, pipeline.py created | 07cdb3e
 2026-11-01 20:52 | T3.G | Gate G3 review and verification pass | All G3 checklist items green, Numeric checklist audited, G3.md report | d3968a5
 2026-11-01 20:58 | T4.1 | specialize constant weights and port stripping | tests/test_constant_weights.py PASS (6/6), make check PASS (101/101), Invariant I3 enforced | 578a176
-2026-11-01 21:02 | T4.2 | matrix tiling, zero-padding, manifest generation | tests/test_tiling.py PASS (6/6), make check PASS (107/107), property tests green | pending
+2026-11-01 21:02 | T4.2 | matrix tiling, zero-padding, manifest generation | tests/test_tiling.py PASS (6/6), make check PASS (107/107), property tests green | 03166c9
