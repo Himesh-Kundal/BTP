@@ -26,3 +26,5 @@
 2026-11-01 20:43 | T3.4 | Synthetic bias quantization per rule N5 | Scaling sb = sx * sw, 32-bit clipping, bit-exact against reference oracle | a6fb082
 2026-11-01 20:45 | T3.5 | Accumulator bound pass per rule N4 | K*128*127 + |bq|max < 2^31 enforced, acc_bits_min annotated on IR | 3ebee29
 2026-11-01 20:48 | T3.6 | Quantization quality evaluation (Claim C2) and thresholds | 21 configs evaluated, results/quant_quality.json, ADR-0001 frozen | 4c7679a
+2026-11-01 20:50 | T3.7 | End-to-end compiler pipeline driver | Sequential passes, tested on real SmolLM2 layers, pipeline.py created | 07cdb3e
+2026-11-01 20:52 | T3.G | Gate G3 review and verification pass | All G3 checklist items green, Numeric checklist audited, G3.md report | pending
