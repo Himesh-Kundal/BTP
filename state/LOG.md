@@ -36,3 +36,4 @@
 2026-11-01 21:23 | T4.6 | interface conformance & weight audit | tests/test_interface_conformance.py PASS (6/6), make check PASS (126/126), negative controls killed | 13bc0d2
 2026-11-01 21:26 | T4.7 | RTL generation determinism verification | tests/test_determinism.py PASS (3/3), make check PASS (129/129), byte-identical rerun | 45fc7de
 2026-11-01 21:32 | T4.G | Gate G4 review, RTL checklist audit, walkthrough | results/gates/G4.md PASS, docs/walkthroughs/P4.md, tag gate-G4, make check 130/130 | 7211ef0
+2026-11-01 21:40 | T5.1 | Design P baseline generator (W_reg & P_bus) | tests/test_baseline_p.py PASS (4/4), make check PASS (134/134), Rule N10 verified | fb0b883
