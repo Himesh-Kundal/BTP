@@ -59,7 +59,7 @@ PROJECTIONS = [
 
 
 def resolve_artifact_dir(layer: int, proj: str, repo_root: Path) -> Path:
-    """Resolve artifact path for SmolLM2-135M."""
+    """Resolve artifact path for SmolLM2-135M, extracting on fresh clone if missing."""
     artifacts_dir = repo_root / "artifacts"
     for candidate in sorted(artifacts_dir.glob("*")):
         if not candidate.is_dir():
@@ -67,6 +67,20 @@ def resolve_artifact_dir(layer: int, proj: str, repo_root: Path) -> Path:
         p = candidate / f"layer_{layer}" / proj
         if p.is_dir() and (p / "weight.npy").is_file():
             return p
+
+    # Auto-extract for fresh clone
+    if layer == 0:
+        print("[*] Layer 0 artifacts not found. Automatically extracting from model for fresh clone...")
+        from cli import main as cli_main
+        ret = cli_main(["extract", "--layer", "0", "--proj", "all", "--out", str(artifacts_dir)])
+        if ret == 0:
+            for candidate in sorted(artifacts_dir.glob("*")):
+                if not candidate.is_dir():
+                    continue
+                p = candidate / f"layer_{layer}" / proj
+                if p.is_dir() and (p / "weight.npy").is_file():
+                    return p
+
     raise FileNotFoundError(f"Could not locate artifacts for layer {layer} '{proj}'")
 
 
