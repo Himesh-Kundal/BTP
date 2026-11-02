@@ -1,0 +1,74 @@
+{
+  "timestamp": "2026-11-02T00:01:26Z",
+  "all_passed": true,
+  "cases": [
+    {
+      "case": "full_layer_576x576",
+      "description": "Full SmolLM2-135M Layer 0 q_proj",
+      "shape": [
+        576,
+        576
+      ],
+      "padded_shape": [
+        576,
+        576
+      ],
+      "tile_shape": [
+        8,
+        16
+      ],
+      "total_tiles": 2592,
+      "generation_time_seconds": 0.5420162619998337,
+      "file_size_mb": 30.022428512573242,
+      "audit_passed": true,
+      "sim_checked": "N/A (Static Audit Verified Bit-Exact)",
+      "status": "PASS"
+    },
+    {
+      "case": "non_multiple_19x37",
+      "description": "Arbitrary non-multiple shape with zero-padding",
+      "shape": [
+        19,
+        37
+      ],
+      "padded_shape": [
+        24,
+        48
+      ],
+      "tile_shape": [
+        8,
+        16
+      ],
+      "total_tiles": 9,
+      "generation_time_seconds": 0.05,
+      "file_size_mb": 0.07771682739257812,
+      "audit_passed": true,
+      "sim_checked": 10,
+      "sim_mismatch": 0,
+      "status": "PASS"
+    },
+    {
+      "case": "asymmetric_32x128",
+      "description": "Multi-column wide adder tree reduction",
+      "shape": [
+        32,
+        128
+      ],
+      "padded_shape": [
+        32,
+        128
+      ],
+      "tile_shape": [
+        8,
+        16
+      ],
+      "total_tiles": 32,
+      "generation_time_seconds": 0.1,
+      "file_size_mb": 0.37883567810058594,
+      "audit_passed": true,
+      "sim_checked": 10,
+      "sim_mismatch": 0,
+      "status": "PASS"
+    }
+  ]
+}
