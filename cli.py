@@ -522,7 +522,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Extract model weights and capture calibration activations",
     )
     p_extract.add_argument("--model", type=str, default="HuggingFaceTB/SmolLM2-135M", help="Model ID or directory")
-    p_extract.add_argument("--revision", type=str, default="93efa2f097d5bad609955792945d81bbf5cb9836", help="Pinned commit")
+    p_extract.add_argument("--revision", type=str, default="93efa2f097d58c2a74874c7e644dbc9b0cee75a2", help="Pinned commit")
     p_extract.add_argument("--layer", type=str, default="0", help="Layer index (0..29) or 'all'")
     p_extract.add_argument("--proj", type=str, default="all", help="Projection type or 'all'")
     p_extract.add_argument("--out", type=Path, default=Path("artifacts"), help="Output artifact directory")
