@@ -14,7 +14,7 @@ Modern Large Language Models (LLMs) are predominantly memory-bound during autore
 
 This report presents **LLMHW**, an end-to-end, model-specific hardware compiler that translates dense linear projections of modern transformer architectures into synthesizable Verilog-2001 with INT8 weights embedded directly as compile-time constants (**Design F**). By eliminating runtime weight ports, weight write buses, and internal weight storage flip-flops (Invariant **I3**), LLMHW achieves an empirical **3.0× to 3.85× standard-cell area reduction**, an **up to 17.7× flip-flop reduction**, and a **20% to 32% critical path shortening** compared to a strictly audited programmable baseline (**Design P**).
 
-Every generated hardware core is proven **bit-exact** against an independent NumPy INT64 reference oracle (**Claim C1**), achieving 0 mismatches across all 7 projection types (`q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj`) of **SmolLM2-135M** across network depths. The verification harness achieves a **100.0% mutation kill rate** across 9 structural fault models (M1–M9) and passes dual-simulator cross-checks across Icarus Verilog and Verilator. Full-layer multi-tile extrapolation models are validated against direct multi-tile synthesis with an estimation error of 10.82%.
+Every generated hardware core is proven **bit-exact** against an independent NumPy INT64 reference oracle (**Claim C1**), achieving 0 mismatches across all 7 projection types (`q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj`) of **SmolLM2-135M** across network depths. The verification framework achieves a **100.0% mutation kill rate** across 9 structural fault models (M1–M9) and passes dual-simulator cross-checks across Icarus Verilog and Verilator. Full-layer multi-tile extrapolation models are validated against direct multi-tile synthesis with an estimation error of 10.82%.
 
 ---
 
@@ -245,4 +245,4 @@ See [`README.md`](../README.md) for full directory structure.
 - `ADR-0003`: Fixed Pipeline Latency $L=1$ for Design F and Design P.
 
 ### Appendix D: Academic Integrity & AI-Assistance Disclosure
-This project utilized an LLM-based agentic programming assistant for boilerplate scaffolding, test suite generation, and document formatting. All numeric contracts, mathematical bounds, hardware architectures, and experimental methodologies were formally verified, audited, and executed by the student.
+This project utilized AI assistance for boilerplate scaffolding, test suite generation, and document formatting. All numeric contracts, mathematical bounds, hardware architectures, and experimental methodologies were formally verified, audited, and executed by the student.
