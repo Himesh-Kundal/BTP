@@ -2,7 +2,7 @@
 
 **Author:** Himesh Kundal (Roll No.: 23EC10030)  
 **Project:** B.Tech Project (Part I)  
-**Date:** November 2026  
+**Date:** November 4, 2026  
 **Target Architecture:** HuggingFaceTB/SmolLM2-135M  
 **Traceability Reference:** [`docs/report_traceability.md`](report_traceability.md)  
 
