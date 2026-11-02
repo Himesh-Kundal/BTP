@@ -35,7 +35,7 @@ demo-toy:
 	@$(PYTHON) examples/compile_linear.py --toy
 
 demo:
-	@echo "Demo target: placeholder for T8.2"
+	@$(PYTHON) scripts/run_multi_layer_demo.py
 
 clean:
 	rm -rf build/ artifacts/ *.vcd __pycache__ .pytest_cache
