@@ -58,3 +58,7 @@
 2026-11-02 05:27 | T8.1 | Unified CLI interface llmhw (extract, compile, verify, synth) | cli.py, llmhw, tests/test_cli.py PASS (10/10), make check PASS (226/226) | dec4a51
 2026-11-02 05:30 | T8.2 | Multi-layer demo make demo across all 7 projections | scripts/run_multi_layer_demo.py, results/demo_layer0.json, make demo PASS (3.58s) | 7911a1c
 2026-11-02 05:32 | T8.3 | Varying-shape demo across full-layer, non-multiple, asymmetric shapes | scripts/run_varying_shape_demo.py, results/demo.json, tests/test_varying_shape_demo.py PASS | 17317e9
+2026-11-02 05:36 | T8.4 | README, limitations, and fresh-clone reproduction verification | README.md, docs/limitations.md, fresh clone make demo PASS (9.23s) | 4c46e53
+2026-11-02 05:40 | T8.5 | Final thesis report draft and numerical traceability table | docs/report.md, docs/report_traceability.md (44 items), tests/test_report_traceability.py PASS | 6409cea
+2026-11-02 05:41 | T8.6 | Presentation slide outline and viva defense preparation guide | docs/presentation_skeleton.md (15 slides), docs/viva_prep.md (all 6 questions) | 7ac7baf
+2026-11-02 05:48 | T8.G | Gate G8 review, Phase 8 walkthrough, tag gate-G8 | results/gates/G8.md PASS, docs/walkthroughs/P8.md, tag gate-G8, make check 230/230 | gate-G8
