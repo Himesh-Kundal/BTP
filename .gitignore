@@ -2,22 +2,42 @@
 .venv/
 .python-version
 
-# Build & runtime artifacts (hashes tracked in results/)
+# Build & runtime artifacts (model weights & temporary hardware builds)
 artifacts/
 build/
+obj_dir/
 *.vcd
 *.hex
 *.vvp
 *.o
 
-# Python caches
+# Python caches & coverage
 __pycache__/
 *.py[cod]
 *$py.class
 .pytest_cache/
 .ruff_cache/
+.coverage
+htmlcov/
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+report/main.pdf
+
+# Ephemeral CLI test outputs
+results/cli_synth_report.json
+results/cli_verify_report.json
 
 # OS / Editor
 .DS_Store
 *.swp
 *.swo
+*~
+.vscode/
+.idea/
