@@ -56,3 +56,5 @@
 2026-11-02 05:07 | T7.6 | Report figures & synthesis summary generator | make report-figs, results/figures/ (4 figs, PNG+SVG), results/synthesis_summary.md, make check PASS (216/216) | dc79cd6
 2026-11-02 05:10 | T7.G | Gate G7 review, Phase 7 walkthrough, tag gate-G7 | results/gates/G7.md PASS, docs/walkthroughs/P7.md, tag gate-G7, make check 216/216 | d45c7b7
 2026-11-02 05:27 | T8.1 | Unified CLI interface llmhw (extract, compile, verify, synth) | cli.py, llmhw, tests/test_cli.py PASS (10/10), make check PASS (226/226) | dec4a51
+2026-11-02 05:30 | T8.2 | Multi-layer demo make demo across all 7 projections | scripts/run_multi_layer_demo.py, results/demo_layer0.json, make demo PASS (3.58s) | 7911a1c
+2026-11-02 05:32 | T8.3 | Varying-shape demo across full-layer, non-multiple, asymmetric shapes | scripts/run_varying_shape_demo.py, results/demo.json, tests/test_varying_shape_demo.py PASS | 17317e9

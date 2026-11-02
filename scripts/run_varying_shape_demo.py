@@ -37,7 +37,7 @@ from verification.weight_audit import audit_weights_match
 
 
 def resolve_layer0_q_proj(repo_root: Path) -> np.ndarray:
-    """Load real layer 0 q_proj weights."""
+    """Load real layer 0 q_proj weights, extracting on fresh clone if missing."""
     artifacts_dir = repo_root / "artifacts"
     for candidate in sorted(artifacts_dir.glob("*")):
         if not candidate.is_dir():
@@ -47,6 +47,21 @@ def resolve_layer0_q_proj(repo_root: Path) -> np.ndarray:
             w_float = np.load(p)
             w_q, _ = quantize_weights(w_float)
             return w_q
+
+    # Auto-extract on fresh clone
+    print("[*] Layer 0 artifacts not found. Automatically extracting from model for fresh clone...")
+    from cli import main as cli_main
+    ret = cli_main(["extract", "--layer", "0", "--proj", "all", "--out", str(artifacts_dir)])
+    if ret == 0:
+        for candidate in sorted(artifacts_dir.glob("*")):
+            if not candidate.is_dir():
+                continue
+            p = candidate / "layer_0" / "q_proj" / "weight.npy"
+            if p.is_file():
+                w_float = np.load(p)
+                w_q, _ = quantize_weights(w_float)
+                return w_q
+
     raise FileNotFoundError("Could not locate layer 0 q_proj weight.npy")
 
 
