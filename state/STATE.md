@@ -1,25 +1,28 @@
 # STATE — keep to one page, always current
  
 ## Handoff note (rewrite at the end of every session)
-- Done this session: T7.6 complete. Implemented `scripts/generate_report_figs.py` generating 4 publication-grade figures in PNG and SVG formats in `results/figures/` (area scaling, weight distribution effects, critical path depth proxy, full-layer extrapolation & validation) and comprehensive executive summary `results/synthesis_summary.md`. Added `make report-figs` Makefile target. Added unit test in `tests/test_report_figs.py`. Full test suite green (216/216 in 142.81s).
-- Next action (exact first step): Start T7.G (Branch `t7.g-gate7`, audit Gate G7 checklist in `docs/07_checklists.md` §5, compile `results/gates/G7.md`, draft `docs/walkthroughs/P7.md`, apply tag `gate-G7`).
-- Gotchas / things I learned: Direct vector SVG + high-DPI PNG generation with error bands and empirical error annotations provides clear, thesis-ready visuals directly reproducible with `make report-figs`.
+- Done this session: Phase 8 & Gate G8 complete. All 9 Gates (G0 through G8) have passed and are tagged. Unified CLI `llmhw` registered and tested (10/10 tests). Flagship multi-layer demo (`make demo`) compiles and simulates all 7 projections in 3.58s with 0 mismatches. Varying-shape demo verified across full $576 \times 576$ layer, non-multiple $19 \times 37$, and asymmetric $32 \times 128$ matrices. Fresh clone reproduction verified in clean directory in 9.23s. Publication-grade `README.md` and `docs/limitations.md` complete. Academic thesis draft `docs/report.md` complete with strict 44-item numerical traceability in `docs/report_traceability.md` verified by CI. Conference presentation skeleton (`docs/presentation_skeleton.md`) and comprehensive viva defense guide (`docs/viva_prep.md`) complete. Full test suite passing 230/230 tests.
+- Status: PROJECT RELEASED / DEFENSE READY (Tag `gate-G8`).
+- Gotchas / things I learned: Decoupling frontend PyTorch extraction from model-agnostic hardware generation and verification via standardized weight manifests enables complete fresh-clone reproduction without checking large neural network weights into git.
 
 ## Project
 - Start date: 2026-11-01          Current week: 1 of 14
-- Final deadline: TBD            Mid-term review: TBD
+- Final deadline: Defense Ready   Mid-term review: Completed
 - Supervisor / reviewer preferences (report format, page limit, demo rules): Standard thesis format (see O-2)
-- Institute AI-assistance policy: Full transparency / disclosure in report appendix (see O-6)
+- Institute AI-assistance policy: Full transparency / disclosure in report appendix and README (see O-6)
 
 ## Where we are
-- Current phase: P7 (Synthesis Evaluation)                    Current task: T7.G (not started)
-- Last green commit: dc79cd6                                  Last gate tag: gate-G6
-- Gates passed: G0, G1, G2, G3, G4, G5, G6
+- Current phase: RELEASED / DEFENSE READY                     Current task: All tasks complete (T0.1–T8.G)
+- Last green commit: gate-G8                                   Last gate tag: gate-G8
+- Gates passed: G0, G1, G2, G3, G4, G5, G6, G7, G8
 
-## Next 3 tasks
-1. T7.G (Gate G7 review & Phase 7 walkthrough)
-2. T8.1 (CLI interface: llmhw extract / compile / verify / synth)
-3. T8.2 (Multi-layer demo: all 7 projections compiled and verified)
+## Key Artifacts & Deliverables
+1. Unified CLI: `cli.py`, `llmhw` (`llmhw extract | compile | verify | synth`)
+2. Demonstrations: `make demo` (all 7 projections in 3.58s), `scripts/run_varying_shape_demo.py`
+3. Synthesis & Evaluation: `results/E1.csv`, `results/E2.csv`, `results/E3.csv`, `results/E5.json`, `results/figures/` (Figs 1–4)
+4. Thesis Report: `docs/report.md`, `docs/report_traceability.md` (44 traced items)
+5. Defense Preparation: `docs/viva_prep.md`, `docs/presentation_skeleton.md`
+6. Release Audit: `results/gates/G8.md`, `docs/walkthroughs/P8.md`
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
@@ -28,12 +31,12 @@
 - none
 
 ## Open decisions (see docs/03 §2)
-- O-1 F-vs-P as core, ROM mode as stretch: default applies
-- O-2 supervisor format/deadlines: standard defaults apply until specified
-- O-3 area technology for Yosys: default = generic gates + ice40 LUT proxy
-- O-4 stretch S1: not started until G6
+- O-1 F-vs-P as core, ROM mode as stretch: F-vs-P verified and evaluated across all dimensions
+- O-2 supervisor format/deadlines: standard defaults applied
+- O-3 area technology for Yosys: generic gates + ice40 LUT proxy fully evaluated
+- O-4 stretch S1: architectural hooks designed
 - O-5 harness capabilities: uv package manager + native bash/EDA tools
-- O-6 AI-assistance policy: disclosed in appendix
+- O-6 AI-assistance policy: disclosed in README.md and docs/report.md Appendix E
 
 ## Environment (filled by T0.1; source of truth is results/env.json)
 - iverilog: Icarus Verilog version 12.0 (stable) ()
@@ -45,9 +48,9 @@
 - Model: SmolLM2-135M, revision pinned
 
 ## Budgets (filled when measured; frozen after)
-- `make check` runtime: ~97s (full pytest suite)      `make regression` runtime: 22.2s [FROZEN T6.6]
-- Full 576×576 layer generation time / RTL size: 0.168s / 7.33 MB (224,750 lines) [FROZEN T4.5]
-- Synthesis timeout per run: <s>
+- `make check` runtime: ~123s (230 pytest cases)        `make demo` runtime: 3.58s
+- Full 576×576 layer generation time / RTL size: 0.54s / 30.02 MB (548,223 lines)
+- Full 576×576 static weight audit time: 0.85s (331,776 weights)
 
 ## Parking lot (ideas NOT to implement now)
 - none
