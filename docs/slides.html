@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTP Defense Presentation | Himesh Kundal (23EC10030)</title>
+    <!-- KaTeX CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <!-- Prism CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #0b0f17;
+            --slide-bg: #111827;
+            --card-bg: rgba(255, 255, 255, 0.04);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-color: #f3f4f6;
+            --text-muted: #9ca3af;
+            --cyan: #00e5ff;
+            --cyan-glow: rgba(0, 229, 255, 0.25);
+            --amber: #f59e0b;
+            --emerald: #10b981;
+            --rose: #f43f5e;
+            --header-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --mono-font: "JetBrains Mono", "Fira Code", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--header-font);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 48px;
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 50;
+            font-size: 0.85rem;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            color: var(--cyan);
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-color);
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+            background: rgba(0, 229, 255, 0.1);
+        }
+
+        .nav-btn.active {
+            background: var(--cyan);
+            color: #0b0f17;
+            font-weight: 700;
+        }
+
+        /* Slide Viewport */
+        .viewport {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .slide {
+            position: absolute;
+            width: 92vw;
+            max-width: 1380px;
+            height: 86vh;
+            background: var(--slide-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 36px 48px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            display: none;
+            flex-direction: column;
+            opacity: 0;
+            transform: scale(0.98);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Slide Header */
+        .slide-header {
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .slide-title-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .slide-category {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--cyan);
+            font-weight: 700;
+        }
+
+        .slide-title {
+            font-size: 1.95rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
+        .slide-num-badge {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: var(--card-bg);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+        }
+
+        /* Slide Body Layouts */
+        .slide-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            height: 100%;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-60-40 {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 24px;
+            height: 100%;
+        }
+
+        .grid-40-60 {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 24px;
+            height: 100%;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--cyan);
+        }
+
+        .card-title.amber { color: var(--amber); }
+        .card-title.emerald { color: var(--emerald); }
+        .card-title.rose { color: var(--rose); }
+
+        /* Metric Callouts */
+        .metric-badge {
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.12), rgba(0, 229, 255, 0.02));
+            border: 1px solid var(--cyan);
+            border-radius: 12px;
+            padding: 16px 20px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--cyan);
+            line-height: 1.1;
+        }
+
+        .metric-value.amber { color: var(--amber); }
+        .metric-value.emerald { color: var(--emerald); }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        /* Tables */
+        table.slide-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+
+        table.slide-table th, table.slide-table td {
+            padding: 8px 12px;
+            border: 1px solid var(--card-border);
+            text-align: left;
+        }
+
+        table.slide-table th {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--cyan);
+            font-weight: 600;
+        }
+
+        table.slide-table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Bullet lists */
+        ul.slide-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        ul.slide-list li {
+            position: relative;
+            padding-left: 24px;
+            font-size: 1.05rem;
+            line-height: 1.5;
+            color: #e5e7eb;
+        }
+
+        ul.slide-list li::before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: var(--cyan);
+            font-size: 1.2rem;
+            line-height: 1.2;
+        }
+
+        /* Code Blocks */
+        pre[class*="language-"] {
+            margin: 0 !important;
+            padding: 14px !important;
+            border-radius: 8px !important;
+            background: #0d1117 !important;
+            border: 1px solid var(--card-border) !important;
+            font-size: 0.85rem !important;
+            line-height: 1.4 !important;
+        }
+
+        /* Images */
+        .chart-img {
+            max-width: 100%;
+            max-height: 380px;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            background: #ffffff;
+            padding: 4px;
+        }
+
+        /* Speaker Notes Panel */
+        .notes-drawer {
+            position: fixed;
+            bottom: 40px;
+            left: 0;
+            right: 0;
+            height: 240px;
+            background: #0d121d;
+            border-top: 2px solid var(--cyan);
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.8);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .notes-drawer.open {
+            transform: translateY(0);
+        }
+
+        .notes-header {
+            padding: 10px 20px;
+            background: #151c2c;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--cyan);
+        }
+
+        .notes-content {
+            padding: 16px 24px;
+            overflow-y: auto;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #d1d5db;
+        }
+
+        .notes-content blockquote {
+            border-left: 3px solid var(--amber);
+            padding-left: 14px;
+            font-style: italic;
+            color: #fef3c7;
+        }
+
+        /* Slide Sorter / Overview Modal */
+        .overview-modal {
+            position: fixed;
+            top: 48px;
+            bottom: 40px;
+            left: 0;
+            right: 0;
+            background: rgba(11, 15, 23, 0.95);
+            backdrop-filter: blur(12px);
+            z-index: 90;
+            padding: 30px;
+            overflow-y: auto;
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .overview-modal.open {
+            display: grid;
+        }
+
+        .overview-thumb {
+            background: var(--slide-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 140px;
+        }
+
+        .overview-thumb:hover, .overview-thumb.active {
+            border-color: var(--cyan);
+            box-shadow: 0 0 15px var(--cyan-glow);
+            transform: translateY(-2px);
+        }
+
+        .overview-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        /* Bottom Status Bar */
+        .bottom-bar {
+            height: 38px;
+            background: rgba(17, 24, 39, 0.95);
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 50;
+        }
+
+        .progress-bar-container {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0 20px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--cyan);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="top-bar">
+        <div class="top-bar-left">
+            <i class="fa-solid fa-microchip"></i>
+            <span>BTP Defense | Model-Specific Verilog Compilation</span>
+        </div>
+        <div class="top-bar-right">
+            <button class="nav-btn" id="btn-notes" title="Toggle Speaker Notes (N)">
+                <i class="fa-solid fa-microphone-lines"></i> <span>Notes (N)</span>
+            </button>
+            <button class="nav-btn" id="btn-overview" title="Slide Overview (O)">
+                <i class="fa-solid fa-table-cells"></i> <span>Grid (O)</span>
+            </button>
+            <button class="nav-btn" id="btn-fullscreen" title="Toggle Fullscreen (F)">
+                <i class="fa-solid fa-expand"></i> <span>Fullscreen (F)</span>
+            </button>
+            <button class="nav-btn" id="btn-doc-viewer" onclick="window.location.href='index.html'" title="Return to Document Viewer">
+                <i class="fa-solid fa-book-open"></i> <span>Docs</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- SLIDE VIEWPORT -->
+    <main class="viewport">
+
+        <!-- SLIDE 1: TITLE -->
+        <section class="slide active" data-slide="1">
+            <div style="height: 100%; display: flex; flex-direction: column; justify-content: space-between; text-align: center; padding: 20px 0;">
+                <div>
+                    <img src="figures/iitkgp_logo.png" alt="IIT KGP" style="height: 90px; margin-bottom: 16px; filter: drop-shadow(0 0 12px rgba(255,255,255,0.2));">
+                    <p style="color: var(--cyan); font-weight: 700; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 2px;">
+                        Department of Electronics & Electrical Communication Engineering • IIT Kharagpur
+                    </p>
+                    <h1 style="font-size: 2.35rem; font-weight: 800; margin: 16px auto; max-width: 1000px; line-height: 1.25; color: #ffffff;">
+                        Model-Specific Hardware Compilation of Dense Transformer Projections into Synthesizable Constant-Weight Verilog
+                    </h1>
+                    <p style="font-size: 1.15rem; color: var(--text-muted); margin-bottom: 24px;">
+                        B.Tech Project (Part I) Defense Presentation
+                    </p>
+                </div>
+
+                <div style="display: flex; justify-content: center; gap: 60px; text-align: left; background: var(--card-bg); padding: 18px 36px; border-radius: 12px; border: 1px solid var(--card-border); max-width: 800px; margin: 0 auto;">
+                    <div>
+                        <div style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Candidate</div>
+                        <div style="font-size: 1.1rem; font-weight: 700; color: #ffffff;">Himesh Kundal</div>
+                        <div style="font-size: 0.85rem; color: var(--cyan);">Roll No: 23EC10030</div>
+                    </div>
+                    <div style="border-left: 1px solid var(--card-border); padding-left: 60px;">
+                        <div style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">Supervisor</div>
+                        <div style="font-size: 1.1rem; font-weight: 700; color: #ffffff;">Prof. Mrityunjoy Chakraborty</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">Dept. of E&ECE, IIT Kharagpur</div>
+                    </div>
+                </div>
+
+                <div class="grid-3" style="max-width: 1000px; margin: 0 auto; width: 100%;">
+                    <div class="metric-badge">
+                        <div class="metric-value">3.85×</div>
+                        <div class="metric-label">Logic Area Reduction</div>
+                    </div>
+                    <div class="metric-badge">
+                        <div class="metric-value amber">17.7×</div>
+                        <div class="metric-label">Flip-Flop Elimination</div>
+                    </div>
+                    <div class="metric-badge">
+                        <div class="metric-value emerald">100%</div>
+                        <div class="metric-label">Bit-Exact Parity</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: PROBLEM STATEMENT -->
+        <section class="slide" data-slide="2">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <span class="slide-category">Motivation & Problem Statement</span>
+                    <h2 class="slide-title">The Memory Wall & The "Generality Tax"</h2>
+                </div>
+                <span class="slide-num-badge">02 / 16</span>
+            </div>
+            <div class="slide-body grid-2">
+                <div class="card">
+                    <div class="card-title rose"><i class="fa-solid fa-triangle-exclamation"></i> The Generality Problem in Edge NPUs</div>
+                    <ul class="slide-list">
+                        <li><strong>Standard NPUs/GPUs must support any model:</strong> They require heavy writable SRAMs, register files, and address decoding.</li>
+                        <li><strong>Generic Multiplier Tax:</strong> $8\times 8$ Baugh-Wooley multipliers require 64 AND gates + 56 Full Adders ($\approx 380$ gates per MAC).</li>
+                        <li><strong>Overhead:</strong> Up to <strong>75% of accelerator silicon area</strong> is spent managing weight mutability!</li>
+                    </ul>
+                    <div style="margin-top: auto; padding: 12px; background: rgba(244, 63, 94, 0.1); border-left: 3px solid var(--rose); border-radius: 6px; font-size: 0.9rem;">
+                        <strong>The Question:</strong> In fixed-purpose appliances, weights never change post-training. Why pay the generality tax?
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title emerald"><i class="fa-solid fa-lightbulb"></i> The Model-Specific Specialization Opportunity</div>
+                    <ul class="slide-list">
+                        <li><strong>Fixed Appliance Reality:</strong> In UAV flight control, automotive radar, and robotics, the trained model is frozen.</li>
+                        <li><strong>Compile Weights into Silicon:</strong> Replace memory arrays and multipliers with <em>hardcoded constant standard cells</em>.</li>
+                        <li><strong>Zero Weight Ports:</strong> Completely eliminate weight buses, write-enables, and weight register flip-flops.</li>
+                        <li><strong>Instant Benefits:</strong> Faster clock, zero weight SRAM leakage, and massive area shrink.</li>
+                    </ul>
+                    <div style="margin-top: auto; padding: 12px; background: rgba(16, 185, 129, 0.1); border-left: 3px solid var(--emerald); border-radius: 6px; font-size: 0.9rem;">
+                        <strong>Our Approach:</strong> Automated compiler that converts PyTorch weights directly into synthesizable Verilog-2001 logic.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: SYSTEM ARCHITECTURE -->
+        <section class="slide" data-slide="3">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <span class="slide-category">System Architecture</span>
+                    <h2 class="slide-title">The LLMHW Hardware Compiler Pipeline</h2>
+                </div>
+                <span class="slide-num-badge">03 / 16</span>
+            </div>
+            <div class="slide-body">
+                <div class="card" style="padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 0.85rem; text-align: center;">
+                        <div style="flex: 1; background: rgba(255,255,255,0.06); padding: 14px 10px; border-radius: 8px; border: 1px solid var(--cyan);">
+                            <i class="fa-brands fa-python" style="font-size: 1.5rem; color: var(--cyan); margin-bottom: 6px;"></i>
+                            <div style="font-weight: 700;">HuggingFace Model</div>
+                            <div style="color: var(--text-muted); font-size: 0.75rem;">SmolLM2-135M</div>
+                        </div>
+                        <i class="fa-solid fa-arrow-right" style="color: var(--cyan);"></i>
+                        <div style="flex: 1; background: rgba(255,255,255,0.06); padding: 14px 10px; border-radius: 8px; border: 1px solid var(--card-border);">
+                            <i class="fa-solid fa-filter" style="font-size: 1.5rem; color: var(--amber); margin-bottom: 6px;"></i>
+                            <div style="font-weight: 700;">Frontend & Quant</div>
+                            <div style="color: var(--text-muted); font-size: 0.75rem;">Symmetric INT8</div>
+                        </div>
+                        <i class="fa-solid fa-arrow-right" style="color: var(--cyan);"></i>
+                        <div style="flex: 1; background: rgba(255,255,255,0.06); padding: 14px 10px; border-radius: 8px; border: 1px solid var(--emerald);">
+                            <i class="fa-solid fa-file-code" style="font-size: 1.5rem; color: var(--emerald); margin-bottom: 6px;"></i>
+                            <div style="font-weight: 700;">TileManifest IR</div>
+                            <div style="color: var(--text-muted); font-size: 0.75rem;">Model-Agnostic JSON</div>
+                        </div>
+                        <i class="fa-solid fa-arrow-right" style="color: var(--cyan);"></i>
+                        <div style="flex: 1.2; background: rgba(255,255,255,0.06); padding: 14px 10px; border-radius: 8px; border: 1px solid var(--cyan);">
+                            <i class="fa-solid fa-microchip" style="font-size: 1.5rem; color: var(--cyan); margin-bottom: 6px;"></i>
+                            <div style="font-weight: 700;">Verilog Backend</div>
+                            <div style="color: var(--text-muted); font-size: 0.75rem;">Design F & Design P</div>
+                        </div>
+                        <i class="fa-solid fa-arrow-right" style="color: var(--cyan);"></i>
+                        <div style="flex: 1; background: rgba(255,255,255,0.06); padding: 14px 10px; border-radius: 8px; border: 1px solid var(--amber);">
+                            <i class="fa-solid fa-shield-halved" style="font-size: 1.5rem; color: var(--amber); margin-bottom: 6px;"></i>
+                            <div style="font-weight: 700;">Verification & Synth</div>
+                            <div style="color: var(--text-muted); font-size: 0.75rem;">NumPy Oracle & Yosys</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-title"><i class="fa-solid fa-layer-group"></i> Golden Rule 5: Strict Architectural Layering</div>
+                        <ul class="slide-list">
+                            <li><strong>PyTorch Isolation:</strong> `torch` is strictly restricted to `frontend/`.</li>
+                            <li><strong>Model-Agnostic Core:</strong> Compiler, IR, Verilog codegen, and testbenches have <em>zero model dependencies</em>.</li>
+                            <li><strong>Reusability:</strong> Can compile LLaMA-3, Mistral, or custom DSP FIR filters without changing backend code!</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-title amber"><i class="fa-solid fa-check-double"></i> Two Synthesis Targets for Scientific Rigor</div>
+                        <ul class="slide-list">
+                            <li><strong>Design F (Fixed):</strong> Weights compiled as constant literals; zero-skipping; direct wire routing.</li>
+                            <li><strong>Design P (Programmable):</strong> Rigorous baseline with weight write-ports and memory flip-flops.</li>
+                            <li><strong>Rule N10 Fairness:</strong> Identical port widths, clocking, and $L=1$ registered latency.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: TARGET WORKLOAD -->
+        <section class="slide" data-slide="4">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <span class="slide-category">Workload Profiling</span>
+                    <h2 class="slide-title">Target Model: SmolLM2-135M Projections</h2>
+                </div>
+                <span class="slide-num-badge">04 / 16</span>
+            </div>
+            <div class="slide-body grid-60-40">
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-table"></i> All 7 Dense Linear Projections Profiled</div>
+                    <table class="slide-table">
+                        <thead>
+                            <tr>
+                                <th>Sub-Module</th>
+                                <th>Projection</th>
+                                <th>Dimensions ($N \times K$)</th>
+                                <th>Weights</th>
+                                <th>Role</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Self-Attention</td><td><code>q_proj</code></td><td>$576 \times 576$</td><td>331,776</td><td>Query vector</td></tr>
+                            <tr><td>Self-Attention</td><td><code>k_proj</code></td><td>$192 \times 576$</td><td>110,592</td><td>Key (GQA: 3 grps)</td></tr>
+                            <tr><td>Self-Attention</td><td><code>v_proj</code></td><td>$192 \times 576$</td><td>110,592</td><td>Value (GQA: 3 grps)</td></tr>
+                            <tr><td>Self-Attention</td><td><code>o_proj</code></td><td>$576 \times 576$</td><td>331,776</td><td>Output projection</td></tr>
+                            <tr><td>SwiGLU MLP</td><td><code>gate_proj</code></td><td>$1536 \times 576$</td><td>884,736</td><td>Gating projection</td></tr>
+                            <tr><td>SwiGLU MLP</td><td><code>up_proj</code></td><td>$1536 \times 576$</td><td>884,736</td><td>Up-scaling</td></tr>
+                            <tr><td>SwiGLU MLP</td><td><code>down_proj</code></td><td>$576 \times 1536$</td><td>884,736</td><td>Down-reduction</td></tr>
+                        </tbody>
+                    </table>
+                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">
+                        Total per block: <strong>3,538,944 weights</strong> × 30 blocks = <strong>106.17 Million Weights</strong> (>78% of model).
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title amber"><i class="fa-solid fa-diagram-project"></i> Transformer Block Mapping</div>
+                    <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 14px; font-size: 0.88rem; line-height: 1.6;">
+                        <div style="color: var(--cyan); font-weight: 700; margin-bottom: 4px;">1. Self-Attention Engine:</div>
+                        • Input dimension: $D = 576$<br>
+                        • Grouped-Query Attention (9 Q heads, 3 KV heads)<br>
+                        <div style="color: var(--amber); font-weight: 700; margin: 10px 0 4px;">2. SwiGLU MLP Block:</div>
+                        • Intermediate expansion: $D_{\text{ff}} = 1536$<br>
+                        • Gate & Up linear projections followed by element-wise Swish, reduced by Down projection.
+                    </div>
+                    <div class="metric-badge" style="margin-top: auto;">
+                        <div class="metric-value" style="font-size: 1.8rem;">210 Layers</div>
+                        <div class="metric-label">Dense Projections Compiled</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: NUMERIC RIGOR -->
+        <section class="slide" data-slide="5">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <span class="slide-category">Mathematical Foundation</span>
+                    <h2 class="slide-title">Quantization & Bit-Growth Proofs</h2>
+                </div>
+                <span class="slide-num-badge">05 / 16</span>
+            </div>
+            <div class="slide-body grid-2">
+                <div class="card">
+                    <div class="card-title rose"><i class="fa-solid fa-ban"></i> Why Forbid -128? (Two's Complement Proof)</div>
+                    <ul class="slide-list" style="font-size: 0.95rem;">
+                        <li>8-bit signed range: $[-128, +127]$. But $-128$ has <strong>no positive counterpart</strong>!</li>
+                        <li><strong>Unary Negation Overflow:</strong> Inverting bits of $-128$ (`1000_0000`) and adding 1:
+                            $$\text{inv}(\texttt{1000\_0000}) + 1 = \texttt{0111\_1111} + 1 = \texttt{1000\_0000} = \mathbf{-128 \neq +128!}$$
+                        </li>
+                        <li>Restricting strictly to <strong>$[-127, +127]$</strong> guarantees hardware negation $-x$ is closed and exact.</li>
+                        <li><strong>Round-Half-to-Even:</strong> Guarantees zero statistical DC bias ($\mathbb{E}[\epsilon] = 0$). Cosine Similarity $> 0.9994$.</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-title emerald"><i class="fa-solid fa-calculator"></i> Accumulator Bit-Growth Proof</div>
+                    <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 14px; font-size: 0.9rem; line-height: 1.6;">
+                        Max product of two INT8 numbers: $127 \times 127 = 16{,}129$.<br>
+                        Required signed bits for inner product length $K$:
+                        $$B_{\text{req}}(K) = 1 + \lceil \log_2(K \times 16{,}129) \rceil$$
+                        • $K=576$ (Attention): $\max |y| = 9{,}290{,}304 \implies \mathbf{25\text{ bits}}$<br>
+                        • $K=1536$ (Down Proj): $\max |y| = 24{,}774{,}144 \implies \mathbf{26\text{ bits}}$
+                    </div>
+                    <div class="metric-badge" style="margin-top: auto;">
+                        <div class="metric-value emerald" style="font-size: 2rem;">6 to 7 Bits</div>
+                        <div class="metric-label">Guaranteed Overflow Headroom in 32-bit Acc</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: RTL ARCHITECTURE -->
+        <section class="slide" data-slide="6">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <span class="slide-category">Hardware Architecture</span>
+                    <h2 class="slide-title">Synthesizable Verilog: Design F vs Design P</h2>
+                </div>
+                <span class="slide-num-badge">06 / 16</span>
+            </div>
+            <div class="slide-body grid-2">
+                <div class="card">
+                    <div class="card-title emerald"><i class="fa-solid fa-microchip"></i> Design F: Constant-Weight Specialization</div>
+                    <pre><code class="language-verilog">// Unpack 128-bit bus into signed 8-bit inputs
+wire signed [7:0] x_col_0 = x_in[7:0];
+wire signed [7:0] x_col_2 = x_in[23:16];
+
+// Constant dot product: 0-skip & wire routing
+wire signed [31:0] acc_0 = 
+      ($signed(x_col_0) * 8'sd12)  // constant literal
+    + (-$signed(x_col_2))          // W=-1 (unary neg)
+    + $signed(x_col_3);            // W=+1 (bare wire)
+    // W=0 is completely omitted at compile-time!
+
+always @(posedge clk) begin
+    if (valid_in) y_out[31:0] <= acc_0; // L=1
+end</code></pre>
+                    <div style="font-size: 0.85rem; color: var(--emerald);">
+                        ✓ Invariant I3: Zero weight ports, zero weight storage registers!
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title rose"><i class="fa-solid fa-server"></i> Design P: Programmable Baseline</div>
+                    <pre><code class="language-verilog">// Weight memory array & write port
+reg signed [7:0] w_mem [0:127];
+always @(posedge clk) begin
+    if (w_we) w_mem[w_addr] <= w_din;
+end
+
+// Generic runtime multipliers (Baugh-Wooley)
+wire signed [15:0] prod_0_0 = x_col_0 * w_mem[0];
+wire signed [15:0] prod_0_1 = x_col_1 * w_mem[1];
+
+wire signed [31:0] acc_0 = prod_0_0 + prod_0_1 + ...;
+
+always @(posedge clk) begin
+    if (valid_in) y_out[31:0] <= acc_0; // L=1
+end</code></pre>
+                    <div style="font-size: 0.85rem; color: var(--rose);">
+                        ✗ Requires 1,024 weight flip-flops + 64 generic 8x8 multipliers.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: VLSI MULTIPLIER -->
+        <section class="slide" data-slide="7">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <span class="slide-category">VLSI Signal Processing</span>
+                    <h2 class="slide-title">Baugh-Wooley Array vs. CSD Shift-Add Trees</h2>
+                </div>
+                <span class="slide-num-badge">07 / 16</span>
+            </div>
+            <div class="slide-body grid-2">
+                <div class="card">
+                    <div class="card-title rose"><i class="fa-solid fa-cubes"></i> Generic $8\times 8$ Multiplier (Design P)</div>
+                    <ul class="slide-list" style="font-size: 0.95rem;">
+                        <li><strong>64 Partial-Product AND Gates:</strong> Must generate every $x_a \land w_b$ bit.</li>
+                        <li><strong>Carry-Save Reduction Matrix:</strong> Requires ~48 Full Adders and 8 Half Adders.</li>
+                        <li><strong>16-bit Carry-Propagate Adder:</strong> High rippling delay.</li>
+                        <li><strong>Silicon Cost:</strong> $\mathbf{\approx 350\text{--}450\text{ logic gates per multiplier}}$.</li>
+                        <li><strong>High Delay:</strong> 25–35 gate levels through multiplier alone!</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-title emerald"><i class="fa-solid fa-wand-magic-sparkles"></i> Constant Multiplier via CSD (Design F)</div>
+                    <ul class="slide-list" style="font-size: 0.95rem;">
+                        <li><strong>Zero Partial-Product Gates:</strong> Known constant bits eliminate AND array.</li>
+                        <li><strong>Hardwired Shifts Cost 0 Gates:</strong> `x << k` is pure metal wire routing.</li>
+                        <li><strong>Canonical Signed Digit (CSD) Recoding:</strong>
+                            Example: $W = 63 = \texttt{00111111}_2 \implies 64 - 1$:
+                            $$63 \cdot x = (x \ll 6) - x \quad \mathbf{(Only\;1\;subtractor!)}$$
+                        </li>
+                        <li>Average for Gaussian LLM weights: <strong>$< 1.2$ adders per tap</strong>!</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: MULTI-TILE HIERARCHY -->
+        <section class="slide" data-slide="8">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <span class="slide-category">Modular Scaling</span>
+                    <h2 class="slide-title">Multi-Tile Spatial Partitioning & Reduction</h2>
+                </div>
+                <span class="slide-num-badge">08 / 16</span>
+            </div>
+            <div class="slide-body grid-60-40">
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-sitemap"></i> Inter-Tile Adder Reduction Tree</div>
+                    <ul class="slide-list">
+                        <li><strong>2D Tile Partitioning:</strong> Large $(N, K)$ matrix split into $R_{\text{tiles}} \times C_{\text{tiles}}$ grid (e.g. $8\times 16$ tiles).</li>
+                        <li><strong>Combinational Sub-Tiles:</strong> Each tile computes partial dot products across its 16 columns.</li>
+                        <li><strong>Top Wrapper Reduction:</strong> Column partial sums are summed across column tiles in parallel:
+                            $$\text{total\_acc}_{8r+i} = \sum_{c=0}^{C_{\text{tiles}}-1} s_{r,c}[i] + b_{8r+i}$$
+                        </li>
+                        <li><strong>Latency Parity:</strong> Single registered stage at boundary latches `y_out` $\implies \mathbf{L=1\text{ cycle preserved}}$.</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-title amber"><i class="fa-solid fa-cubes-stacked"></i> Tile Dimensions</div>
+                    <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 14px; font-size: 0.9rem; line-height: 1.6;">
+                        <strong>For $576 \times 576$ Layer:</strong><br>
+                        • Tile size: $8 \times 16$<br>
+                        • Row tiles: $576 / 8 = 72$<br>
+                        • Column tiles: $576 / 16 = 36$<br>
+                        • Total tiles: $72 \times 36 = \mathbf{2{,}592\text{ tiles}}$<br>
+                        • Bit-identical output to monolithic RTL.
+                    </div>
+                    <div class="metric-badge" style="margin-top: auto;">
+                        <div class="metric-value">L = 1 Cycle</div>
+                        <div class="metric-label">Pipeline Latency Parity</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 9: SYNTHESIS RESULTS (AREA & FLOPS) -->
+        <section class="slide" data-slide="9">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <span class="slide-category">Synthesis Evaluation (Experiment E1)</span>
+                    <h2 class="slide-title">Standard-Cell Area & Flop Elimination</h2>
+                </div>
+                <span class="slide-num-badge">09 / 16</span>
+            </div>
+            <div class="slide-body grid-2">
+                <div class="card" style="align-items: center; justify-content: center;">
+                    <img src="figures/fig1_area_scaling.png" alt="Area Scaling" class="chart-img">
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">
+                        Figure 1: Area scaling across tile dimensions (Yosys 0.52 generic gates).
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title emerald"><i class="fa-solid fa-chart-simple"></i> Primary Synthesis Metrics</div>
+                    <table class="slide-table">
+                        <thead>
+                            <tr>
+                                <th>Tile ($N \times K$)</th>
+                                <th>Design P Gates</th>
+                                <th>Design F Gates</th>
+                                <th>Area Ratio</th>
+                                <th>Flop Ratio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>$4 \times 16$</td><td>33,656</td><td><strong>8,970</strong></td><td><strong>3.75×</strong></td><td>5.71×</td></tr>
+                            <tr><td>$8 \times 16$</td><td>68,074</td><td><strong>17,998</strong></td><td><strong>3.78×</strong></td><td>11.43×</td></tr>
+                            <tr><td>$8 \times 32$</td><td>136,874</td><td><strong>35,972</strong></td><td><strong>3.81×</strong></td><td>11.43×</td></tr>
+                            <tr><td>$16 \times 64$</td><td>599,085</td><td><strong>155,648</strong></td><td><strong>3.85×</strong></td><td><strong>17.78×</strong></td></tr>
+                        </tbody>
+                    </table>
+                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 8px;">
+                        • <strong>Dead-Bit Pruning:</strong> Yosys statically proves upper accumulator bits are redundant sign-extensions and prunes upper 16 flip-flops!
+                    </div>
+                    <div class="grid-2" style="margin-top: auto;">
+                        <div class="metric-badge">
+                            <div class="metric-value">3.85×</div>
+                            <div class="metric-label">Area Reduction</div>
+                        </div>
+                        <div class="metric-badge">
+                            <div class="metric-value amber">17.7×</div>
+                            <div class="metric-label">Flop Reduction</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 10: SYNTHESIS RESULTS (WEIGHTS & TIMING) -->
+        <section class="slide" data-slide="10">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <span class="slide-category">Synthesis Evaluation (Experiments E2 & E3)</span>
+                    <h2 class="slide-title">Weight Sparsity & Critical Path Depth (LTP)</h2>
+                </div>
+                <span class="slide-num-badge">10 / 16</span>
+            </div>
+            <div class="slide-body grid-2">
+                <div class="card" style="align-items: center; justify-content: center;">
+                    <img src="figures/fig2_weight_distribution.png" alt="Weight Distribution" class="chart-img" style="max-height: 240px;">
+                    <div style="margin-top: 10px; font-size: 0.9rem; text-align: left; width: 100%;">
+                        <strong style="color: var(--cyan);">Exp E2 (Weight Distribution Effect):</strong><br>
+                        • Real trained weights are <strong>23.0% smaller</strong> than uniform random INT8 ($22,764$ vs $28,006$ gates) due to Gaussian zero-clustering!
+                    </div>
+                </div>
+
+                <div class="card" style="align-items: center; justify-content: center;">
+                    <img src="figures/fig3_critical_path_depth.png" alt="Critical Path Depth" class="chart-img" style="max-height: 240px;">
+                    <div style="margin-top: 10px; font-size: 0.9rem; text-align: left; width: 100%;">
+                        <strong style="color: var(--amber);">Exp E3 (Critical Path Depth):</strong><br>
+                        • Design P critical path: <strong>56 gate levels</strong>.<br>
+                        • Design F critical path: <strong>38 gate levels</strong> (Ratio: <strong>0.68</strong>).<br>
+                        • <strong>32% reduction in logic delay</strong>!
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 11: FULL-LAYER EXTRAPOLATION -->
+        <section class="slide" data-slide="11">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <span class="slide-category">Full-Model Scaling (Experiment E5)</span>
+                    <h2 class="slide-title">Layer Extrapolation & Empirical Validation</h2>
+                </div>
+                <span class="slide-num-badge">11 / 16</span>
+            </div>
+            <div class="slide-body grid-2">
+                <div class="card" style="align-items: center; justify-content: center;">
+                    <img src="figures/fig4_full_layer_extrapolation.png" alt="Extrapolation" class="chart-img">
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">
+                        Figure 4: Tile-scaling analytical model vs. multi-tile direct synthesis.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title emerald"><i class="fa-solid fa-chart-line"></i> Analytical Tile Model Validation</div>
+                    <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 12px; font-size: 0.85rem; line-height: 1.5;">
+                        $$\text{Area}_{\text{est}} = (R_t \cdot C_t \cdot \text{Area}_{\text{tile}}) + N \cdot (C_t - 1) \cdot \text{Area}_{\text{adder32}}$$
+                        • Direct synthesis of $16 \times 32$ core: $82{,}160$ gates.<br>
+                        • Formula prediction: $91{,}056$ gates.<br>
+                        • <strong>Estimation error: 10.82%</strong> (safe conservative upper bound).
+                    </div>
+
+                    <div style="margin-top: 10px;">
+                        <div style="font-size: 0.95rem; font-weight: 700; color: var(--cyan); margin-bottom: 6px;">Full SmolLM2-135M Estimates:</div>
+                        • Single $576 \times 576$ Layer: <strong>13.59M gates</strong> (Design F) vs <strong>49.43M</strong> (Design P).<br>
+                        • All 210 Projections (30 Layers): <strong>6.10 Billion gates</strong> vs <strong>22.18 Billion gates</strong>.
+                    </div>
+
+                    <div class="metric-badge" style="margin-top: auto;">
+                        <div class="metric-value">16+ Billion Gates</div>
+                        <div class="metric-label">Total Silicon Area Saved Across Full Model</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 12: VERIFICATION & MUTATION -->
+        <section class="slide" data-slide="12">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <span class="slide-category">Verification & Hardening</span>
+                    <h2 class="slide-title">Independent Oracle & 100% Mutation Kill</h2>
+                </div>
+                <span class="slide-num-badge">12 / 16</span>
+            </div>
+            <div class="slide-body grid-3">
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-circle-check"></i> Tier 1: NumPy Oracle</div>
+                    <ul class="slide-list" style="font-size: 0.9rem;">
+                        <li>Independent 64-bit integer golden reference model.</li>
+                        <li>Tested across 1,080 test conditions & all 7 projections.</li>
+                        <li><strong>Result:</strong> Zero arithmetic mismatches ($\mathbf{Y}_{\text{RTL}} \equiv \mathbf{Y}_{\text{ref}}$).</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-title amber"><i class="fa-solid fa-file-magnifying-glass"></i> Tier 2: Static RTL Audit</div>
+                    <ul class="slide-list" style="font-size: 0.9rem;">
+                        <li>Regex/AST parser inspects generated Verilog.</li>
+                        <li>Audits 6 legal ports (Invariant I3).</li>
+                        <li>Reconstructs all 331,776 weights in <strong>0.85 seconds</strong> and matches PyTorch tensor 100%.</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-title emerald"><i class="fa-solid fa-bug-slash"></i> Tier 3: Mutation Testing</div>
+                    <ul class="slide-list" style="font-size: 0.9rem;">
+                        <li>Injected 9 hardware faults (sign flip, slice offset, dropped carry, unsigned drop).</li>
+                        <li><strong>Result: 100.0% Kill Rate</strong> (9/9 mutants killed).</li>
+                        <li>Zero false passes or surviving bugs!</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 13: LIVE DEMONSTRATION -->
+        <section class="slide" data-slide="13">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <span class="slide-category">Live Toolchain Demonstration</span>
+                    <h2 class="slide-title">Unified CLI & Automated Pipeline</h2>
+                </div>
+                <span class="slide-num-badge">13 / 16</span>
+            </div>
+            <div class="slide-body grid-2">
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-terminal"></i> Command-Line Workflow</div>
+                    <pre><code class="language-bash"># Complete compilation and verification demo
+$ make demo
+
+[1/5] Extracting Layer 0 projections...  (0.9s)
+[2/5] Quantizing to symmetric INT8...    (0.4s)
+[3/5] Emitting synthesizable Verilog...  (0.6s)
+[4/5] Static RTL weight audit: PASS      (0.2s)
+[5/5] Icarus Verilog co-simulation: PASS (0.8s)
+==============================================
+PASS: checked=10 mismatch_count=0
+Total Time: 2.97 seconds
+==============================================</code></pre>
+                </div>
+
+                <div class="card">
+                    <div class="card-title emerald"><i class="fa-solid fa-vial-circle-check"></i> Test Suite Robustness</div>
+                    <ul class="slide-list">
+                        <li><strong>230 Passing Tests</strong> across 17 test suites (`make check`).</li>
+                        <li>Tests cover frontend extraction, quantization, IR serialization, RTL generation, Icarus simulation, and Yosys synthesis.</li>
+                        <li>100% reproducible across standard Linux workstations.</li>
+                    </ul>
+                    <div class="metric-badge" style="margin-top: auto;">
+                        <div class="metric-value emerald">2.97 Seconds</div>
+                        <div class="metric-label">Complete End-to-End Demo Runtime</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 14: SCOPE BOUNDARIES -->
+        <section class="slide" data-slide="14">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <span class="slide-category">Engineering Rigor</span>
+                    <h2 class="slide-title">Scope Boundaries & Practical Trade-offs</h2>
+                </div>
+                <span class="slide-num-badge">14 / 16</span>
+            </div>
+            <div class="slide-body grid-2">
+                <div class="card">
+                    <div class="card-title emerald"><i class="fa-solid fa-circle-check"></i> What We Have Proven</div>
+                    <ul class="slide-list">
+                        <li><strong>3.85× Gate Reduction</strong> and <strong>17.7× Flop Reduction</strong> on standard-cell synthesis.</li>
+                        <li><strong>Bit-exact mathematical equivalence</strong> against independent 64-bit NumPy oracle.</li>
+                        <li><strong>32% Critical Path reduction</strong> via constant shift-add trees.</li>
+                        <li><strong>100% Mutation Kill Rate</strong> verifying verification integrity.</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-title amber"><i class="fa-solid fa-triangle-exclamation"></i> Practical Caveats & Boundaries</div>
+                    <ul class="slide-list">
+                        <li><strong>Pre-Layout Standard Cells:</strong> Does not yet include physical place-and-route interconnect parasitics.</li>
+                        <li><strong>Weight Immutability:</strong> Model updates require FPGA bitstream re-flash or ASIC respins (tailored for fixed edge devices).</li>
+                        <li><strong>Non-Linear Ops in Software:</strong> Part I covers linear projections (>78% params); RMSNorm, Softmax, RoPE remain in software.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 15: FUTURE ROADMAP -->
+        <section class="slide" data-slide="15">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <span class="slide-category">Future Directions</span>
+                    <h2 class="slide-title">Roadmap to Part II & Part III</h2>
+                </div>
+                <span class="slide-num-badge">15 / 16</span>
+            </div>
+            <div class="slide-body grid-3">
+                <div class="card" style="border-top: 3px solid var(--cyan);">
+                    <div class="card-title"><i class="fa-solid fa-flag-checkered"></i> Part I (Completed)</div>
+                    <ul class="slide-list" style="font-size: 0.88rem;">
+                        <li>Automated Verilog-2001 compiler for all 7 linear projections.</li>
+                        <li>Symmetric INT8 quantization and 32-bit overflow proofs.</li>
+                        <li>Yosys evaluation: 3.85× area & 17.7× flop reduction.</li>
+                        <li>Official 14-page BTP report published.</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="border-top: 3px solid var(--amber);">
+                    <div class="card-title amber"><i class="fa-solid fa-forward"></i> Part II (Spring 2027)</div>
+                    <ul class="slide-list" style="font-size: 0.88rem;">
+                        <li><strong>On-Chip Non-Linear Fusion:</strong> Synthesizable RMSNorm, RoPE, and SwiGLU hardware blocks.</li>
+                        <li><strong>Pipelining ($L > 1$):</strong> Multi-cycle adder trees targeting $\ge 500\text{ MHz}$.</li>
+                        <li><strong>Streaming BRAMs:</strong> Ping-pong activation buffering for continuous token streaming.</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="border-top: 3px solid var(--emerald);">
+                    <div class="card-title emerald"><i class="fa-solid fa-microchip"></i> Part III (Tapeout)</div>
+                    <ul class="slide-list" style="font-size: 0.88rem;">
+                        <li><strong>Physical ASIC Flow:</strong> OpenLane automated P&R targeting SkyWater 130nm PDK.</li>
+                        <li><strong>Silicon Sign-Off:</strong> Exact GDSII layout, DRC/LVS, post-layout timing & thermal analysis.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 16: CONCLUSION -->
+        <section class="slide" data-slide="16">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <span class="slide-category">Summary</span>
+                    <h2 class="slide-title">Conclusion & Key Takeaways</h2>
+                </div>
+                <span class="slide-num-badge">16 / 16</span>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-title"><i class="fa-solid fa-trophy"></i> Key Accomplishments</div>
+                        <ul class="slide-list">
+                            <li>Proved that compiling frozen Transformer weights into constant standard cells is <strong>viable, highly scalable, and bit-exact</strong>.</li>
+                            <li>Delivered a <strong>3.85× standard-cell area reduction</strong> and up to <strong>17.7× flip-flop reduction</strong>.</li>
+                            <li>Slashed critical path delay by <strong>32%</strong> over programmable multipliers.</li>
+                            <li>Built an open-source, fully tested compiler with 230 passing tests.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card" style="justify-content: space-between;">
+                        <div>
+                            <div class="card-title emerald"><i class="fa-solid fa-code-branch"></i> Open-Source Release</div>
+                            <p style="font-size: 0.95rem; margin-top: 10px; color: var(--text-muted);">
+                                Complete source code, automated test suite, synthesis scripts, documentation, and the official 14-page report are published at:
+                            </p>
+                            <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 6px; font-family: var(--mono-font); font-size: 0.9rem; color: var(--cyan); margin: 12px 0;">
+                                https://github.com/Himesh-Kundal/BTP
+                            </div>
+                        </div>
+
+                        <div style="text-align: center; padding: 16px; background: rgba(0, 229, 255, 0.08); border-radius: 8px; border: 1px solid var(--cyan);">
+                            <div style="font-size: 1.3rem; font-weight: 700; color: #ffffff;">Thank You!</div>
+                            <div style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Questions & Discussion</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- SPEAKER NOTES DRAWER -->
+    <div class="notes-drawer" id="notes-drawer">
+        <div class="notes-header">
+            <span><i class="fa-solid fa-microphone-lines"></i> Speaker Script for Active Slide</span>
+            <button class="nav-btn" id="btn-close-notes" style="padding: 2px 8px;">✕ Close</button>
+        </div>
+        <div class="notes-content" id="notes-content">
+            <!-- Dynamically populated -->
+        </div>
+    </div>
+
+    <!-- OVERVIEW / GRID MODAL -->
+    <div class="overview-modal" id="overview-modal">
+        <!-- Dynamically populated thumbnails -->
+    </div>
+
+    <!-- BOTTOM STATUS BAR -->
+    <footer class="bottom-bar">
+        <div>Slide <span id="current-slide-num">1</span> of <span id="total-slides-num">16</span></div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div>Press <strong>← / →</strong> or <strong>Space</strong> to navigate • <strong>N</strong> for Notes • <strong>O</strong> for Grid</div>
+    </footer>
+
+    <!-- Prism JS for code highlighting -->
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-verilog.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <!-- KaTeX JS & auto-render -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+
+    <script>
+        // Slide deck state
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        let currentSlide = 1;
+
+        const currentSlideNumEl = document.getElementById('current-slide-num');
+        const totalSlidesNumEl = document.getElementById('total-slides-num');
+        const progressBarEl = document.getElementById('progress-bar');
+        const notesDrawer = document.getElementById('notes-drawer');
+        const notesContent = document.getElementById('notes-content');
+        const overviewModal = document.getElementById('overview-modal');
+
+        totalSlidesNumEl.innerText = totalSlides;
+
+        // Speaker script database corresponding to each slide
+        const speakerNotes = {
+            1: `<blockquote>"Good morning, respected committee members and Professor Chakraborty. My name is Himesh Kundal, Roll Number 23EC10030, presenting my B.Tech Project Part I on 'Model-Specific Hardware Compilation of Dense Transformer Projections into Synthesizable Constant-Weight Verilog'. We examine a fundamental architectural opportunity: when deploying LLMs to fixed-purpose edge appliances, weights are frozen post-training. By baking weights directly into immutable standard-cell logic, LLMHW achieves a 3.85x area reduction and 17.7x flip-flop reduction with zero weight memory overhead."</blockquote>`,
+            2: `<blockquote>"Standard NPUs pay a heavy 'Generality Tax'—up to 75% of silicon area is spent merely managing weight mutability (writable SRAMs, wide buses, and 400-gate Baugh-Wooley multipliers). In edge appliances, weights never change. By compiling weights directly into constant standard cells, we eliminate weight ports and memory arrays entirely."</blockquote>`,
+            3: `<blockquote>"LLMHW follows Golden Rule 5: Strict Architectural Layering. PyTorch is isolated strictly to the frontend. All compiler passes, tiling, Verilog codegen, and testbenches operate on a model-agnostic Intermediate Representation called TileManifest. We generate both specialized Design F and a strictly fair baseline Design P with identical widths, clocks, and L=1 latency."</blockquote>`,
+            4: `<blockquote>"We evaluated SmolLM2-135M, profiling all 7 linear projections across Self-Attention and SwiGLU MLP. Across all 30 layers, these 7 projections account for 106.2 million weights—more than 78% of the entire model footprint. Compiling these 7 matrices efficiently is the primary driver of edge hardware acceleration."</blockquote>`,
+            5: `<blockquote>"In hardware DSP, overflow is fatal. We strictly restrict INT8 weights and activations to [-127, +127], forbidding -128 because two's complement negation of -128 wraps around. Banker's rounding ensures zero-mean statistical bias. Our analytical bit-growth proof shows K=576 requires 25 bits and K=1536 requires 26 bits. Our 32-bit accumulator guarantees 6 to 7 bits of overflow headroom under all inputs."</blockquote>`,
+            6: `<blockquote>"In synthesizable Verilog, Design P uses an internal flip-flop array and generic variable multipliers. In Design F, all weight ports and registers are eliminated. Our compiler directly emits constant signed literals (8'sd<W>), skips zero terms, passes +1 as bare wires, and passes -1 as unary negations. Both designs maintain identical L=1 registered output latency."</blockquote>`,
+            7: `<blockquote>"From a VLSI perspective, multiplying two variables in Design P requires an 8x8 Baugh-Wooley multiplier with 64 AND gates and ~48 Full Adders (350-450 gates). In Design F, bit-shifts are free wire routings, and Canonical Signed Digit (CSD) recoding rewrites weights like 63 as 64-1 (a single 16-bit subtractor!). Average cost drops to <1.2 adders per tap."</blockquote>`,
+            8: `<blockquote>"Real LLM layers are large. LLMHW partitions matrices into 2D tile grids (e.g. 8x16). Sub-tiles compute combinational partial sums; an Inter-Tile 32-Bit Adder Reduction Tree sums partial outputs across column tiles in the same cycle. A single synchronous output stage latches y_out on posedge clk, preserving L=1 latency parity."</blockquote>`,
+            9: `<blockquote>"In Experiment E1, Yosys 0.52 standard-cell synthesis confirms a 3.75x to 3.85x reduction in logic gates across all tile dimensions. Flip-flops drop by 5.7x to 17.7x due to total weight register elimination and automatic dead upper sign-extension bit pruning. Even against Design P_bus (without registers), Design F is still 3.77x smaller!"</blockquote>`,
+            10: `<blockquote>"In Experiment E2, real trained SmolLM2 weights are 23% smaller than uniform random INT8 because Gaussian weights cluster near zero, triggering zero-skipping and small-constant CSD optimizations far more often. In Experiment E3, eliminating deep multiplier arrays slashes the Longest Topological Path from 56 down to 38 gate levels—a 32% reduction in logic delay."</blockquote>`,
+            11: `<blockquote>"Our analytical tile-scaling model accounts for tile cores and inter-tile 32-bit adders. Directly synthesizing a 16x32 core in Yosys matched the formula within 10.82% (serving as a safe upper bound). For the full 30-layer SmolLM2 model, compiling all 210 projections saves over 16 billion gates of silicon area."</blockquote>`,
+            12: `<blockquote>"We enforce a three-tier verification harness: Tier 1 is an independent 64-bit NumPy oracle verifying bit-exact arithmetic across 1,080 test conditions. Tier 2 is a static regex auditor that parses Verilog text, extracts all 331,776 weights in 0.85s, and verifies 100% tensor identity. Tier 3 is mutation testing: we injected 9 hardware faults and achieved a 100% kill rate (9/9 mutants killed)."</blockquote>`,
+            13: `<blockquote>"Our toolchain is fully automated: with a single command, 'make demo', the compiler extracts layer 0 projections, quantizes, emits Verilog, audits invariants, runs cycle-accurate simulation, and summarizes synthesis in 2.97 seconds. The entire codebase includes 230 automated unit, integration, and property tests."</blockquote>`,
+            14: `<blockquote>"We honestly acknowledge three engineering boundaries: First, metrics reflect pre-layout standard cells (post-P&R interconnect will introduce secondary effects). Second, constant-weight hardware is immutable, making it best suited for fixed-purpose edge systems. Third, Part I covers linear projections; non-linear operators remain in software."</blockquote>`,
+            15: `<blockquote>"Our roadmap directly addresses these boundaries: Part II (Spring 2027) will add synthesizable fixed-point hardware for RMSNorm, SwiGLU, and RoPE, along with pipelined adder trees (L>1) targeting >=500 MHz and ping-pong BRAM streaming. Part III will execute physical ASIC tapeout via OpenLane on the SkyWater 130nm PDK."</blockquote>`,
+            16: `<blockquote>"In conclusion, compiling frozen Transformer weights directly into constant Verilog standard cells delivers nearly a 4x reduction in logic area, an 18x reduction in flip-flops, and a 32% faster critical path with guaranteed bit-exact correctness. Thank you very much, and I welcome your questions."</blockquote>`
+        };
+
+        // Go to specific slide
+        function goToSlide(n) {
+            if (n < 1 || n > totalSlides) return;
+            slides[currentSlide - 1].classList.remove('active');
+            currentSlide = n;
+            slides[currentSlide - 1].classList.add('active');
+
+            currentSlideNumEl.innerText = currentSlide;
+            const progressPct = ((currentSlide - 1) / (totalSlides - 1)) * 100;
+            progressBarEl.style.width = progressPct + '%';
+
+            // Update speaker notes
+            notesContent.innerHTML = speakerNotes[currentSlide] || "<em>No notes for this slide.</em>";
+
+            // Update overview thumbs
+            document.querySelectorAll('.overview-thumb').forEach((thumb, idx) => {
+                if (idx + 1 === currentSlide) {
+                    thumb.classList.add('active');
+                } else {
+                    thumb.classList.remove('active');
+                }
+            });
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) goToSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) goToSlide(currentSlide - 1);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'Backspace') {
+                prevSlide();
+            } else if (e.key === 'n' || e.key === 'N') {
+                toggleNotes();
+            } else if (e.key === 'o' || e.key === 'O') {
+                toggleOverview();
+            } else if (e.key === 'f' || e.key === 'F') {
+                toggleFullscreen();
+            } else if (e.key === 'Escape') {
+                overviewModal.classList.remove('open');
+                notesDrawer.classList.remove('open');
+            }
+        });
+
+        // Notes drawer toggle
+        function toggleNotes() {
+            notesDrawer.classList.toggle('open');
+            document.getElementById('btn-notes').classList.toggle('active');
+        }
+
+        document.getElementById('btn-notes').addEventListener('click', toggleNotes);
+        document.getElementById('btn-close-notes').addEventListener('click', toggleNotes);
+
+        // Overview / Grid Modal
+        function buildOverview() {
+            overviewModal.innerHTML = '';
+            slides.forEach((slide, idx) => {
+                const titleEl = slide.querySelector('.slide-title');
+                const title = titleEl ? titleEl.innerText : `Slide ${idx + 1}`;
+                const categoryEl = slide.querySelector('.slide-category');
+                const category = categoryEl ? categoryEl.innerText : '';
+
+                const thumb = document.createElement('div');
+                thumb.className = 'overview-thumb';
+                if (idx + 1 === currentSlide) thumb.classList.add('active');
+
+                thumb.innerHTML = `
+                    <div>
+                        <div style="font-size: 0.7rem; color: var(--cyan); text-transform: uppercase;">${category}</div>
+                        <div class="overview-title">${idx + 1}. ${title}</div>
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-align: right;">Slide ${idx + 1}</div>
+                `;
+
+                thumb.addEventListener('click', () => {
+                    goToSlide(idx + 1);
+                    overviewModal.classList.remove('open');
+                    document.getElementById('btn-overview').classList.remove('active');
+                });
+
+                overviewModal.appendChild(thumb);
+            });
+        }
+
+        function toggleOverview() {
+            overviewModal.classList.toggle('open');
+            document.getElementById('btn-overview').classList.toggle('active');
+        }
+
+        document.getElementById('btn-overview').addEventListener('click', toggleOverview);
+
+        // Fullscreen Toggle
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {});
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        document.getElementById('btn-fullscreen').addEventListener('click', toggleFullscreen);
+
+        // Initialize KaTeX Math
+        document.addEventListener("DOMContentLoaded", () => {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                    { left: '\\(', right: '\\)', display: false },
+                    { left: '\\[', right: '\\]', display: true }
+                ],
+                throwOnError: false
+            });
+            buildOverview();
+            goToSlide(1);
+        });
+    </script>
+</body>
+</html>
