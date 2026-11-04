@@ -1,4 +1,4 @@
-# BTP Defense Presentation: Slide Deck & Speaker Script
+# BTP Presentation: Slide Deck & Speaker Script
 **Project:** Model-Specific Hardware Compilation of Dense Transformer Projections into Synthesizable Constant-Weight Verilog  
 **Candidate:** Himesh Kundal (Roll No: 23EC10030)  
 **Supervisor:** Prof. Mrityunjoy Chakraborty  

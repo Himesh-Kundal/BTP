@@ -1,4 +1,4 @@
-# BTP Defense: Complete Word-for-Word Speaker Script
+# BTP Presentation: Complete Word-for-Word Speaker Script
 **Project:** Model-Specific Hardware Compilation of Dense Transformer Projections into Synthesizable Constant-Weight Verilog  
 **Presenter:** Himesh Kundal (Roll No: 23EC10030)  
 **Supervisor:** Prof. Mrityunjoy Chakraborty  
@@ -7,7 +7,7 @@
 
 ---
 
-## 🎙️ General Presentation Delivery Tips for Defense
+## 🎙️ General Presentation Delivery Tips
 
 1. **Pacing:** Speak at a measured, calm pace (~120–130 words per minute). Don't rush through equations—give the committee 2–3 seconds to look at a chart before explaining it.
 2. **Body Language & Pointers:** When mentioning numbers like **3.85×** or **17.7×**, point directly to the corresponding column or badge on the slide.
@@ -307,7 +307,7 @@
 
 ---
 
-## 🛡️ Backup Viva Q&A Defense Scripts
+## 🛡️ Backup Viva Q&A Reference Scripts
 
 Use these exact prepared responses if Professor Chakraborty or the committee asks these common questions during the viva:
 
