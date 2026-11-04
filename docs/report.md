@@ -1,6 +1,6 @@
 # Model-Specific Hardware Compilation of Dense Transformer Projections into Synthesizable Constant-Weight Verilog
 
-**Author:** Himesh  
+**Author:** Himesh Kundal (Roll No.: 23EC10030)  
 **Project:** B.Tech Project (Part I)  
 **Date:** November 2026  
 **Target Architecture:** HuggingFaceTB/SmolLM2-135M  
