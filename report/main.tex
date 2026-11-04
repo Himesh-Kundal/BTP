@@ -26,7 +26,7 @@
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[L]{\small\textit{B.Tech Project (Part I) Report --- LLM Hardware Specialization}}
-\fancyhead[R]{\small\textit{November 2026}}
+\fancyhead[R]{\small\textit{November 4, 2026}}
 \fancyfoot[C]{\thepage}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
@@ -50,13 +50,91 @@
 \begin{document}
 
 % -----------------------------------------------------------------------------
-% TITLE & FRONT MATTER
+% PAGE 1: SELF-DECLARATION & SUPERVISOR'S ENDORSEMENT
+% -----------------------------------------------------------------------------
+\thispagestyle{empty}
+
+\begin{center}
+    {\Large \textbf{Self-Declaration}}
+\end{center}
+\vspace{1.5em}
+
+\noindent I, \textbf{Himesh Kundal} (Roll No. \textbf{23EC10030}), a student of the B.Tech programme in the Department of Electronics and Electrical Communication Engineering, Indian Institute of Technology Kharagpur, hereby declare that the work presented in this report, titled ``\textit{Model-Specific Hardware Compilation of Dense Transformer Projections into Synthesizable Constant-Weight Verilog}'', is my bona fide work carried out under the guidance of \textbf{Prof. Mrityunjoy Chakraborty}.
+
+\vspace{1em}
+\noindent All material taken from other sources, including text, figures, tables, data and code, has been properly referenced and attributed following standard academic publication practices. This work has not been submitted elsewhere for any other degree or evaluation.
+
+\vspace{3em}
+\begin{flushright}
+\begin{minipage}{0.55\textwidth}
+Signature: \underline{\hspace{4.5cm}}\\[1.2em]
+Himesh Kundal, Roll No. 23EC10030\\[0.8em]
+Date: \underline{\hspace{3.5cm}}
+\end{minipage}
+\end{flushright}
+
+\vspace{2.5em}
+\hrule
+\vspace{2.5em}
+
+\begin{center}
+    {\Large \textbf{Supervisor's Endorsement}}
+\end{center}
+\vspace{1.5em}
+
+\noindent This is to certify that the report titled ``\textit{Model-Specific Hardware Compilation of Dense Transformer Projections into Synthesizable Constant-Weight Verilog}'' submitted by \textbf{Himesh Kundal} (Roll No. \textbf{23EC10030}) is a record of bona fide work carried out under my supervision and guidance, and is approved for submission to the viva panel.
+
+\vspace{3em}
+\begin{flushright}
+\begin{minipage}{0.75\textwidth}
+Signature: \underline{\hspace{4.5cm}}\\[1.2em]
+Prof. Mrityunjoy Chakraborty\\[0.4em]
+Department of Electronics and Electrical Communication Engineering\\[0.4em]
+IIT Kharagpur\\[0.8em]
+Date: \underline{\hspace{3.5cm}}
+\end{minipage}
+\end{flushright}
+
+\newpage
+
+% -----------------------------------------------------------------------------
+% PAGE 2: TITLE & COVER PAGE (WITH IIT KHARAGPUR EMBLEM)
+% -----------------------------------------------------------------------------
+\thispagestyle{empty}
+
+\begin{center}
+    \vspace*{1em}
+    {\large \textbf{B.Tech Project Report}}\\[3em]
+    
+    {\LARGE \textbf{Model-Specific Hardware Compilation of Dense\\ Transformer Projections into Synthesizable\\ Constant-Weight Verilog}}\\[3.5em]
+    
+    {\normalsize Submitted in partial fulfilment of the requirements of the}\\[0.4em]
+    {\normalsize \textit{B.Tech} programme}\\[3em]
+    
+    {\normalsize by}\\[1.2em]
+    {\large \textbf{Himesh Kundal}}\\[0.4em]
+    {\normalsize Roll No. 23EC10030}\\[2.5em]
+    
+    \includegraphics[width=0.22\linewidth]{figures/iitkgp_logo.png}\\[2.5em]
+    
+    {\normalsize Under the guidance of}\\[0.8em]
+    {\large \textbf{Prof. Mrityunjoy Chakraborty}}\\[3em]
+    
+    {\normalsize Department of Electronics and Electrical Communication Engineering}\\[0.4em]
+    {\normalsize Indian Institute of Technology Kharagpur}\\[1em]
+    {\normalsize November 4, 2026}
+\end{center}
+
+\newpage
+
+% -----------------------------------------------------------------------------
+% PAGE 3+: MAIN TECHNICAL REPORT
 % -----------------------------------------------------------------------------
 \begin{center}
     {\LARGE \textbf{Model-Specific Hardware Compilation of Dense Transformer Projections into Synthesizable Constant-Weight Verilog}}\\[1.2em]
     {\large \textbf{B.Tech Project (Part I) Final Report}}\\[0.8em]
     {\normalsize \textbf{Author:} Himesh Kundal \quad|\quad \textbf{Roll No.:} 23EC10030}\\[0.4em]
-    {\small \textbf{Target Architecture:} HuggingFaceTB/SmolLM2-135M \quad|\quad Date: November 2026}
+    {\small \textbf{Target Architecture:} HuggingFaceTB/SmolLM2-135M \quad|\quad Date: November 4, 2026}
 \end{center}
 
 \vspace{0.4em}
