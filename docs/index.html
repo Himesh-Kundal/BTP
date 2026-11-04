@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTP Documentation Viewer</title>
+    <!-- GitHub Markdown CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.6.1/github-markdown.min.css">
+    <!-- KaTeX CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <!-- Prism CSS for syntax highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --sidebar-width: 320px;
+            --header-height: 64px;
+            --bg-color: #0d1117;
+            --sidebar-bg: #161b22;
+            --text-color: #c9d1d9;
+            --border-color: #30363d;
+            --accent-color: #58a6ff;
+            --hover-color: #1f242c;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #ffffff;
+            --sidebar-bg: #f6f8fa;
+            --text-color: #24292f;
+            --border-color: #d0d7de;
+            --accent-color: #0969da;
+            --hover-color: #eaeef2;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Header */
+        header {
+            height: var(--header-height);
+            background-color: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--accent-color);
+        }
+
+        .doc-select {
+            padding: 7px 12px;
+            border-radius: 6px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 7px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--hover-color);
+            border-color: var(--accent-color);
+        }
+
+        /* App Layout */
+        .layout {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - var(--header-height));
+            overflow: hidden;
+        }
+
+        /* Sidebar Navigation */
+        aside {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-box {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 6px 10px;
+            border-radius: 6px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-color);
+        }
+
+        .toc-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 0;
+            list-style: none;
+        }
+
+        .toc-item {
+            padding: 6px 16px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+            text-decoration: none;
+            color: var(--text-color);
+            opacity: 0.85;
+            transition: all 0.15s;
+        }
+
+        .toc-item:hover {
+            background-color: var(--hover-color);
+            color: var(--accent-color);
+            opacity: 1;
+        }
+
+        .toc-item.active {
+            border-left-color: var(--accent-color);
+            background-color: var(--hover-color);
+            color: var(--accent-color);
+            font-weight: 600;
+            opacity: 1;
+        }
+
+        .toc-h1 { font-weight: 700; padding-left: 16px; font-size: 0.95rem; }
+        .toc-h2 { font-weight: 600; padding-left: 24px; }
+        .toc-h3 { padding-left: 36px; font-size: 0.82rem; }
+        .toc-h4 { padding-left: 48px; font-size: 0.78rem; opacity: 0.7; }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 50px 80px;
+            scroll-behavior: smooth;
+        }
+
+        .content-container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        /* Markdown styling overrides */
+        .markdown-body {
+            background-color: transparent !important;
+            color: inherit !important;
+            font-size: 16px;
+        }
+
+        [data-theme="dark"] .markdown-body {
+            color-scheme: dark;
+        }
+
+        .markdown-body table {
+            display: table;
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .markdown-body table th,
+        .markdown-body table td {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .markdown-body pre {
+            position: relative;
+            background-color: #161b22 !important;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        [data-theme="light"] .markdown-body pre {
+            background-color: #f6f8fa !important;
+        }
+
+        .copy-code-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            background: rgba(48, 54, 61, 0.7);
+            border: 1px solid var(--border-color);
+            color: #c9d1d9;
+            border-radius: 4px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .markdown-body pre:hover .copy-code-btn {
+            opacity: 1;
+        }
+
+        /* Callout blocks */
+        .callout {
+            padding: 14px 18px;
+            margin: 16px 0;
+            border-radius: 6px;
+            border-left: 4px solid var(--accent-color);
+            background-color: rgba(56, 139, 253, 0.1);
+        }
+
+        .callout-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 12px;
+            background-color: rgba(56, 139, 253, 0.2);
+            color: var(--accent-color);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 850px) {
+            aside {
+                position: fixed;
+                top: var(--header-height);
+                bottom: 0;
+                left: 0;
+                transform: translateX(-100%);
+                z-index: 99;
+                box-shadow: 4px 0 16px rgba(0,0,0,0.4);
+            }
+            aside.open {
+                transform: translateX(0);
+            }
+            main {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+
+    <header>
+        <div class="header-left">
+            <button class="btn" id="toggle-sidebar-btn" title="Toggle Sidebar">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <div class="logo-title">
+                <i class="fa-solid fa-microchip"></i>
+                <span>BTP LLMHW</span>
+            </div>
+            <select class="doc-select" id="doc-select">
+                <option value="complete_beginner_guide.md">📘 1. Complete Beginner Guide (Zero to Hero)</option>
+                <option value="technical_deep_dive.md">🔬 2. Technical Deep-Dive & VLSI Architecture</option>
+                <option value="viva_prep.md">🎓 3. Viva Preparation & Defense Guide</option>
+                <option value="report.md">📄 4. Full BTP Report (Markdown)</option>
+            </select>
+        </div>
+        <div class="header-right">
+            <button class="btn" id="theme-toggle" title="Toggle Dark/Light Mode">
+                <i class="fa-solid fa-sun" id="theme-icon"></i>
+            </button>
+            <button class="btn" id="font-increase" title="Increase Font">A+</button>
+            <button class="btn" id="font-decrease" title="Decrease Font">A-</button>
+            <button class="btn" id="print-btn" title="Print / Export PDF">
+                <i class="fa-solid fa-print"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="layout">
+        <aside id="sidebar">
+            <div class="sidebar-header">
+                <span>Table of Contents</span>
+                <span class="badge" id="toc-count">0 items</span>
+            </div>
+            <div class="search-box">
+                <input type="text" class="search-input" id="search-input" placeholder="Filter headings...">
+            </div>
+            <ul class="toc-list" id="toc-list">
+                <!-- Headings populated dynamically -->
+            </ul>
+        </aside>
+
+        <main id="main-content">
+            <div class="content-container">
+                <article class="markdown-body" id="doc-content">
+                    <p style="text-align: center; padding: 50px 0; font-size: 1.2rem; color: #8b949e;">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Loading document...
+                    </p>
+                </article>
+            </div>
+        </main>
+    </div>
+
+    <!-- Marked JS -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+    <!-- KaTeX JS & auto-render -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <!-- Prism JS for syntax highlighting -->
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-verilog.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+
+    <script>
+        const docSelect = document.getElementById('doc-select');
+        const docContent = document.getElementById('doc-content');
+        const tocList = document.getElementById('toc-list');
+        const tocCount = document.getElementById('toc-count');
+        const searchInput = document.getElementById('search-input');
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+
+        let currentHeadings = [];
+        let baseFontSize = 16;
+
+        // Custom Marked renderer with heading anchors & IDs
+        const renderer = new marked.Renderer();
+        let headingIndex = 0;
+
+        renderer.heading = function(text, level) {
+            headingIndex++;
+            const cleanText = text.replace(/<[^>]*>?/gm, '');
+            const slug = 'heading-' + headingIndex + '-' + cleanText.toLowerCase().replace(/[^\w]+/g, '-').replace(/^-+|-+$/g, '');
+            return `<h${level} id="${slug}">${text} <a href="#${slug}" class="header-link" style="opacity: 0.2; text-decoration: none;">#</a></h${level}>`;
+        };
+
+        marked.setOptions({
+            renderer: renderer,
+            gfm: true,
+            breaks: false
+        });
+
+        // Load and render markdown file
+        async function loadDocument(filename) {
+            docContent.innerHTML = `
+                <div style="text-align: center; padding: 60px 0; color: #8b949e;">
+                    <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+                    <p style="margin-top: 15px;">Loading ${filename}...</p>
+                </div>
+            `;
+            headingIndex = 0;
+            tocList.innerHTML = '';
+
+            try {
+                const response = await fetch(filename);
+                if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to load ${filename}`);
+                const markdownText = await response.text();
+
+                // Render Markdown
+                docContent.innerHTML = marked.parse(markdownText);
+
+                // Render KaTeX Math
+                renderMathInElement(docContent, {
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    throwOnError: false
+                });
+
+                // Highlight Code
+                Prism.highlightAllUnder(docContent);
+
+                // Add Copy Buttons to Code Blocks
+                document.querySelectorAll('pre').forEach(pre => {
+                    const btn = document.createElement('button');
+                    btn.className = 'copy-code-btn';
+                    btn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy';
+                    btn.addEventListener('click', () => {
+                        const code = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
+                        navigator.clipboard.writeText(code);
+                        btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+                        setTimeout(() => { btn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy'; }, 2000);
+                    });
+                    pre.appendChild(btn);
+                });
+
+                // Generate TOC
+                buildTOC();
+                mainContent.scrollTop = 0;
+
+            } catch (err) {
+                docContent.innerHTML = `
+                    <div style="padding: 30px; border: 1px solid #f85149; border-radius: 8px; background: rgba(248,81,73,0.1); color: #f85149;">
+                        <h3><i class="fa-solid fa-circle-exclamation"></i> Error Loading Document</h3>
+                        <p style="margin-top: 10px;">${err.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Build Table of Contents
+        function buildTOC() {
+            tocList.innerHTML = '';
+            currentHeadings = [];
+            const elements = docContent.querySelectorAll('h1, h2, h3, h4');
+            
+            elements.forEach((el, idx) => {
+                const level = parseInt(el.tagName.substring(1));
+                const text = el.innerText.replace(/#$/, '').trim();
+                const id = el.id;
+
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = '#' + id;
+                a.className = `toc-item toc-h${level}`;
+                a.innerText = text;
+                a.title = text;
+
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    history.pushState(null, null, '#' + id);
+                    document.querySelectorAll('.toc-item').forEach(item => item.classList.remove('active'));
+                    a.classList.add('active');
+                    if (window.innerWidth <= 850) {
+                        sidebar.classList.remove('open');
+                    }
+                });
+
+                li.appendChild(a);
+                tocList.appendChild(li);
+                currentHeadings.push({ el, a });
+            });
+
+            tocCount.innerText = `${elements.length} items`;
+        }
+
+        // Search TOC
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            tocList.querySelectorAll('li').forEach(li => {
+                const text = li.innerText.toLowerCase();
+                li.style.display = text.includes(query) ? '' : 'none';
+            });
+        });
+
+        // Scroll spy for TOC
+        mainContent.addEventListener('scroll', () => {
+            let activeSet = false;
+            const fromTop = mainContent.scrollTop + 100;
+            
+            for (let i = currentHeadings.length - 1; i >= 0; i--) {
+                const { el, a } = currentHeadings[i];
+                if (el.offsetTop <= fromTop) {
+                    document.querySelectorAll('.toc-item').forEach(item => item.classList.remove('active'));
+                    a.classList.add('active');
+                    activeSet = true;
+                    break;
+                }
+            }
+            if (!activeSet && currentHeadings.length > 0) {
+                document.querySelectorAll('.toc-item').forEach(item => item.classList.remove('active'));
+                currentHeadings[0].a.classList.add('active');
+            }
+        });
+
+        // Dropdown selection change
+        docSelect.addEventListener('change', (e) => {
+            window.location.hash = '';
+            loadDocument(e.target.value);
+        });
+
+        // Theme Toggle
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+            themeIcon.className = newTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        });
+
+        // Font Sizing
+        document.getElementById('font-increase').addEventListener('click', () => {
+            if (baseFontSize < 24) {
+                baseFontSize += 1;
+                docContent.style.fontSize = baseFontSize + 'px';
+            }
+        });
+
+        document.getElementById('font-decrease').addEventListener('click', () => {
+            if (baseFontSize > 12) {
+                baseFontSize -= 1;
+                docContent.style.fontSize = baseFontSize + 'px';
+            }
+        });
+
+        // Sidebar Toggle
+        toggleSidebarBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+
+        // Print
+        document.getElementById('print-btn').addEventListener('click', () => {
+            window.print();
+        });
+
+        // Check URL parameters or hash to select document
+        const urlParams = new URLSearchParams(window.location.search);
+        const docParam = urlParams.get('doc');
+        if (docParam && Array.from(docSelect.options).some(o => o.value === docParam)) {
+            docSelect.value = docParam;
+        }
+
+        // Initial Load
+        loadDocument(docSelect.value);
+    </script>
+</body>
+</html>
