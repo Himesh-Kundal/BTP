@@ -1,0 +1,8 @@
+{
+  "dataset": "wikitext-2-raw-v1",
+  "split": "test",
+  "file": "wikitext2_test.txt",
+  "bytes": 1256449,
+  "sha256": "d790b833ef8cf03a90db7bf1271b7520b83c45ce07ba3c1a9699df81e239eca0",
+  "source_url": "https://raw.githubusercontent.com/pytorch/examples/master/word_language_model/data/wikitext-2/test.txt"
+}

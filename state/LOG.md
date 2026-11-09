@@ -68,3 +68,13 @@
 2026-11-09 16:11 | U0.4 | Part II skeleton, Makefile targets, measure machine budgets | results/part2/budgets.json, D2-02 feasibility 31.6x reduction confirmed, make check2 PASS | U0.4
 2026-11-09 16:13 | U0.5 | Deterministic tiny random transformer model generator | frontend/tiny_model.py, tests/test_tiny_model.py PASS (4/4), artifacts dumped, fp32 forward | U0.5
 2026-11-09 16:15 | U0.G | Gate H0 review, Phase U0 sign-off, tag gate-H0 | results/gates/H0.md PASS, make check2 (36/36), make check (234/234), tag gate-H0 | gate-H0
+2026-11-09 16:30 | UA.1 | NumPy fp32 reference decoder validated against Hugging Face | eval/fp32/decoder.py, tests/test_fp32_decoder.py PASS (21/21), max abs diff <= 3.29e-5 | UA.1
+2026-11-09 16:35 | UA.2 | Evaluation harness, pinned WikiText-2 & 20-prompt battery | eval/harness.py, eval/data/manifest.json, tests/test_eval_harness.py PASS (6/6) | UA.2
+2026-11-09 16:40 | UA.3 | Integer math op library, dyadic scale (M, s), and LUT builders | numerics/ops.py, tests/test_numerics_ops.py PASS (13/13) | UA.3
+2026-11-09 16:45 | UA.4 | Integer decoder oracle v0 and step-by-step exact validation | numerics/decoder.py, tests/test_integer_decoder.py PASS (2/2, 50 sequences exact match) | UA.4
+2026-11-09 16:50 | UA.5 | Per-op quantization ablation study (isolate PPL loss per op) | eval/ablation.py, results/part2/ua5_ablation.csv, RMSNorm isolated as dominant factor | UA.5
+2026-11-09 16:55 | UA.6 | Numeric format sweep across widths and LUT sizes | eval/numerics_sweeps.py, results/part2/numerics_sweep.csv (12 configs evaluated) | UA.6
+2026-11-09 16:58 | UA.7 | Freeze integer numerics configuration and ADR-2-1 | numerics/config_frozen.json, docs/part2/adr/ADR-2-1_frozen_numerics_configuration.md | UA.7
+2026-11-09 17:00 | UA.8 | Trace diff diagnostic tool and negative controls | verification/trace_diff.py, tests/test_trace_diff.py PASS (3/3) | UA.8
+2026-11-09 17:03 | UA.9 | Hardware cost proxies and resource budget validation | eval/cost_proxies.py, results/part2/cost_proxies.json (129.28 MB ROM, 2.81 MB SRAM) | UA.9
+2026-11-09 17:05 | UA.G | Gate HA review, 5 Explain-It questions, tag gate-HA | results/gates/HA.md PASS, make check2 (81/81), tag gate-HA | gate-HA

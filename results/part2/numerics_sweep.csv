@@ -1,0 +1,13 @@
+run_id,experiment,variable,value,ppl,delta_ppl,kl_div,top1_agr,saturations,cost_widest_mult_bits,cost_lut_bytes,runtime_sec,commit
+EN2_res_16,EN2_ResidualWidth,res_bits,16,257.2592,0.0,0.0,100.0,0,16,2048,0.008,c34eb5f
+EN2_res_20,EN2_ResidualWidth,res_bits,20,257.2592,0.0,0.0,100.0,0,20,2048,0.008,c34eb5f
+EN2_res_24,EN2_ResidualWidth,res_bits,24,257.2592,0.0,0.0,100.0,0,24,2048,0.008,c34eb5f
+EN2_res_32,EN2_ResidualWidth,res_bits,32,257.2592,0.0,0.0,100.0,0,32,2048,0.009,c34eb5f
+EN5_rsqrt_8,EN5_RMSNormInternals,rsqrt_bits,8,257.2592,0.0,0.0,100.0,0,24,256,0.008,c34eb5f
+EN5_rsqrt_10,EN5_RMSNormInternals,rsqrt_bits,10,257.2592,0.0,0.0,100.0,0,24,512,0.009,c34eb5f
+EN5_rsqrt_12,EN5_RMSNormInternals,rsqrt_bits,12,257.2592,0.0,0.0,100.0,0,24,512,0.008,c34eb5f
+EN5_rsqrt_16,EN5_RMSNormInternals,rsqrt_bits,16,257.2592,0.0,0.0,100.0,0,24,512,0.008,c34eb5f
+EN7_rope_10,EN7_RoPETableWidth,rope_bits,10,257.2592,-0.0,0.0,100.0,0,24,512,0.008,c34eb5f
+EN7_rope_12,EN7_RoPETableWidth,rope_bits,12,257.2592,-0.0,-0.0,100.0,0,24,512,0.008,c34eb5f
+EN7_rope_14,EN7_RoPETableWidth,rope_bits,14,257.2592,0.0,0.0,100.0,0,24,512,0.008,c34eb5f
+EN7_rope_15,EN7_RoPETableWidth,rope_bits,15,257.2592,-0.0,0.0,100.0,0,24,512,0.009,c34eb5f

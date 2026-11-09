@@ -1,0 +1,77 @@
+{
+  "version": "2.0.0",
+  "frozen": true,
+  "config_name": "INT8_DYADIC_RES24_FROZEN",
+  "provenance": {
+    "adr": "ADR-2-1",
+    "phase": "UA",
+    "gate": "HA",
+    "model": "HuggingFaceTB/SmolLM2-135M",
+    "revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2"
+  },
+  "formats": {
+    "linear_weights": {
+      "bits": 8,
+      "signed": true,
+      "range": [-127, 127],
+      "quantization": "symmetric_per_channel"
+    },
+    "linear_activations": {
+      "bits": 8,
+      "signed": true,
+      "range": [-127, 127],
+      "quantization": "symmetric_static"
+    },
+    "residual_stream": {
+      "bits": 24,
+      "signed": true,
+      "range": [-8388608, 8388607],
+      "saturation": "saturating"
+    },
+    "rmsnorm_internals": {
+      "accumulator_bits": 48,
+      "lut_entries": 256,
+      "lut_bits": 16,
+      "lut_format": "Q0.16",
+      "gamma_bits": 16,
+      "inv_d_multiplier": 7282,
+      "inv_d_shift": 22
+    },
+    "rope_tables": {
+      "max_ctx": 256,
+      "head_dim": 64,
+      "frequencies": 32,
+      "base_theta": 100000.0,
+      "table_format": "Q1.14",
+      "word_bits": 16,
+      "range": [-16384, 16384]
+    },
+    "softmax_internals": {
+      "scores_bits": 32,
+      "exp2_lut_entries": 256,
+      "exp2_lut_bits": 16,
+      "exp2_format": "Q0.16",
+      "reciprocal_lut_entries": 256,
+      "reciprocal_lut_bits": 16,
+      "reciprocal_format": "Q0.16",
+      "prob_bits": 16,
+      "prob_format": "Q0.15"
+    },
+    "swiglu_internals": {
+      "silu_lut_entries": 512,
+      "silu_in_bits": 8,
+      "silu_out_bits": 8,
+      "mult_bits": 16
+    },
+    "argmax": {
+      "vocab_size": 49152,
+      "scale_alignment": "per_row_dyadic",
+      "tie_break": "lowest_token_id"
+    }
+  },
+  "quality_thresholds": {
+    "max_delta_ppl": 25.0,
+    "min_top1_agreement_pct": 35.0,
+    "max_mean_kl_div": 0.15
+  }
+}
