@@ -63,3 +63,8 @@
 2026-11-02 05:41 | T8.6 | Presentation slide outline and viva defense preparation guide | docs/presentation_skeleton.md (15 slides), docs/viva_prep.md (all 6 questions) | 7ac7baf
 2026-11-02 05:48 | T8.G | Gate G8 review, Phase 8 walkthrough, tag gate-G8 | results/gates/G8.md PASS, docs/walkthroughs/P8.md, tag gate-G8, make check 230/230 | gate-G8
 2026-11-09 16:00 | U0.1 | Audit and reproduce Part I, archive state, tag part1-final | results/part2/part1_audit.md, make check PASS (230/230), make sim PASS, make regression PASS (124/124), make demo PASS (3.94s), tag part1-final | part1-final
+2026-11-09 16:07 | U0.2 | Retrospective & process trim, propose ADR-2-0 | docs/part2/adr/ADR-2-0_retrospective_and_process_trims.md, D2-02 ROM engine motivated | ADR-2-0
+2026-11-09 16:09 | U0.3 | Model facts v2: SmolLM2-135M audit, RoPE theta=100k, tied embedding | docs/model_facts.md v2 complete, 134,515,008 total parameters verified | U0.3
+2026-11-09 16:11 | U0.4 | Part II skeleton, Makefile targets, measure machine budgets | results/part2/budgets.json, D2-02 feasibility 31.6x reduction confirmed, make check2 PASS | U0.4
+2026-11-09 16:13 | U0.5 | Deterministic tiny random transformer model generator | frontend/tiny_model.py, tests/test_tiny_model.py PASS (4/4), artifacts dumped, fp32 forward | U0.5
+2026-11-09 16:15 | U0.G | Gate H0 review, Phase U0 sign-off, tag gate-H0 | results/gates/H0.md PASS, make check2 (36/36), make check (234/234), tag gate-H0 | gate-H0

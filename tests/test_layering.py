@@ -10,7 +10,7 @@ Only `frontend/` and `examples/` are allowed to handle model-specific code.
 import ast
 from pathlib import Path
 
-PROTECTED_DIRS = ["ir", "compiler", "backend", "verification"]
+PROTECTED_DIRS = ["ir", "compiler", "backend", "verification", "numerics"]
 FORBIDDEN_MODULES = {"torch", "transformers"}
 FORBIDDEN_STRINGS = {"SmolLM", "smollm", "SmolLM2"}
 

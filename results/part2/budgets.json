@@ -1,0 +1,30 @@
+{
+  "host": {
+    "cpu_cores": 20,
+    "ram_total_gb": 15.35,
+    "ram_available_gb": 8.97,
+    "disk_free_gb": 598.26
+  },
+  "verilator": {
+    "verilator_compile_success": true,
+    "compile_time_seconds": 4.53,
+    "sim_throughput_cycles_sec": 156351.0,
+    "sim_throughput_mcycles_sec": 0.16
+  },
+  "rom": {
+    "rom_words": 65536,
+    "rom_bits": 524288,
+    "lint_success": true,
+    "lint_time_sec": 0.064
+  },
+  "scaling_analysis": {
+    "part1_spatial_bytes_per_weight": 94.88,
+    "full_model_total_params": 134479872,
+    "extrapolated_spatial_verilog_gb": 11.88,
+    "rom_architecture_weight_storage_mb": 128.25,
+    "rom_hex_text_mb": 384.75,
+    "reduction_factor_code_size": 31.6
+  },
+  "d2_02_feasibility_confirmed": true,
+  "timestamp": "2026-11-09T10:44:51Z"
+}
