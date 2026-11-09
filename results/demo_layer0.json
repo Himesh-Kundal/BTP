@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-11-01T23:58:22Z",
+  "timestamp": "2026-11-09T10:21:03Z",
   "model": "HuggingFaceTB/SmolLM2-135M",
   "layer": 0,
   "all_passed": true,
-  "total_elapsed_seconds": 3.583731883999917,
+  "total_elapsed_seconds": 3.939481921999686,
   "projections": [
     {
       "projection": "q_proj",
@@ -25,7 +25,7 @@
       "mismatch": 0,
       "port_audit_passed": true,
       "const_audit_passed": true,
-      "elapsed_seconds": 0.5351502499997878
+      "elapsed_seconds": 0.7195523929999581
     },
     {
       "projection": "k_proj",
@@ -47,7 +47,7 @@
       "mismatch": 0,
       "port_audit_passed": true,
       "const_audit_passed": true,
-      "elapsed_seconds": 0.5626622680001674
+      "elapsed_seconds": 0.5228481879998981
     },
     {
       "projection": "v_proj",
@@ -69,7 +69,7 @@
       "mismatch": 0,
       "port_audit_passed": true,
       "const_audit_passed": true,
-      "elapsed_seconds": 0.5077779769999324
+      "elapsed_seconds": 0.6845717890000742
     },
     {
       "projection": "o_proj",
@@ -91,7 +91,7 @@
       "mismatch": 0,
       "port_audit_passed": true,
       "const_audit_passed": true,
-      "elapsed_seconds": 0.4174789540002166
+      "elapsed_seconds": 0.30234213199992155
     },
     {
       "projection": "gate_proj",
@@ -113,7 +113,7 @@
       "mismatch": 0,
       "port_audit_passed": true,
       "const_audit_passed": true,
-      "elapsed_seconds": 0.5173499530001209
+      "elapsed_seconds": 0.6213903120001305
     },
     {
       "projection": "up_proj",
@@ -135,7 +135,7 @@
       "mismatch": 0,
       "port_audit_passed": true,
       "const_audit_passed": true,
-      "elapsed_seconds": 0.5388016750002862
+      "elapsed_seconds": 0.6458039170001939
     },
     {
       "projection": "down_proj",
@@ -157,7 +157,7 @@
       "mismatch": 0,
       "port_audit_passed": true,
       "const_audit_passed": true,
-      "elapsed_seconds": 0.5042871989999185
+      "elapsed_seconds": 0.44275025799970535
     }
   ],
   "claim_c1_verified": true,

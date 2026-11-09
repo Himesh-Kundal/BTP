@@ -62,3 +62,4 @@
 2026-11-02 05:40 | T8.5 | Final thesis report draft and numerical traceability table | docs/report.md, docs/report_traceability.md (44 items), tests/test_report_traceability.py PASS | 6409cea
 2026-11-02 05:41 | T8.6 | Presentation slide outline and viva defense preparation guide | docs/presentation_skeleton.md (15 slides), docs/viva_prep.md (all 6 questions) | 7ac7baf
 2026-11-02 05:48 | T8.G | Gate G8 review, Phase 8 walkthrough, tag gate-G8 | results/gates/G8.md PASS, docs/walkthroughs/P8.md, tag gate-G8, make check 230/230 | gate-G8
+2026-11-09 16:00 | U0.1 | Audit and reproduce Part I, archive state, tag part1-final | results/part2/part1_audit.md, make check PASS (230/230), make sim PASS, make regression PASS (124/124), make demo PASS (3.94s), tag part1-final | part1-final

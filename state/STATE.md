@@ -1,28 +1,27 @@
-# STATE — keep to one page, always current
- 
+# STATE (Part II) — one page, always current
+
 ## Handoff note (rewrite at the end of every session)
-- Done this session: Phase 8 & Gate G8 complete. All 9 Gates (G0 through G8) have passed and are tagged. Unified CLI `llmhw` registered and tested (10/10 tests). Flagship multi-layer demo (`make demo`) compiles and simulates all 7 projections in 3.58s with 0 mismatches. Varying-shape demo verified across full $576 \times 576$ layer, non-multiple $19 \times 37$, and asymmetric $32 \times 128$ matrices. Fresh clone reproduction verified in clean directory in 9.23s. Publication-grade `README.md` and `docs/limitations.md` complete. Academic thesis draft `docs/report.md` complete with strict 44-item numerical traceability in `docs/report_traceability.md` verified by CI. Conference presentation skeleton (`docs/presentation_skeleton.md`) and comprehensive viva defense guide (`docs/viva_prep.md`) complete. Full test suite passing 230/230 tests.
-- Status: PROJECT RELEASED / DEFENSE READY (Tag `gate-G8`).
-- Gotchas / things I learned: Decoupling frontend PyTorch extraction from model-agnostic hardware generation and verification via standardized weight manifests enables complete fresh-clone reproduction without checking large neural network weights into git.
+- Done this session: Task U0.1 (Audit and reproduce Part I) completed. Verified clean `make check` (230/230 passed in 146.76s), `make sim` (4 vectors, 0 mismatches), `make regression` (124/124 tests across 7 suites in 23.17s), and `make demo` (all 7 Layer 0 projections bit-exact in 3.94s). Performed independent fresh-clone reproduction in `/tmp/fresh_clone_test` (230/230 passed). Tagged `part1-final` at `bf06427`. Archived Part I state to `state/archive/part1_STATE.md`. Generated comprehensive audit report `results/part2/part1_audit.md` re-deriving arithmetic shares and core claims.
+- Next action (exact first step): Task U0.2 (Retrospective and process trim) & Task U0.3 (Model facts v2).
+- Gotchas / things I learned: Model weight artifacts under `artifacts/` are properly gitignored; in a fresh clone, `./llmhw extract --layer 14,29 --proj all` deterministically recreates the multi-depth test fixtures from the pinned Hugging Face revision.
+- Background jobs running (command, log path, expected finish, success criteria): None.
 
 ## Project
-- Start date: 2026-11-01          Current week: 1 of 14
-- Final deadline: Defense Ready   Mid-term review: Completed
-- Supervisor / reviewer preferences (report format, page limit, demo rules): Standard thesis format (see O-2)
-- Institute AI-assistance policy: Full transparency / disclosure in report appendix and README (see O-6)
+- Start date: 2026-11-09          Current week: 1 of 14
+- Final deadline: End of Semester (W14)            Mid-term review: W7
+- Supervisor: Prof. Mrityunjoy Chakraborty (per Part I report).
+- Institute AI-assistance policy: Full transparency / disclosure in report appendix and README.
+- Part I final tag: `part1-final` (created in U0.1 at `bf06427`)
 
 ## Where we are
-- Current phase: RELEASED / DEFENSE READY                     Current task: All tasks complete (T0.1–T8.G)
-- Last green commit: gate-G8                                   Last gate tag: gate-G8
-- Gates passed: G0, G1, G2, G3, G4, G5, G6, G7, G8
+- Current phase: U0            Current task: U0.1 (Complete) -> U0.2
+- Last green commit: bf06427    Last gate tag: part1-final (Part I gates G0–G8 are history)
+- Gates passed (Part II): none
 
-## Key Artifacts & Deliverables
-1. Unified CLI: `cli.py`, `llmhw` (`llmhw extract | compile | verify | synth`)
-2. Demonstrations: `make demo` (all 7 projections in 3.58s), `scripts/run_varying_shape_demo.py`
-3. Synthesis & Evaluation: `results/E1.csv`, `results/E2.csv`, `results/E3.csv`, `results/E5.json`, `results/figures/` (Figs 1–4)
-4. Thesis Report: `docs/report.md`, `docs/report_traceability.md` (44 traced items)
-5. Defense Preparation: `docs/viva_prep.md`, `docs/presentation_skeleton.md`
-6. Release Audit: `results/gates/G8.md`, `docs/walkthroughs/P8.md`
+## Next 3 tasks
+1. U0.2 (retrospective: 3 things that worked, 3 that slowed us down, trim unused scripts)
+2. U0.3 (model facts v2: audit SmolLM2-135M config, weights, tie embedding, shapes)
+3. U0.4 (Part II skeleton, directory structure, makefile targets, and budgets)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
@@ -30,27 +29,26 @@
 ## Yellow items awaiting the human
 - none
 
-## Open decisions (see docs/03 §2)
-- O-1 F-vs-P as core, ROM mode as stretch: F-vs-P verified and evaluated across all dimensions
-- O-2 supervisor format/deadlines: standard defaults applied
-- O-3 area technology for Yosys: generic gates + ice40 LUT proxy fully evaluated
-- O-4 stretch S1: architectural hooks designed
-- O-5 harness capabilities: uv package manager + native bash/EDA tools
-- O-6 AI-assistance policy: disclosed in README.md and docs/report.md Appendix E
+## Open decisions (docs/part2/03 §2)
+- O2-1 ROM-backed engine for the full model: default applies (confirmed)
+- O2-2 quality thresholds: set at HA from measurements
+- O2-3 FPGA/ASIC-flow expectations from supervisor: generic gates + ice40 LUT proxy
+- O2-4 area technology/liberty: default generic (+ liberty if provided)
+- O2-5 evaluation corpus: default WikiText-2 + prompt battery
+- O2-6 MAX_CTX: default 256, set at U0.4/UB.6
+- O2-7 combined report vs Part II report: default combined
+- O2-8 harness capabilities: native Linux EDA (Icarus, Verilator, Yosys) + uv
+- O2-9 early start of UA before semester: in progress
 
-## Environment (filled by T0.1; source of truth is results/env.json)
-- iverilog: Icarus Verilog version 12.0 (stable) ()
-- vvp: Icarus Verilog runtime version 12.0 (stable) ()
-- verilator: Verilator 5.032 2025-01-01 rev (Debian 5.032-1+b2)
-- yosys: Yosys 0.52 (git sha1 fee39a3284c90249e1d9684cf6944ffbbcbb8f90)
-- python: 3.13.5
-- torch: 2.15.0+cpu, transformers: 5.22.1, numpy: 2.5.4, pytest: 9.2.0, ruff: 0.17.3
-- Model: SmolLM2-135M, revision pinned
+## Fallback ladder
+- Target: F0 (full 30-layer token-exact). Decision date for ADR-2-F: end of W9.
 
-## Budgets (filled when measured; frozen after)
-- `make check` runtime: ~123s (230 pytest cases)        `make demo` runtime: 3.58s
-- Full 576×576 layer generation time / RTL size: 0.54s / 30.02 MB (548,223 lines)
-- Full 576×576 static weight audit time: 0.85s (331,776 weights)
+## Environment and budgets (source of truth is results/env.json and results/part2/budgets.json)
+- Tool versions: python 3.13.5, torch 2.15.0+cpu, transformers 5.22.1, numpy 2.5.4, iverilog 12.0, verilator 5.032, yosys 0.52
+- Machine: Linux 6.12.113+deb13-amd64 x86_64
+- Part I test suite: 230 tests passed in 146.76s
+- Part I regression: 124 tests passed in 23.17s
+- Part I demo runtime: 3.94s
 
 ## Parking lot (ideas NOT to implement now)
 - none

@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "checked": 4,
+  "mismatch": 0,
+  "timing_err": 0,
+  "returncode": 0,
+  "stdout": "TB_RESULT CHECKED=4 MISMATCH=0 TIMING_ERR=0\n/home/himesh/BTP/build/toy_sim/tb.v:74: $finish called at 60000 (1ps)\n",
+  "stderr": "",
+  "elapsed_seconds": 0.010756883999874844,
+  "report_path": "/home/himesh/BTP/results/report.json"
+}
