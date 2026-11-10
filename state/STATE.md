@@ -1,17 +1,23 @@
 # STATE (Part II) — one page, always current
 
 ## Handoff note (rewrite at the end of every session)
-- Done this session: Phase UB (Compiler Extension) 100% complete. Tasks UB.1–UB.7 passed and Gate HB approved:
-  - UB.1: Graph IR v2 in `ir/graph_v2.py` with node ops, tensor kinds, edge formats, lossless JSON serialization, and Invariants I1–I7 verified with negative controls.
-  - UB.2: Frontend v2 importer in `frontend/importer_v2.py` extracting full structure with cryptographic SHA256 integrity (`artifacts/tiny_model_v2`).
-  - UB.3: Format & dyadic scale assignment pass in `compiler/format_assignment.py`, folding $\gamma$, $1/\sqrt{d}$, and per-channel weights into dyadic $(M, s)$ scales.
-  - UB.4: ROM packing pass in `compiler/rom_packing.py` generating `weights.hex`, `requant_params.hex`, `tables.hex`, and `address_map.json`.
-  - UB.5: Sequencer schedule & microprogram generator in `compiler/schedule.py` with parameterized layer loop and analytical cycle estimates.
-  - UB.6: Memory planner in `compiler/memory_planner.py` sizing activation buffers and confirming 2.81 MB KV cache RAM footprint.
-  - UB.7: Compiled-artifact software interpreter in `compiler/interpreter.py` executing microprograms directly on packed ROM hex images.
-  - UB.G: Gate HB review document written (`results/gates/HB.md`), all 5 Explain-It questions answered. `make check2` passes (101 tests).
-- Next action (exact first step): Phase UC (RTL Unit Library) -> Task UC.1 (`rtl/lib/numerics.vh` and `requant` unit).
-- Gotchas / things I learned: Parameterizing the sequencer layer loop reduces microprogram ROM storage from thousands of instructions to < 20 instructions by maintaining a layer ROM base address table.
+- Done this session: Phase UC (RTL Unit Library) 100% complete. Tasks UC.1–UC.13 passed and Gate HC approved:
+  - UC.1: `rtl/lib/numerics.vh` & `rtl/lib/requant.v` with rounding and saturation.
+  - UC.2: `rtl/lib/rom_sync.v`, `backend/rom_generator.py`, and `verification/weight_audit_v2.py` with immutable weights audit.
+  - UC.3: `rtl/lib/rmsnorm.v` bit-exact against `numerics/ops.py` integer oracle.
+  - UC.4: `rtl/lib/rope.v` rotary position embedding unit with Q0.14 table lookups.
+  - UC.5: `rtl/lib/softmax.v` base-2 exponential decomposition and normalization unit.
+  - UC.6: `rtl/lib/swiglu.v` MLP activation unit with 512-word SiLU LUT.
+  - UC.7: `rtl/lib/residual_add.v` saturating adder & `rtl/lib/embed_gather.v` token gather unit.
+  - UC.8: `rtl/lib/argmax.v` scale-normalized token extractor with strict lowest-ID tie breaking.
+  - UC.9: `rtl/lib/kv_cache.v` dual-port INT8 synchronous RAM & `rtl/lib/kv_addr_gen.v`.
+  - UC.10: `rtl/lib/linear_engine.v` R×C MAC array with ROM streaming and requantization.
+  - UC.11: `rtl/lib/attention.v` datapath with GQA and causal historical context loop.
+  - UC.12: `rtl/lib/sequencer.v` microcode engine matching `compiler/interpreter.py` op order.
+  - UC.13: Mutation suite v2 in `verification/mutate2.py` achieving 100.0% kill rate (21/21 mutants killed M10–M30).
+  - UC.G: Gate HC review report written (`results/gates/HC.md`), all 5 Explain-It questions answered. `make check2` passes (136 tests).
+- Next action (exact first step): Phase UD (Tiny Model End-to-End) -> Task UD.1 (Top-level generator: composition, ROM instances, step interface).
+- Gotchas / things I learned: Softmax expects synchronous registered read latency from memory; matching pipeline register delays between memory reads and accumulators guarantees zero-bubble throughput and bit-exact equivalence.
 - Background jobs running (command, log path, expected finish, success criteria): None.
 
 ## Project
@@ -20,17 +26,17 @@
 - Supervisor: Prof. Mrityunjoy Chakraborty (per Part I report).
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix and README.
 - Part I final tag: `part1-final` (created in U0.1 at `bf06427`)
-- Part II Gate tags: `gate-H0`, `gate-HA`, `gate-HB`
+- Part II Gate tags: `gate-H0`, `gate-HA`, `gate-HB`, `gate-HC`
 
 ## Where we are
-- Current phase: UC (RTL Unit Library)      Current task: UC.1
-- Last green commit: gate-HB                Last gate tag: gate-HB
-- Gates passed (Part II): H0, HA, HB
+- Current phase: UD (Tiny model end to end)      Current task: UD.1
+- Last green commit: gate-HC                Last gate tag: gate-HC
+- Gates passed (Part II): H0, HA, HB, HC
 
 ## Next 3 tasks
-1. UC.1 (`rtl/lib/numerics.vh` shared macros/functions and `requant` unit)
-2. UC.2 (ROM generator, module template, weight audit v2, no-write-path interface test)
-3. UC.3 (`rmsnorm` unit bit-exact against `numerics/ops.py` and mutant tests)
+1. UD.1 (Top-level generator: composition, ROM instances, step interface)
+2. UD.2 (Testbench generator: feed prompt tokens, generate N tokens, dump traces, summary line)
+3. UD.3 (Token-exact and trace-exact on >= 100 random prompts incl. sequences up to MAX_CTX)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none
