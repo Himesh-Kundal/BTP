@@ -4,6 +4,8 @@
 `timescale 1ns / 1ps
 
 /* verilator lint_off BLKSEQ */
+/* verilator lint_off WIDTHEXPAND */
+/* verilator lint_off WIDTHTRUNC */
 module softmax #(
     parameter SCORES_WIDTH = 32,
     parameter EXP_WIDTH    = 18,
@@ -157,7 +159,7 @@ module softmax #(
                 S_PASS2_ACC: begin
                     // exp2_lut_data is now available
                     exp_mem[acc_cnt[7:0]] <= exp_val;
-                    sigma                 <= sigma + {16'd0, exp_val};
+                    sigma                 <= sigma + {{14{1'b0}}, exp_val};
                     acc_cnt               <= acc_cnt + 16'd1;
 
                     if (acc_cnt + 16'd1 < seq_len) begin
@@ -197,3 +199,5 @@ module softmax #(
 
 endmodule
 /* verilator lint_on BLKSEQ */
+/* verilator lint_on WIDTHEXPAND */
+/* verilator lint_on WIDTHTRUNC */
