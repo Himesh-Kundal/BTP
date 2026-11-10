@@ -105,12 +105,12 @@ endfunction
 // Dyadic requantization for 64-bit intermediate products
 function signed [7:0] requant_to_int8;
     input signed [31:0] acc;
-    input signed [31:0] M;
+    input signed [31:0] m_scale;
     input [5:0] sh;
     reg signed [63:0] prod;
     reg signed [63:0] shifted;
     begin
-        prod = {{32{acc[31]}}, acc} * {{32{M[31]}}, M};
+        prod = {{32{acc[31]}}, acc} * {{32{m_scale[31]}}, m_scale};
         shifted = rshift_rnd64(prod, sh);
         requant_to_int8 = sat_int8(shifted);
     end
