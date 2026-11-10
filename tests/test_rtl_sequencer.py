@@ -166,17 +166,19 @@ module tb_sequencer;
     // Log every dispatched unit start
     always @(posedge clk) begin
         if (embed_start || norm_start || linear_start || rope_start || attn_start || add_start || swiglu_start || argmax_start) begin
-            $display("DISPATCH pc=%0d layer=%0d op=%0d src=%0d dst=%0d dim0=%0d dim1=%0d",
-                     cur_pc, cur_layer, cur_opcode, cur_src_buf, cur_dst_buf, cur_dim0, cur_dim1);
+            $display("DISPATCH pc=%0d layer=%0d op=%0d src=%0d dst=%0d dim0=%0d dim1=%0d base=%0d",
+                     cur_pc, cur_layer, cur_opcode, cur_src_buf, cur_dst_buf, cur_dim0, cur_dim1, cur_weight_base);
         end
     end
 
     reg [15:0] captured_tok;
+    reg tok_valid_seen;
     initial begin
         clk = 0;
         rst_n = 0;
         start = 0;
-        captured_tok = 16'd0;
+        captured_tok = 16'hffff;
+        tok_valid_seen = 0;
         #20;
         rst_n = 1;
         #20;
@@ -189,11 +191,16 @@ module tb_sequencer;
         while (!done) begin
             if (tok_out_valid) begin
                 captured_tok = tok_out;
+                tok_valid_seen = 1;
             end
             @(posedge clk);
         end
 
         #20;
+        if (!tok_valid_seen) begin
+            $display("FAIL: done asserted before tok_out_valid!");
+            $fatal(1, "Premature done without tok_out_valid");
+        end
         $display("FINAL_TOK %0d", captured_tok);
         $finish;
     end
@@ -216,7 +223,7 @@ endmodule
 
         run_cmd = ["vvp", str(sim_exe)]
         res_run = subprocess.run(run_cmd, check=False, capture_output=True, text=True)
-        assert res_run.returncode == 0, f"Simulation failed: {res_run.stderr}"
+        assert res_run.returncode == 0 and "FAIL" not in res_run.stdout, f"Simulation failed: {res_run.stdout}\n{res_run.stderr}"
 
         dispatched_ops: list[dict[str, Any]] = []
         final_tok = 0
@@ -278,6 +285,7 @@ def test_sequencer_execution_order_vs_interpreter(tmp_path: Path):
         dims = ins["dims"]
         d0 = dims[0] if len(dims) > 0 else 0
         d1 = dims[1] if len(dims) > 1 else 0
+        base = ins.get("rom_weight_base", 0)
         interp_ops.append({
             "layer": layer_idx,
             "op": ins["opcode_val"],
@@ -285,6 +293,7 @@ def test_sequencer_execution_order_vs_interpreter(tmp_path: Path):
             "dst": ins["dst_buf"],
             "dim0": d0,
             "dim1": d1,
+            "base": base,
         })
         return orig_execute(ins, layer_idx, pos, token_id, layer_bases)
 
@@ -312,6 +321,7 @@ def test_sequencer_execution_order_vs_interpreter(tmp_path: Path):
         assert s_op["dst"] == py_op["dst"], f"Op {i}: dst_buf mismatch ({s_op['dst']} vs {py_op['dst']})"
         assert s_op["dim0"] == py_op["dim0"], f"Op {i}: dim0 mismatch ({s_op['dim0']} vs {py_op['dim0']})"
         assert s_op["dim1"] == py_op["dim1"], f"Op {i}: dim1 mismatch ({s_op['dim1']} vs {py_op['dim1']})"
+        assert s_op["base"] == py_op["base"], f"Op {i}: base mismatch ({s_op['base']} vs {py_op['base']})"
 
 
 def test_sequencer_single_layer_loop():

@@ -1,0 +1,177 @@
+{
+  "timestamp": "2026-11-10T22:21:20.062385+00:00",
+  "total_mutants": 21,
+  "killed_mutants": 21,
+  "survived_mutants": 0,
+  "kill_rate_pct": 100.0,
+  "results": [
+    {
+      "id": "M10",
+      "description": "Requant rounds half-down instead of half-up",
+      "target_file": "rtl/lib/requant.v",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_numerics.py -k test_rtl_requant_module"
+    },
+    {
+      "id": "M11",
+      "description": "Asymmetric saturation to -128 instead of symmetric -127",
+      "target_file": "rtl/lib/numerics.vh",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_numerics.py -k test_rtl_rshift_rnd_and_sat_exhaustive_small_widths"
+    },
+    {
+      "id": "M12",
+      "description": "RoPE pairs adjacent elements instead of split halves",
+      "target_file": "rtl/lib/rope.v",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_rope.py"
+    },
+    {
+      "id": "M13",
+      "description": "RoPE table index off by one",
+      "target_file": "rtl/lib/rope.v",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_rope.py"
+    },
+    {
+      "id": "M14",
+      "description": "Attention K vector corrupted / inverted during KV store",
+      "target_file": "rtl/lib/attention.v",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_attention.py -k test_attention_multi_position_causal"
+    },
+    {
+      "id": "M15",
+      "description": "GQA head mapping uses modulo instead of floor divide",
+      "target_file": "rtl/lib/kv_addr_gen.v",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_kv_cache.py -k test_gqa_mapping_and_coord_calc"
+    },
+    {
+      "id": "M16",
+      "description": "Causal mask off, attends to future position pos+1",
+      "target_file": "rtl/lib/attention.v",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_attention.py -k test_attention_multi_position_causal"
+    },
+    {
+      "id": "M17",
+      "description": "Softmax without max subtraction",
+      "target_file": "rtl/lib/softmax.v",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_softmax.py"
+    },
+    {
+      "id": "M18",
+      "description": "Softmax exp2 LUT index off by one",
+      "target_file": "rtl/lib/softmax.v",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_softmax.py"
+    },
+    {
+      "id": "M19",
+      "description": "Rsqrt LUT index off by one (unshifted index)",
+      "target_file": "rtl/lib/rmsnorm.v",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_rmsnorm.py"
+    },
+    {
+      "id": "M20",
+      "description": "RMSNorm skips gamma scaling",
+      "target_file": "rtl/lib/rmsnorm.v",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_rmsnorm.py"
+    },
+    {
+      "id": "M21",
+      "description": "SiLU LUT sign inversion",
+      "target_file": "rtl/lib/swiglu.v",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_swiglu.py"
+    },
+    {
+      "id": "M22",
+      "description": "Residual addition skipped",
+      "target_file": "rtl/lib/residual_add.v",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_residual_embed.py -k test_residual_add_with_saturation"
+    },
+    {
+      "id": "M23",
+      "description": "Argmax ties to highest index instead of lowest",
+      "target_file": "rtl/lib/argmax.v",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_argmax.py -k test_argmax_tie_breaking"
+    },
+    {
+      "id": "M24",
+      "description": "Argmax compares raw unscaled accumulators",
+      "target_file": "rtl/lib/argmax.v",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_argmax.py -k test_argmax_scale_inversion"
+    },
+    {
+      "id": "M25",
+      "description": "ROM word base offset by +1",
+      "target_file": "rtl/lib/sequencer.v",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_sequencer.py -k test_sequencer_execution_order_vs_interpreter"
+    },
+    {
+      "id": "M26",
+      "description": "KV write at pos+1 (causal store corruption)",
+      "target_file": "rtl/lib/kv_cache.v",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_kv_cache.py -k test_kv_cache_read_write_ordering"
+    },
+    {
+      "id": "M27",
+      "description": "Embedding row index off by one",
+      "target_file": "rtl/lib/embed_gather.v",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_residual_embed.py -k test_embed_gather"
+    },
+    {
+      "id": "M28",
+      "description": "Linear engine accumulator truncated to 16 bits",
+      "target_file": "rtl/lib/linear_engine.v",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_linear_engine.py -k test_linear_engine_multi_tile_exact"
+    },
+    {
+      "id": "M29",
+      "description": "Linear engine padding lane nonzero",
+      "target_file": "rtl/lib/linear_engine.v",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_linear_engine.py -k test_linear_engine_non_multiple_shape_with_padding"
+    },
+    {
+      "id": "M30",
+      "description": "Sequencer premature done assertion",
+      "target_file": "rtl/lib/sequencer.v",
+      "status": "KILLED",
+      "exit_code": 1,
+      "command": "/home/himesh/.local/bin/uv run pytest tests/test_rtl_sequencer.py -k test_sequencer_execution_order_vs_interpreter"
+    }
+  ]
+}
