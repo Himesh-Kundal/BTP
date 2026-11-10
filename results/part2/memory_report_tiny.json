@@ -1,0 +1,106 @@
+{
+  "activation_buffers": [
+    {
+      "buffer_id": 0,
+      "element_bits": 16,
+      "live_end": 18,
+      "live_start": 0,
+      "name": "BUF_RES",
+      "num_elements": 64,
+      "total_bytes": 128
+    },
+    {
+      "buffer_id": 1,
+      "element_bits": 8,
+      "live_end": 16,
+      "live_start": 1,
+      "name": "BUF_ACT",
+      "num_elements": 64,
+      "total_bytes": 64
+    },
+    {
+      "buffer_id": 2,
+      "element_bits": 8,
+      "live_end": 7,
+      "live_start": 2,
+      "name": "BUF_Q",
+      "num_elements": 64,
+      "total_bytes": 64
+    },
+    {
+      "buffer_id": 3,
+      "element_bits": 8,
+      "live_end": 7,
+      "live_start": 3,
+      "name": "BUF_K",
+      "num_elements": 32,
+      "total_bytes": 32
+    },
+    {
+      "buffer_id": 4,
+      "element_bits": 8,
+      "live_end": 7,
+      "live_start": 4,
+      "name": "BUF_V",
+      "num_elements": 32,
+      "total_bytes": 32
+    },
+    {
+      "buffer_id": 5,
+      "element_bits": 8,
+      "live_end": 8,
+      "live_start": 7,
+      "name": "BUF_ATTN_OUT",
+      "num_elements": 64,
+      "total_bytes": 64
+    },
+    {
+      "buffer_id": 6,
+      "element_bits": 8,
+      "live_end": 13,
+      "live_start": 11,
+      "name": "BUF_MLP_GATE",
+      "num_elements": 128,
+      "total_bytes": 128
+    },
+    {
+      "buffer_id": 7,
+      "element_bits": 8,
+      "live_end": 13,
+      "live_start": 12,
+      "name": "BUF_MLP_UP",
+      "num_elements": 128,
+      "total_bytes": 128
+    },
+    {
+      "buffer_id": 8,
+      "element_bits": 8,
+      "live_end": 14,
+      "live_start": 13,
+      "name": "BUF_MLP_SWIGLU",
+      "num_elements": 128,
+      "total_bytes": 128
+    },
+    {
+      "buffer_id": 9,
+      "element_bits": 16,
+      "live_end": 18,
+      "live_start": 17,
+      "name": "BUF_LOGITS",
+      "num_elements": 256,
+      "total_bytes": 512
+    }
+  ],
+  "activation_bytes_total": 1280,
+  "kv_cache_bytes": 4096,
+  "kv_cache_shape": [
+    2,
+    2,
+    2,
+    32,
+    16
+  ],
+  "max_ctx": 32,
+  "total_dynamic_sram_bytes": 5376,
+  "total_dynamic_sram_mb": 0.0051
+}

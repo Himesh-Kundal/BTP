@@ -1,19 +1,17 @@
 # STATE (Part II) — one page, always current
 
 ## Handoff note (rewrite at the end of every session)
-- Done this session: Phase UA (Numerics First) 100% complete. Tasks UA.1–UA.9 passed and Gate HA approved:
-  - UA.1: NumPy FP32 reference decoder in `eval/fp32/decoder.py` validated against Hugging Face (diff <= 3.29e-5).
-  - UA.2: Evaluation harness in `eval/harness.py`, pinned WikiText-2 dataset hash, 20-prompt battery.
-  - UA.3: Integer math op library in `numerics/ops.py` (dyadic scale, sat, rshift_rnd, LUT builders).
-  - UA.4: Integer decoder oracle in `numerics/decoder.py` (exact bit-level step vs scorer across 50 sequences).
-  - UA.5: Per-op quantization ablation (`results/part2/ua5_ablation.csv`), isolating RMSNorm as primary quality contributor.
-  - UA.6: Format sweep across widths and LUT sizes (`results/part2/numerics_sweep.csv`).
-  - UA.7: Frozen integer config in `numerics/config_frozen.json` and `ADR-2-1_frozen_numerics_configuration.md`.
-  - UA.8: Trace diff diagnostic tool in `verification/trace_diff.py` with fault-injection negative controls.
-  - UA.9: Hardware cost proxies in `eval/cost_proxies.py` (129.28 MB ROM, 2.81 MB SRAM).
-  - UA.G: Gate HA review document written (`results/gates/HA.md`), 5 Explain-It questions answered. `make check2` passes (81 tests).
-- Next action (exact first step): Phase UB (Compiler Extension) -> Task UB.1 (Graph IR v2 in `ir/graph_v2.py`).
-- Gotchas / things I learned: RMSNorm accounts for almost the entire perplexity delta in quantized transformer inference; using a 16-bit mantissa LUT with dyadic scale completely preserves quality.
+- Done this session: Phase UB (Compiler Extension) 100% complete. Tasks UB.1–UB.7 passed and Gate HB approved:
+  - UB.1: Graph IR v2 in `ir/graph_v2.py` with node ops, tensor kinds, edge formats, lossless JSON serialization, and Invariants I1–I7 verified with negative controls.
+  - UB.2: Frontend v2 importer in `frontend/importer_v2.py` extracting full structure with cryptographic SHA256 integrity (`artifacts/tiny_model_v2`).
+  - UB.3: Format & dyadic scale assignment pass in `compiler/format_assignment.py`, folding $\gamma$, $1/\sqrt{d}$, and per-channel weights into dyadic $(M, s)$ scales.
+  - UB.4: ROM packing pass in `compiler/rom_packing.py` generating `weights.hex`, `requant_params.hex`, `tables.hex`, and `address_map.json`.
+  - UB.5: Sequencer schedule & microprogram generator in `compiler/schedule.py` with parameterized layer loop and analytical cycle estimates.
+  - UB.6: Memory planner in `compiler/memory_planner.py` sizing activation buffers and confirming 2.81 MB KV cache RAM footprint.
+  - UB.7: Compiled-artifact software interpreter in `compiler/interpreter.py` executing microprograms directly on packed ROM hex images.
+  - UB.G: Gate HB review document written (`results/gates/HB.md`), all 5 Explain-It questions answered. `make check2` passes (101 tests).
+- Next action (exact first step): Phase UC (RTL Unit Library) -> Task UC.1 (`rtl/lib/numerics.vh` and `requant` unit).
+- Gotchas / things I learned: Parameterizing the sequencer layer loop reduces microprogram ROM storage from thousands of instructions to < 20 instructions by maintaining a layer ROM base address table.
 - Background jobs running (command, log path, expected finish, success criteria): None.
 
 ## Project
@@ -22,17 +20,17 @@
 - Supervisor: Prof. Mrityunjoy Chakraborty (per Part I report).
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix and README.
 - Part I final tag: `part1-final` (created in U0.1 at `bf06427`)
-- Part II Gate tags: `gate-H0`, `gate-HA`
+- Part II Gate tags: `gate-H0`, `gate-HA`, `gate-HB`
 
 ## Where we are
-- Current phase: UB (Compiler Extension)    Current task: UB.1
-- Last green commit: gate-HA                Last gate tag: gate-HA
-- Gates passed (Part II): H0, HA
+- Current phase: UC (RTL Unit Library)      Current task: UC.1
+- Last green commit: gate-HB                Last gate tag: gate-HB
+- Gates passed (Part II): H0, HA, HB
 
 ## Next 3 tasks
-1. UB.1 (Graph IR v2 in `ir/graph_v2.py` representing complete transformer graph with Invariants I1–I7)
-2. UB.2 (Frontend importer v2 in `frontend/importer_v2.py` extracting full structure from Hugging Face)
-3. UB.3 (Format and dyadic scale assignment pass applying frozen `config_frozen.json` scales)
+1. UC.1 (`rtl/lib/numerics.vh` shared macros/functions and `requant` unit)
+2. UC.2 (ROM generator, module template, weight audit v2, no-write-path interface test)
+3. UC.3 (`rmsnorm` unit bit-exact against `numerics/ops.py` and mutant tests)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none

@@ -78,3 +78,11 @@
 2026-11-09 17:00 | UA.8 | Trace diff diagnostic tool and negative controls | verification/trace_diff.py, tests/test_trace_diff.py PASS (3/3) | UA.8
 2026-11-09 17:03 | UA.9 | Hardware cost proxies and resource budget validation | eval/cost_proxies.py, results/part2/cost_proxies.json (129.28 MB ROM, 2.81 MB SRAM) | UA.9
 2026-11-09 17:05 | UA.G | Gate HA review, 5 Explain-It questions, tag gate-HA | results/gates/HA.md PASS, make check2 (81/81), tag gate-HA | gate-HA
+2026-11-11 00:43 | UB.1 | Graph IR v2, Invariants I1-I7, and lossless serialization | ir/graph_v2.py, tests/test_ir_v2.py PASS (9/9), strict layering enforced | UB.1
+2026-11-11 00:45 | UB.2 | Frontend v2 importer, SHA256 integrity, tiny model extraction | frontend/importer_v2.py, tests/test_importer_v2.py PASS (3/3), artifacts/tiny_model_v2 | UB.2
+2026-11-11 00:47 | UB.3 | Format and dyadic scale assignment pass (fold gamma, 1/sqrt(d)) | compiler/format_assignment.py, tests/test_format_assignment.py PASS | UB.3
+2026-11-11 00:50 | UB.4 | ROM packing pass: tile-ordered weights, tables, requant params | compiler/rom_packing.py, tests/test_rom_packing.py PASS, weights.hex, address_map.json | UB.4
+2026-11-11 00:52 | UB.5 | Sequencer schedule & microprogram generator with layer loop | compiler/schedule.py, tests/test_schedule.py PASS, program.hex, schedule.json | UB.5
+2026-11-11 00:54 | UB.6 | Memory planner: buffer sizing by liveness, KV cache layout | compiler/memory_planner.py, tests/test_memory_planner.py PASS, 2.81 MB KV cache confirmed | UB.6
+2026-11-11 00:58 | UB.7 | Compiled-artifact software interpreter on ROM hex images | compiler/interpreter.py, tests/test_interpreter.py PASS (2/2), deterministic execution | UB.7
+2026-11-11 01:00 | UB.G | Gate HB review, compiler pipeline sign-off, tag gate-HB | results/gates/HB.md PASS, make check2 (101/101), tag gate-HB | gate-HB

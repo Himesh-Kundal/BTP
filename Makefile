@@ -20,7 +20,7 @@ check: lint test
 	@echo "=== make check: PASSED ==="
 
 check2: lint
-	@$(PYTEST) -v tests/test_smoke.py tests/test_layering.py tests/test_tiny_model.py tests/test_fp32_decoder.py tests/test_eval_harness.py tests/test_numerics_ops.py tests/test_integer_decoder.py tests/test_trace_diff.py tests/test_reference.py tests/test_weight_encoder.py tests/test_ir_complete.py tests/test_tiling.py
+	@$(PYTEST) -v tests/test_smoke.py tests/test_layering.py tests/test_tiny_model.py tests/test_fp32_decoder.py tests/test_eval_harness.py tests/test_numerics_ops.py tests/test_integer_decoder.py tests/test_trace_diff.py tests/test_ir_v2.py tests/test_importer_v2.py tests/test_format_assignment.py tests/test_rom_packing.py tests/test_schedule.py tests/test_memory_planner.py tests/test_interpreter.py tests/test_reference.py tests/test_weight_encoder.py tests/test_ir_complete.py tests/test_tiling.py
 	@echo "=== make check2: PASSED ==="
 
 numerics:
