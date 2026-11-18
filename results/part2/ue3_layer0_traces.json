@@ -1,0 +1,53 @@
+{
+  "task": "UE.3",
+  "prompt_tokens": [
+    1,
+    42,
+    128,
+    512,
+    1024,
+    2048,
+    4096,
+    8192
+  ],
+  "num_generate": 4,
+  "total_positions": 12,
+  "golden_tokens": [
+    1029,
+    1361,
+    44236,
+    631,
+    0,
+    41680,
+    9803,
+    27061,
+    43014,
+    29185,
+    22110,
+    29
+  ],
+  "rtl_tokens": [
+    1029,
+    1361,
+    44236,
+    631,
+    0,
+    41680,
+    9803,
+    27061,
+    43014,
+    29185,
+    22110,
+    29
+  ],
+  "tokens_exact": true,
+  "trace_identical": true,
+  "first_divergence": null,
+  "files_checked": 216,
+  "elements_checked": 728064,
+  "total_cycles": 165511344,
+  "build_sec": 5.76,
+  "sim_sec": 73.07,
+  "sim_speed_kcycles_sec": 2265.07,
+  "status": "PASS"
+}

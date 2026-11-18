@@ -58,6 +58,7 @@ class CompiledArtifactInterpreter:
         self.buffers: dict[int, np.ndarray] = {}
         self.kv_cache: dict[int, tuple[np.ndarray, np.ndarray]] = {}  # layer -> (K, V)
         self.traces: dict[str, np.ndarray] = {}
+        self._weight_cache: dict[str, np.ndarray] = {}
 
     def _load_hex_file(self, path: Path, bits: int, signed: bool = True) -> np.ndarray:
         """Load hex lines into a NumPy integer array."""
@@ -152,26 +153,26 @@ class CompiledArtifactInterpreter:
 
     def _get_linear_weight_matrix(self, node_id: str) -> np.ndarray:
         """Reconstruct 2D weight matrix from tiled Weight ROM layout."""
+        if node_id in self._weight_cache:
+            return self._weight_cache[node_id]
+
         info = self.addr_map["weights"][node_id]
         base = info["base_addr"]
         n_pad, k_pad = info["padded_shape"]
         num_tr, num_tc = info["num_tiles"]
 
         raw_tile_words = self.weight_rom[base : base + info["length"]]
-
-        # Reconstruct padded matrix from tile-ordered elements
-        w_reconstructed = np.zeros((n_pad, k_pad), dtype=np.int8)
-        idx = 0
-        for tr in range(num_tr):
-            for tc in range(num_tc):
-                for r in range(self.tile_r):
-                    for c in range(self.tile_c):
-                        w_reconstructed[tr * self.tile_r + r, tc * self.tile_c + c] = raw_tile_words[idx]
-                        idx += 1
+        w_reconstructed = (
+            raw_tile_words.reshape(num_tr, num_tc, self.tile_r, self.tile_c)
+            .transpose(0, 2, 1, 3)
+            .reshape(n_pad, k_pad)
+        )
 
         # Unpad to original shape
         orig_n, orig_k = info["orig_shape"]
-        return w_reconstructed[:orig_n, :orig_k]
+        res = w_reconstructed[:orig_n, :orig_k]
+        self._weight_cache[node_id] = res
+        return res
 
     def decode_step(self, token_id: int, pos: int) -> tuple[np.ndarray, int]:
         """Execute one complete decode step using the microprogram."""
@@ -237,6 +238,7 @@ class CompiledArtifactInterpreter:
             res = rshift_rnd(row * M, s)
             self.buffers[dst] = sat(res, -8388608, 8388607)
             self.traces[f"embed_tokens_tok{token_id}"] = self.buffers[dst]
+            self.traces["embed_tokens_current"] = self.buffers[dst]
 
         elif opcode == Opcode.RMSNORM:
             x = self.buffers[src].astype(np.int64)
@@ -281,7 +283,7 @@ class CompiledArtifactInterpreter:
                 f"{name[6:]}_{layer_idx}" if name.startswith("layer_") else name
             )
             w = self._get_linear_weight_matrix(node_key)
-            acc = x @ w.T  # INT32 or INT48
+            acc = x @ w.T.astype(np.int64)  # INT32 or INT48
 
             p_info = self.addr_map["requant_params"].get(node_key)
             if p_info:
@@ -290,13 +292,12 @@ class CompiledArtifactInterpreter:
                 is_res_out = dst in (0, 9) or ("o_proj" in name) or ("down_proj" in name)
                 out_min = -8388608 if is_res_out else -127
                 out_max = 8388607 if is_res_out else 127
-                res = np.array(
-                    [
-                        requant(int(acc[i]), int(params[i][0]), int(params[i][1]), out_min, out_max)
-                        for i in range(len(acc))
-                    ],
-                    dtype=np.int64 if is_res_out else np.int8,
-                )
+                m_arr = np.array([p[0] for p in params], dtype=np.int64)
+                s_arr = np.array([p[1] for p in params], dtype=np.int64)
+                prod = acc * m_arr
+                half = np.where(s_arr > 0, np.left_shift(np.int64(1), np.maximum(s_arr - 1, 0)), np.int64(0))
+                shifted = np.where(s_arr > 0, np.right_shift(prod + half, s_arr), prod)
+                res = np.clip(shifted, out_min, out_max).astype(np.int64 if is_res_out else np.int8)
             else:
                 res = acc
 

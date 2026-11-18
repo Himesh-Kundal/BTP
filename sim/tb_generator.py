@@ -60,7 +60,9 @@ def dump_interpreter_traces(
     files_written = 0
 
     # 1. Embed (Layer 0 container)
-    embed_arr = interp.traces.get(f"embed_tokens_tok{interp.traces.get('argmax_tok', [0])[0]}")
+    embed_arr = interp.traces.get("embed_tokens_current")
+    if embed_arr is None:
+        embed_arr = interp.traces.get(f"embed_tokens_tok{interp.traces.get('argmax_tok', [0])[0]}")
     if embed_arr is None:
         # Fallback to any embed trace
         for k, v in interp.traces.items():
