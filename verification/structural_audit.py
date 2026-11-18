@@ -25,7 +25,6 @@ from typing import Any
 
 from verification.weight_audit_v2 import strip_verilog_comments
 
-
 # Authorized dynamic memory buffers in top_accel
 AUTHORIZED_DYNAMIC_BUFFERS = {
     "buf_res",
@@ -238,7 +237,7 @@ def run_multi_tool_lint(
 
     # 1. Icarus Verilog Lint
     cmd_iverilog = ["iverilog", "-Wall", "-g2005", f"-I{inc_dir}", f"-s{top_module}"] + file_strs
-    res_iv = subprocess.run(cmd_iverilog, capture_output=True, text=True)
+    res_iv = subprocess.run(cmd_iverilog, capture_output=True, text=True, check=False)
     if res_iv.returncode != 0:
         raise RuntimeError(f"Icarus Verilog lint failed (rc={res_iv.returncode}):\n{res_iv.stderr}\n{res_iv.stdout}")
 
@@ -255,10 +254,10 @@ def run_multi_tool_lint(
         "-Wno-WIDTHTRUNC",
         "-Wno-BLKSEQ",
         f"-I{inc_dir}",
-        f"--top-module",
+        "--top-module",
         top_module,
     ] + file_strs
-    res_ver = subprocess.run(cmd_verilator, capture_output=True, text=True)
+    res_ver = subprocess.run(cmd_verilator, capture_output=True, text=True, check=False)
     if res_ver.returncode != 0:
         raise RuntimeError(f"Verilator lint failed (rc={res_ver.returncode}):\n{res_ver.stderr}\n{res_ver.stdout}")
 
@@ -270,7 +269,7 @@ def run_multi_tool_lint(
         f"check -assert"
     )
     cmd_yosys = ["yosys", "-q", "-p", yosys_script]
-    res_yo = subprocess.run(cmd_yosys, capture_output=True, text=True)
+    res_yo = subprocess.run(cmd_yosys, capture_output=True, text=True, check=False)
     if res_yo.returncode != 0:
         raise RuntimeError(f"Yosys check failed (rc={res_yo.returncode}):\n{res_yo.stderr}\n{res_yo.stdout}")
 

@@ -12,12 +12,11 @@ Verifies:
 from __future__ import annotations
 
 import json
-import tempfile
 from pathlib import Path
 
 import pytest
 
-from backend.top_generator import emit_hardware_bundle, generate_top_accel_verilog
+from backend.top_generator import emit_hardware_bundle
 from frontend.importer_v2 import build_graph_v2_from_artifacts, load_model_artifacts_v2
 from sim.tb_generator import run_top_accel_simulation
 from verification.structural_audit import (
@@ -26,7 +25,6 @@ from verification.structural_audit import (
     audit_top_accel_memory_structure,
     run_multi_tool_lint,
 )
-from verification.weight_audit_v2 import audit_rom_hex_images, audit_rom_module_source
 
 
 @pytest.fixture
@@ -55,11 +53,6 @@ def test_negative_control_injected_expected_tokens(top_accel_code: str):
 
 def test_negative_control_injected_golden_readmem(top_accel_code: str):
     """Verify audit rejects code attempting to read golden/expected trace files."""
-    tampered = top_accel_code.replace(
-        "module top_accel #(",
-        'module top_accel #(\n    // initial $readmemh("golden_trace.hex", mem);\n',
-    )
-    # Even in comments it should be cleaned, but when active in code:
     active_tampered = top_accel_code + '\ninitial $readmemh("golden_trace.hex", buf_res);\n'
     with pytest.raises(ValueError, match="Forbidden readmem of oracle file in RTL"):
         audit_no_expected_values_in_rtl(active_tampered, module_name="tampered_accel")

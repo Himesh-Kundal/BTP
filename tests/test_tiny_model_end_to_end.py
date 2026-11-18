@@ -148,9 +148,9 @@ def test_tiny_model_first_divergence_tool_on_injected_fault(tiny_hardware_bundle
 
     # Step interpreter and dump golden traces
     interp.reset()
-    _, out0 = interp.decode_step(42, pos=0)
+    _, _out0 = interp.decode_step(42, pos=0)
     dump_interpreter_traces(interp, golden_dir, seq_id=0, tok_idx=0)
-    _, out1 = interp.decode_step(17, pos=1)
+    _, _out1 = interp.decode_step(17, pos=1)
     dump_interpreter_traces(interp, golden_dir, seq_id=0, tok_idx=1)
 
     # Run simulation and dump RTL traces

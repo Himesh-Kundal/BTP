@@ -1,23 +1,16 @@
 # STATE (Part II) — one page, always current
 
 ## Handoff note (rewrite at the end of every session)
-- Done this session: Phase UC (RTL Unit Library) 100% complete. Tasks UC.1–UC.13 passed and Gate HC approved:
-  - UC.1: `rtl/lib/numerics.vh` & `rtl/lib/requant.v` with rounding and saturation.
-  - UC.2: `rtl/lib/rom_sync.v`, `backend/rom_generator.py`, and `verification/weight_audit_v2.py` with immutable weights audit.
-  - UC.3: `rtl/lib/rmsnorm.v` bit-exact against `numerics/ops.py` integer oracle.
-  - UC.4: `rtl/lib/rope.v` rotary position embedding unit with Q0.14 table lookups.
-  - UC.5: `rtl/lib/softmax.v` base-2 exponential decomposition and normalization unit.
-  - UC.6: `rtl/lib/swiglu.v` MLP activation unit with 512-word SiLU LUT.
-  - UC.7: `rtl/lib/residual_add.v` saturating adder & `rtl/lib/embed_gather.v` token gather unit.
-  - UC.8: `rtl/lib/argmax.v` scale-normalized token extractor with strict lowest-ID tie breaking.
-  - UC.9: `rtl/lib/kv_cache.v` dual-port INT8 synchronous RAM & `rtl/lib/kv_addr_gen.v`.
-  - UC.10: `rtl/lib/linear_engine.v` R×C MAC array with ROM streaming and requantization.
-  - UC.11: `rtl/lib/attention.v` datapath with GQA and causal historical context loop.
-  - UC.12: `rtl/lib/sequencer.v` microcode engine matching `compiler/interpreter.py` op order.
-  - UC.13: Mutation suite v2 in `verification/mutate2.py` achieving 100.0% kill rate (21/21 mutants killed M10–M30).
-  - UC.G: Gate HC review report written (`results/gates/HC.md`), all 5 Explain-It questions answered. `make check2` passes (136 tests).
-- Next action (exact first step): Phase UD (Tiny Model End-to-End) -> Task UD.1 (Top-level generator: composition, ROM instances, step interface).
-- Gotchas / things I learned: Softmax expects synchronous registered read latency from memory; matching pipeline register delays between memory reads and accumulators guarantees zero-bubble throughput and bit-exact equivalence.
+- Done this session: Phase UD (Tiny Model End-to-End) 100% complete. Tasks UD.1–UD.6 passed and Gate HD approved:
+  - UD.1: Top-level accelerator generator (`backend/top_generator.py`, `rtl/lib/top_accel.v`) composing sequencer, units, ROMs, RAMs, and step interface.
+  - UD.2: Testbench generator (`sim/tb_generator.py`) driving step interface, dumping traces, checking `TB2_RESULT` with negative controls.
+  - UD.3: Multi-prompt token & trace exactness across 100 random prompts (326 total steps, 82,944 trace elements matched bit-for-bit, sequences up to MAX_CTX=32) against Python integer decoder, and first-divergence diagnosis tool verified on an injected fault.
+  - UD.4: Cross-simulator equality: Icarus Verilog (`iverilog`) vs Verilator (`--binary --timing`) with 100% trace and token equality (empty `diff -r`).
+  - UD.5: Top-level mutation suite (`results/top_mutation_matrix.json`) covering 7 fault models (causal off, kv-head map, pos off-by-one, rope table shift, residual scale, tie-break, ROM word swap) with 100% kill rate (7/7 killed).
+  - UD.6: Determinism and structural audits (`verification/structural_audit.py`, `tests/test_audits_v2.py`): zero expected values in RTL, immutable weights (ROM-only, zero write ports), byte-identical generator and simulation determinism, clean lint across Icarus, Verilator, and Yosys.
+  - UD.G: Gate HD review report written (`results/gates/HD.md`), all 5 Explain-It questions answered. `make check2` passes (155 tests).
+- Next action (exact first step): Phase UE (Full-Model Scale-Up) -> Task UE.1 (Generate full SmolLM2 ROM images, program, and top; measure generation time/size; fix scalability issues).
+- Gotchas / things I learned: Verilator compilation overhead can be bypassed during multi-prompt testing by executing all prompts continuously within a single simulation binary run, speeding up test suites from minutes to seconds.
 - Background jobs running (command, log path, expected finish, success criteria): None.
 
 ## Project
@@ -26,17 +19,17 @@
 - Supervisor: Prof. Mrityunjoy Chakraborty (per Part I report).
 - Institute AI-assistance policy: Full transparency / disclosure in report appendix and README.
 - Part I final tag: `part1-final` (created in U0.1 at `bf06427`)
-- Part II Gate tags: `gate-H0`, `gate-HA`, `gate-HB`, `gate-HC`
+- Part II Gate tags: `gate-H0`, `gate-HA`, `gate-HB`, `gate-HC`, `gate-HD`
 
 ## Where we are
-- Current phase: UD (Tiny model end to end)      Current task: UD.1
-- Last green commit: gate-HC                Last gate tag: gate-HC
-- Gates passed (Part II): H0, HA, HB, HC
+- Current phase: UE (Full-model scale-up)      Current task: UE.1
+- Last green commit: gate-HD                Last gate tag: gate-HD
+- Gates passed (Part II): H0, HA, HB, HC, HD
 
 ## Next 3 tasks
-1. UD.1 (Top-level generator: composition, ROM instances, step interface)
-2. UD.2 (Testbench generator: feed prompt tokens, generate N tokens, dump traces, summary line)
-3. UD.3 (Token-exact and trace-exact on >= 100 random prompts incl. sequences up to MAX_CTX)
+1. UE.1 (Generate full SmolLM2 ROM images, program, and top; measure generation time/size)
+2. UE.2 (Verilator build of the full top; record build time, RAM, sim speed)
+3. UE.3 (Layer-0 block: trace equality for the first positions and several later positions)
 
 ## Open blockers (see state/BLOCKERS.md)
 - none

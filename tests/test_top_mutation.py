@@ -20,8 +20,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-import pytest
-
 from backend.top_generator import emit_hardware_bundle
 from compiler.interpreter import CompiledArtifactInterpreter
 from frontend.importer_v2 import build_graph_v2_from_artifacts, load_model_artifacts_v2
