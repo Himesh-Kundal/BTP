@@ -53,6 +53,8 @@ module softmax #(
     reg [15:0]                    acc_cnt;
     reg [1:0]                     read_pipe;
 
+    localparam POS_W = (MAX_CTX > 1) ? $clog2(MAX_CTX) : 1;
+
     // Temporary local buffer for exp values
     reg [EXP_WIDTH-1:0] exp_mem [0:MAX_CTX-1];
 
@@ -63,7 +65,7 @@ module softmax #(
     wire [EXP_WIDTH-1:0] exp_shift = exp2_lut_data >> (cur_int_part > 32'd16 ? 5'd16 : cur_int_part[4:0]);
     wire [EXP_WIDTH-1:0] exp_val   = (exp_shift == {EXP_WIDTH{1'b0}}) ? 16'd1 : exp_shift;
 
-    wire [47:0] prod_num   = {32'd0, exp_mem[acc_cnt[7:0]]} * 48'd32767;
+    wire [47:0] prod_num   = {32'd0, exp_mem[acc_cnt[POS_W-1:0]]} * 48'd32767;
     wire [31:0] safe_sigma = (sigma == 32'd0) ? 32'd1 : sigma;
     wire [47:0] div_res    = prod_num / {16'd0, safe_sigma};
     /* verilator lint_on UNUSEDSIGNAL */
@@ -158,8 +160,8 @@ module softmax #(
 
                 S_PASS2_ACC: begin
                     // exp2_lut_data is now available
-                    exp_mem[acc_cnt[7:0]] <= exp_val;
-                    sigma                 <= sigma + {{14{1'b0}}, exp_val};
+                    exp_mem[acc_cnt[POS_W-1:0]] <= exp_val;
+                    sigma                       <= sigma + {{14{1'b0}}, exp_val};
                     acc_cnt               <= acc_cnt + 16'd1;
 
                     if (acc_cnt + 16'd1 < seq_len) begin

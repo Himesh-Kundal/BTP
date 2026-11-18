@@ -25,7 +25,9 @@ module attention #(
     input  wire                          start,
     output reg                           busy,
     output reg                           done,
+    /* verilator lint_off UNUSEDSIGNAL */
     input  wire [4:0]                    layer_idx,
+    /* verilator lint_on UNUSEDSIGNAL */
     input  wire [15:0]                   pos,
 
     // Activation Buffer Interfaces (BUF_Q, BUF_K, BUF_V)

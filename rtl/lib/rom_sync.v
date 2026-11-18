@@ -8,6 +8,8 @@
 
 `timescale 1ns / 1ps
 
+/* verilator lint_off WIDTHTRUNC */
+/* verilator lint_off UNUSEDSIGNAL */
 module rom_sync #(
     parameter DATA_WIDTH = 8,
     parameter ADDR_WIDTH = 16,
@@ -33,3 +35,5 @@ module rom_sync #(
     end
 
 endmodule
+/* verilator lint_on WIDTHTRUNC */
+/* verilator lint_on UNUSEDSIGNAL */
