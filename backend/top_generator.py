@@ -125,6 +125,7 @@ def emit_hardware_bundle(
     tile_r: int = 8,
     tile_c: int = 16,
     max_ctx: int = 32,
+    calib_scales: dict[str, float] | None = None,
 ) -> dict[str, Any]:
     """Emit complete hardware bundle: ROMs, address map, program, and top_accel.v."""
     out_path = Path(out_dir)
@@ -135,6 +136,7 @@ def emit_hardware_bundle(
         graph=graph,
         weights_dict=weights_dict,
         frozen_config=frozen_config,
+        calib_scales=calib_scales,
     )
     fmt_res.save_json(out_path / "format_table.json")
 

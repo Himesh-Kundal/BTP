@@ -123,7 +123,7 @@ MUTANTS_V2: list[MutantDefinition] = [
         id="M19",
         description="Rsqrt LUT index off by one (unshifted index)",
         target_rel_path="rtl/lib/rmsnorm.v",
-        target_pattern="wire [6:0]                  calc_sh_amt  = (calc_sh > 7'd8) ? (calc_sh - 7'd8) : 7'd0;",
+        target_pattern="wire [6:0]                  calc_sh_amt  = (calc_b > 7'd8) ? ((calc_b - 7'd7) & 7'h7E) : 7'd0;",
         replacement_pattern="wire [6:0]                  calc_sh_amt  = 7'd0;",
         test_args=["pytest", "tests/test_rtl_rmsnorm.py"],
     ),

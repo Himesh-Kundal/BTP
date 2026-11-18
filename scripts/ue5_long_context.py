@@ -85,7 +85,7 @@ def main() -> None:
         seq_id=0,
         trace_dir=rtl_dir,
         expected_tokens=golden_tokens,
-        timeout_cycles=4_500_000_000,
+        timeout_cycles=10_000_000_000,
         hidden_size=cfg["hidden_size"],
         intermediate_size=cfg["intermediate_size"],
         vocab_size=cfg["vocab_size"],

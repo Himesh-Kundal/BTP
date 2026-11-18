@@ -1,0 +1,79 @@
+{
+  "task": "UF.3",
+  "experiment": "EA3",
+  "model": "SmolLM2-135M",
+  "max_ctx": 256,
+  "hidden_size": 576,
+  "intermediate_size": 1536,
+  "vocab_size": 49152,
+  "num_layers": 30,
+  "num_q_heads": 9,
+  "num_kv_heads": 3,
+  "head_dim": 64,
+  "rom_accounting": {
+    "weight_rom": {
+      "raw_int8_elements": 134479872,
+      "padded_words_in_rom": 162849792,
+      "bits_per_word": 8,
+      "total_bits": 1302798336,
+      "total_megabytes": 155.31
+    },
+    "param_rom": {
+      "words": 288990,
+      "bits_per_word": 64,
+      "total_bits": 18495360,
+      "total_megabytes": 2.2
+    },
+    "table_roms": {
+      "silu_lut_bits": 8192,
+      "rsqrt_lut_bits": 4096,
+      "exp2_lut_bits": 4096,
+      "rope_table_bits": 262144,
+      "total_bits": 278528,
+      "total_kilobytes": 34.0
+    },
+    "program_rom": {
+      "instruction_words": 20,
+      "instruction_bits": 640,
+      "layer_base_words": 270,
+      "layer_base_bits": 8640,
+      "total_bits": 9280,
+      "total_kilobytes": 1.13
+    },
+    "total_immutable_rom_bits": 1321581504,
+    "total_immutable_rom_mb": 157.54
+  },
+  "sram_accounting": {
+    "kv_cache": {
+      "max_ctx": 256,
+      "total_elements": 2949120,
+      "bits_per_element": 8,
+      "total_bits": 23592960,
+      "total_megabytes": 2.81
+    },
+    "activation_buffers": {
+      "buffers_breakdown_bits": {
+        "buf_act": 4608,
+        "buf_res": 9216,
+        "buf_gate": 12288,
+        "buf_up": 12288,
+        "buf_swiglu": 12288,
+        "buf_q": 4608,
+        "buf_attn_ctx": 4608,
+        "scores_buf": 36864,
+        "prob_mem": 4096,
+        "buf_logits": 1179648
+      },
+      "total_bits": 1280512,
+      "total_kilobytes": 156.31
+    },
+    "total_mutable_sram_bits": 24873472,
+    "total_mutable_sram_mb": 2.97
+  },
+  "totals": {
+    "grand_total_memory_bits": 1346454976,
+    "grand_total_memory_mb": 160.51,
+    "rom_share_percent": 98.15,
+    "sram_share_percent": 1.85
+  }
+}

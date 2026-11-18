@@ -98,6 +98,27 @@ def float_to_dyadic_scale(scale: float, max_m_bits: int = 31) -> tuple[int, int]
     return M, s
 
 
+def float_to_signed_dyadic_scale(scale: float, max_m_bits: int = 15) -> tuple[int, int]:
+    """Convert a signed real float scale into a signed dyadic multiplier (M, s).
+    
+    Approximates: scale ≈ M * 2^(-s) with -2^max_m_bits <= M < 2^max_m_bits and s >= 0.
+    """
+    if scale == 0.0:
+        return 0, 0
+    sign = -1 if scale < 0.0 else 1
+    mag = abs(scale)
+    s = int(np.floor(max_m_bits - 1 - np.log2(mag)))
+    s = max(0, min(62, s))
+    M_mag = int(np.round(mag * (2**s)))
+    while M_mag >= (1 << max_m_bits) and s > 0:
+        s -= 1
+        M_mag = int(np.round(mag * (2**s)))
+    while s > 0 and M_mag % 2 == 0:
+        M_mag //= 2
+        s -= 1
+    return sign * M_mag, s
+
+
 # ==============================================================================
 # 2. Offline LUT Builders (Float64 with Explicit Rounding, N2-14)
 # ==============================================================================

@@ -156,10 +156,17 @@ def load_model_artifacts_v2(target_dir: Path) -> dict[str, Any]:
             )
         loaded_tensors[name] = np.load(file_path)
 
+    calib_file = target_dir / "calib_scales.json"
+    calib_scales: dict[str, float] = {}
+    if calib_file.exists():
+        with open(calib_file, "r", encoding="utf-8") as f:
+            calib_scales = json.load(f)
+
     return {
         "manifest": manifest,
         "config": manifest["config"],
         "tensors": loaded_tensors,
+        "calib_scales": calib_scales,
     }
 
 

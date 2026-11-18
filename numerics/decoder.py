@@ -158,15 +158,16 @@ class IntegerDecoder:
             return np.zeros(self.cfg.hidden_size, dtype=np.int8)
 
         # Base-2 normalization for mantissa lookup
-        lzc = 64 - int(mean).bit_length()
-        # Even shift so sqrt works cleanly
-        shift = (64 - lzc) & ~1
-        mantissa = (mean >> max(0, shift - 8)) & 0xFF
-        rsqrt_val = self.rsqrt_lut[mantissa]  # Q0.16
+        b = int(mean).bit_length()
+        sh_amt = ((b - 7) & ~1) if b > 8 else 0
+        mantissa = int(mean >> sh_amt) & 0xFF
+        rsqrt_val = self.rsqrt_lut[mantissa]
 
-        # Normalization and channel scaling
-        scaled_x = rshift_rnd(x_64 * rsqrt_val, 16)
-        out = requant(scaled_x * gamma, M, s)
+        # Stage 1 normalization: shift by sh_amt // 2
+        exp_sh = sh_amt // 2
+        scaled_x = rshift_rnd(x_64 * rsqrt_val, exp_sh) if exp_sh > 0 else (x_64 * rsqrt_val)
+        # Stage 2 channel scaling and dyadic requantization (19 fractional bits folded)
+        out = requant(scaled_x * gamma, M, 19 + s)
         return out.astype(np.int8)
 
     def integer_rope(self, x: np.ndarray, pos: int) -> np.ndarray:

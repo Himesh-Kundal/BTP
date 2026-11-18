@@ -18,7 +18,7 @@ from typing import Any
 import numpy as np
 
 from ir.graph_v2 import EdgeFormat, GraphV2, OpKind, TensorKind
-from numerics.ops import float_to_dyadic_scale
+from numerics.ops import float_to_dyadic_scale, float_to_signed_dyadic_scale
 
 
 @dataclass
@@ -42,8 +42,12 @@ def assign_formats_and_scales(
     graph: GraphV2,
     weights_dict: dict[str, np.ndarray],
     frozen_config: dict[str, Any],
+    calib_scales: dict[str, float] | None = None,
 ) -> FormatAssignmentResult:
     """Execute format and dyadic scale assignment pass on Graph IR v2."""
+    if calib_scales is None:
+        calib_scales = {}
+
     fmt_cfg = frozen_config.get("formats", {})
     res_bits = fmt_cfg.get("residual_stream", {}).get("bits", 16)
     w_bits = fmt_cfg.get("linear_weights", {}).get("bits", 8)
@@ -95,10 +99,16 @@ def assign_formats_and_scales(
                 tensor.format = fmt_weight
         elif name in ("tok_in", "tok_out"):
             tensor.format = fmt_token
-        elif "logits" in name or name.startswith("h_") or "down_" in name or "o_proj_" in name:
+        elif ("norm" not in name) and ("logits" in name or "res" in name or "down_" in name or "o_proj_" in name or name == "h_embed"):
             tensor.format = fmt_res
         else:
-            tensor.format = fmt_act
+            t_scale = calib_scales.get(name, s_act)
+            tensor.format = EdgeFormat(
+                bits=act_bits,
+                signed=True,
+                scale=t_scale,
+                fixed_point=f"INT{act_bits}",
+            )
 
         format_table[name] = {
             "bits": tensor.format.bits,
@@ -134,10 +144,14 @@ def assign_formats_and_scales(
             g_name = node.inputs[1]
             gamma = weights_dict.get(g_name)
             if gamma is not None:
+                out_tensor = graph.tensors.get(node.outputs[0])
+                s_out = out_tensor.format.scale if out_tensor else s_act
                 m_list = []
                 s_list = []
                 for g_val in gamma:
-                    M, s = float_to_dyadic_scale(float(g_val))
+                    real_scale = float(g_val) / s_out
+                    # For RMSNorm in hardware, gamma_data is signed [15:0] (param_rom_data[47:32])
+                    M, s = float_to_signed_dyadic_scale(real_scale, max_m_bits=15)
                     m_list.append(M)
                     s_list.append(s)
                 requant_params[node.id] = {"M": m_list, "shift": s_list}

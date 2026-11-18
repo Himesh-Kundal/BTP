@@ -89,15 +89,16 @@ module rmsnorm #(
     // Intermediate calculations
     /* verilator lint_off UNUSEDSIGNAL */
     wire [6:0]                  calc_lzc     = lzc64(mean);
-    wire [6:0]                  calc_sh      = (7'd64 - calc_lzc) & 7'h7E;
-    wire [6:0]                  calc_sh_amt  = (calc_sh > 7'd8) ? (calc_sh - 7'd8) : 7'd0;
+    wire [6:0]                  calc_b       = 7'd64 - calc_lzc;
+    wire [6:0]                  calc_sh_amt  = (calc_b > 7'd8) ? ((calc_b - 7'd7) & 7'h7E) : 7'd0;
     wire [63:0]                 shifted_mean = mean >> calc_sh_amt;
     wire [7:0]                  mantissa_8b  = shifted_mean[7:0];
 
-    reg [5:0] stg1_s;
+    reg [5:0]                   exp_sh;
+    reg [5:0]                   stg1_s;
 
     wire signed [63:0]          stg2_acc     = stg1_scaled * stg1_gamma;
-    wire signed [63:0]          stg2_scaled  = rshift_rnd64(stg2_acc * {{32{M[31]}}, M}, stg1_s);
+    wire signed [63:0]          stg2_scaled  = rshift_rnd64(stg2_acc * {{32{M[31]}}, M}, 6'd19 + stg1_s);
     wire signed [63:0]          stg2_sat64   = sat_generic(stg2_scaled,
                                                            {{(64-OUT_WIDTH){OUT_MIN[OUT_WIDTH-1]}}, OUT_MIN},
                                                            {{(64-OUT_WIDTH){OUT_MAX[OUT_WIDTH-1]}}, OUT_MAX});
@@ -127,6 +128,7 @@ module rmsnorm #(
             stg1_gamma     <= {GAMMA_WIDTH{1'b0}};
             stg1_s         <= 6'd0;
             stg1_idx       <= 16'd0;
+            exp_sh         <= 6'd0;
         end else begin
             dst_we <= 1'b0;
             done   <= 1'b0;
@@ -190,6 +192,7 @@ module rmsnorm #(
 
                 S_CAPTURE_RSQRT: begin
                     rsqrt_val <= rsqrt_lut_data;
+                    exp_sh    <= calc_sh_amt[6:1];
                     rd_cnt    <= 16'd0;
                     out_cnt   <= 16'd0;
                     read_pipe <= 2'b00;
@@ -209,7 +212,8 @@ module rmsnorm #(
 
                     // Stage 1: Capture data and multiply by rsqrt
                     if (read_pipe[1]) begin
-                        stg1_scaled <= rshift_rnd64(src_data * $signed({1'b0, rsqrt_val}), 6'd16);
+                        stg1_scaled <= (exp_sh > 6'd0) ? rshift_rnd64(src_data * $signed({1'b0, rsqrt_val}), exp_sh) :
+                                                         (src_data * $signed({1'b0, rsqrt_val}));
                         stg1_gamma  <= gamma_data;
                         stg1_s      <= s;
                         stg1_idx    <= out_cnt;

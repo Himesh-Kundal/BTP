@@ -1,0 +1,34 @@
+{
+  "task": "UE.5",
+  "max_ctx": 256,
+  "prompt_len": 250,
+  "num_generate": 6,
+  "total_positions": 256,
+  "tokens_exact": true,
+  "sample_positions_traced": [
+    0,
+    1,
+    127,
+    254,
+    255
+  ],
+  "trace_identical": true,
+  "files_checked": 90,
+  "elements_checked": 303360,
+  "first_divergence": null,
+  "total_cycles": 4669315072,
+  "cycles_per_token": 18239512,
+  "sim_sec": 1754.02,
+  "sim_speed_kcycles_sec": 2662.07,
+  "generated_tokens": [
+    2049,
+    2049,
+    2049,
+    2049,
+    2049,
+    2049,
+    2049
+  ],
+  "generated_text": " left left left left left left left",
+  "status": "PASS"
+}

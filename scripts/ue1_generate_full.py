@@ -68,6 +68,7 @@ def main() -> None:
         tile_r=8,
         tile_c=16,
         max_ctx=256,
+        calib_scales=artifacts.get("calib_scales"),
     )
     t_emit = time.perf_counter()
 

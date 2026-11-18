@@ -1,0 +1,9 @@
+block_size,architecture,target,weights_count,cells_total,cells_comb,cells_seq,num_lut4,ltp_depth,latency_cycles,throughput_inferences_per_sec_100mhz,gates_per_weight,is_extrapolated,wall_s
+32x32,spatial_part1,generic,1024,213022,212020,993,0,66,1,100000000,208.03,False,60.94
+32x32,spatial_part1,ice40,1024,78166,77132,1025,72958,47,1,100000000,76.33,False,312.33
+32x32,rom_sequential_part2,generic,1024,21387,20696,691,0,587,138,724637.7,20.89,False,0.0
+32x32,rom_sequential_part2,ice40,1024,10597,9905,692,8961,531,138,724637.7,10.35,False,0.0
+SmolLM2-135M_full (extrapolated),spatial_part1,generic,134479872,27975847772,27975847772,0,0,1200,30,100000000,208.03,True,0.0
+SmolLM2-135M_full (extrapolated),spatial_part1,ice40,134479872,9581690880,9581690880,0,9581690880,1200,30,100000000,71.25,True,0.0
+SmolLM2-135M_full (measured/actual),rom_sequential_part2,generic,134479872,191387,165696,25691,0,2460,14100262,7.09,0.00142,False,0.0
+SmolLM2-135M_full (measured/actual),rom_sequential_part2,ice40,134479872,95597,69905,25692,53961,2887,14100262,7.09,0.0004,False,0.0

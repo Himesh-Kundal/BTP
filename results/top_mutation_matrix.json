@@ -1,6 +1,6 @@
 {
   "suite": "top_accel_mutation_suite_v2",
-  "timestamp_utc": "2026-11-18T15:02:30.280640+00:00",
+  "timestamp_utc": "2026-11-18T22:29:30.560354+00:00",
   "total_mutants": 7,
   "killed_mutants": 7,
   "survived_mutants": 0,
@@ -53,7 +53,7 @@
       "name": "rom_word_swap",
       "description": "Weight ROM word swap: swap words 0 and 1 in weights_128b.hex",
       "status": "KILLED",
-      "kill_reason": "tok_mismatch=0, trace_mismatch=1"
+      "kill_reason": "tok_mismatch=2, trace_mismatch=1"
     }
   ]
 }

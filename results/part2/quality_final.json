@@ -14,13 +14,13 @@
     "perplexity": 89.6749
   },
   "int_metrics": {
-    "cross_entropy": 13.9384,
-    "perplexity": 1130744.2269
+    "cross_entropy": 18.2529,
+    "perplexity": 84556007.3039
   },
   "comparison": {
-    "delta_ppl": 1130654.552,
-    "mean_kl_div": 9.4782,
-    "top1_agreement_pct": 0.16,
+    "delta_ppl": 84555917.629,
+    "mean_kl_div": 13.7206,
+    "top1_agreement_pct": 1.43,
     "mean_greedy_match_length": 0,
     "median_greedy_match_length": 0.0
   },
@@ -37,6 +37,6 @@
     "ue4_sampled_trace_identical": true,
     "ue4_sampled_trace_elements_checked": 2279424
   },
-  "eval_wall_sec": 158.23,
+  "eval_wall_sec": 144.26,
   "status": "THRESHOLD_VIOLATION"
 }

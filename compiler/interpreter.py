@@ -100,6 +100,8 @@ class CompiledArtifactInterpreter:
             m_hex = line_str[:8]
             s_hex = line_str[8:16]
             M_val = int(m_hex, 16)
+            if M_val >= (1 << 31):
+                M_val -= (1 << 32)
             s_val = int(s_hex, 16)
             params.append((M_val, s_val))
         return params
@@ -249,11 +251,12 @@ class CompiledArtifactInterpreter:
                 self.buffers[dst] = np.zeros(d, dtype=np.int8)
                 return
 
-            lzc = 64 - mean.bit_length()
-            shift = (64 - lzc) & ~1
-            mantissa = (mean >> max(0, shift - 8)) & 0xFF
+            b = mean.bit_length()
+            sh_amt = ((b - 7) & ~1) if b > 8 else 0
+            mantissa = int(mean >> sh_amt) & 0xFF
             rsqrt_val = int(self.rsqrt_lut[mantissa])
-            scaled_x = rshift_rnd(x * rsqrt_val, 16)
+            exp_sh = sh_amt // 2
+            scaled_x = rshift_rnd(x * rsqrt_val, exp_sh) if exp_sh > 0 else (x * rsqrt_val)
 
             # Get gamma from requant ROM
             node_key = f"attn_norm_{layer_idx}" if "attn" in name else (
@@ -265,13 +268,13 @@ class CompiledArtifactInterpreter:
                 params = self.requant_rom[p_base : p_base + d]
                 out = np.array(
                     [
-                        requant(int(scaled_x[i]) * int(params[i][0]), 1, int(params[i][1]), -127, 127)
+                        requant(int(scaled_x[i]) * int(params[i][0]), 1, 19 + int(params[i][1]), -127, 127)
                         for i in range(d)
                     ],
                     dtype=np.int64,
                 )
             else:
-                out = sat(scaled_x, -127, 127)
+                out = sat(rshift_rnd(scaled_x, 19), -127, 127)
 
             self.buffers[dst] = out.astype(np.int8)
             self.traces[f"{name}_L{layer_idx}"] = self.buffers[dst]

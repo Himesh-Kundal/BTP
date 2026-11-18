@@ -27,12 +27,13 @@ def test_rmsnorm_bit_exact_against_oracle():
         mean = ss // dim
         if mean <= 0:
             return np.zeros(dim, dtype=np.int8)
-        lzc = 64 - int(mean).bit_length()
-        shift = (64 - lzc) & ~1
-        mantissa = (mean >> max(0, shift - 8)) & 0xFF
+        b = int(mean).bit_length()
+        sh_amt = ((b - 7) & ~1) if b > 8 else 0
+        mantissa = int(mean >> sh_amt) & 0xFF
         rsqrt_val = rsqrt_lut[mantissa]
-        scaled_x = rshift_rnd(x_64 * rsqrt_val, 16)
-        out = requant(scaled_x * gamma, M, s)
+        exp_sh = sh_amt // 2
+        scaled_x = rshift_rnd(x_64 * rsqrt_val, exp_sh) if exp_sh > 0 else (x_64 * rsqrt_val)
+        out = requant(scaled_x * gamma, M, 19 + s)
         return out.astype(np.int8)
 
     test_vectors = [
