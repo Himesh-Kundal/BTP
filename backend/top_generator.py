@@ -174,10 +174,12 @@ def emit_hardware_bundle(
     requant_map = addr_map.get("requant_params", {})
 
     proj_by_op_idx = {
+        0: "attn_norm",
         1: "q_proj",
         2: "k_proj",
         3: "v_proj",
         7: "o_proj",
+        9: "mlp_norm",
         10: "gate_proj",
         11: "up_proj",
         13: "down_proj",
@@ -207,7 +209,13 @@ def emit_hardware_bundle(
         if info:
             b = info["base_addr"]
             length = info["length"]
-            sub_lines = tables_lines[b : b + length]
+            if tbl_name == "exp2_lut":
+                from numerics.ops import build_exp2_fraction_lut
+
+                exp2_arr = build_exp2_fraction_lut(256, 16)
+                sub_lines = [f"{int(v) & 0x3FFFF:05x}" for v in exp2_arr]
+            else:
+                sub_lines = tables_lines[b : b + length]
             short_name = tbl_name.replace("_lut", "").replace("_mantissa", "").replace("mantissa_", "")
             (out_path / f"tables_{short_name}.hex").write_text("\n".join(sub_lines) + "\n", encoding="utf-8")
 

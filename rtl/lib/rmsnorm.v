@@ -94,8 +94,10 @@ module rmsnorm #(
     wire [63:0]                 shifted_mean = mean >> calc_sh_amt;
     wire [7:0]                  mantissa_8b  = shifted_mean[7:0];
 
+    reg [5:0] stg1_s;
+
     wire signed [63:0]          stg2_acc     = stg1_scaled * stg1_gamma;
-    wire signed [63:0]          stg2_scaled  = rshift_rnd64(stg2_acc * {{32{M[31]}}, M}, s);
+    wire signed [63:0]          stg2_scaled  = rshift_rnd64(stg2_acc * {{32{M[31]}}, M}, stg1_s);
     wire signed [63:0]          stg2_sat64   = sat_generic(stg2_scaled,
                                                            {{(64-OUT_WIDTH){OUT_MIN[OUT_WIDTH-1]}}, OUT_MIN},
                                                            {{(64-OUT_WIDTH){OUT_MAX[OUT_WIDTH-1]}}, OUT_MAX});
@@ -123,6 +125,7 @@ module rmsnorm #(
             stg1_valid     <= 1'b0;
             stg1_scaled    <= 64'sd0;
             stg1_gamma     <= {GAMMA_WIDTH{1'b0}};
+            stg1_s         <= 6'd0;
             stg1_idx       <= 16'd0;
         end else begin
             dst_we <= 1'b0;
@@ -208,6 +211,7 @@ module rmsnorm #(
                     if (read_pipe[1]) begin
                         stg1_scaled <= rshift_rnd64(src_data * $signed({1'b0, rsqrt_val}), 6'd16);
                         stg1_gamma  <= gamma_data;
+                        stg1_s      <= s;
                         stg1_idx    <= out_cnt;
                         stg1_valid  <= 1'b1;
                         out_cnt     <= out_cnt + 16'd1;

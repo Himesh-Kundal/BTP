@@ -204,8 +204,8 @@ def pack_rom_artifacts(
     _add_table("rope_cos", cos_tab, 16)
     _add_table("rope_sin", sin_tab, 16)
 
-    # 3b. RMSNorm rsqrt mantissa LUT (1024 entries, Q0.16)
-    rsqrt_lut = build_rsqrt_mantissa_lut(table_size=1024, out_bits=16)
+    # 3b. RMSNorm rsqrt mantissa LUT (256 entries, Q0.16)
+    rsqrt_lut = build_rsqrt_mantissa_lut(table_size=256, out_bits=16)
     _add_table("rsqrt_mantissa_lut", rsqrt_lut, 16)
 
     # 3c. Softmax exp2 fraction LUT (256 entries, Q0.16)

@@ -65,15 +65,13 @@ module top_accel #(
             seq_start    <= 1'b0;
             out_valid    <= 1'b0;
             tok_out      <= 16'd0;
-        end else if (seq_reset) begin
-            pos_reg      <= 16'd0;
-            step_running <= 1'b0;
-            seq_start    <= 1'b0;
-            out_valid    <= 1'b0;
-            tok_out      <= 16'd0;
         end else begin
             seq_start <= 1'b0;
             out_valid <= 1'b0;
+
+            if (seq_reset) begin
+                pos_reg <= 16'd0;
+            end
 
             if (step_valid && step_ready) begin
                 step_running <= 1'b1;
@@ -358,7 +356,15 @@ module top_accel #(
     wire [15:0] embed_num_tc = HIDDEN_SIZE >> 4;
     wire [31:0] embed_word_idx = (embed_tr * embed_num_tc + embed_tc) * 8 + embed_r;
     wire [15:0] embed_word_addr = (cur_weight_base[19:4]) + embed_word_idx[15:0];
-    wire signed [7:0] embed_weight_byte = weight_rom_data[embed_c*8 +: 8];
+    reg [3:0] embed_c_pipe;
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            embed_c_pipe <= 4'd0;
+        end else begin
+            embed_c_pipe <= embed_c;
+        end
+    end
+    wire signed [7:0] embed_weight_byte = weight_rom_data[embed_c_pipe*8 +: 8];
 
     // Parameter lookup for embedding gather:
     wire signed [31:0] embed_M = param_rom_data[63:32];
@@ -415,7 +421,7 @@ module top_accel #(
         .start(norm_start),
         .dim(cur_dim0),
         .M(32'sd1),
-        .s(6'd16),
+        .s(param_rom_data[5:0]),
         .busy(norm_busy),
         .done(norm_done),
         .src_addr(norm_src_addr),
@@ -477,7 +483,7 @@ module top_accel #(
         .done(linear_done),
         .matrix_n(cur_dim0),
         .matrix_k(cur_dim1),
-        .weight_base_addr(cur_weight_base),
+        .weight_base_addr({4'd0, cur_weight_base[31:4]}),
         .param_base_addr(cur_param_base),
         .out_is_res(linear_out_is_res),
         .act_rd_addr(linear_act_rd_addr),

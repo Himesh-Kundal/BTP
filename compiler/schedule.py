@@ -227,7 +227,7 @@ def generate_schedule(
     # For each layer, extract per-layer ROM bases
     for l_idx in range(num_layers):
         l_bases: dict[str, int] = {}
-        for proj in ("q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"):
+        for proj in ("attn_norm", "q_proj", "k_proj", "v_proj", "o_proj", "mlp_norm", "gate_proj", "up_proj", "down_proj"):
             node_id = f"{proj}_{l_idx}"
             l_bases[f"{proj}_w"] = weights_map.get(node_id, {}).get("base_addr", 0)
             l_bases[f"{proj}_p"] = requant_map.get(node_id, {}).get("base_addr", 0)
@@ -425,6 +425,7 @@ def generate_schedule(
     loop_end_pc = len(instructions) - 1
 
     # 3. Final Norm: BUF_RES -> BUF_ACT
+    fn_p_base = requant_map.get("final_norm", {}).get("base_addr", 0)
     instructions.append(
         Instruction(
             opcode=Opcode.RMSNORM,
@@ -432,6 +433,7 @@ def generate_schedule(
             src_buf=0,
             dst_buf=1,
             dims=[hidden_size],
+            rom_param_base=fn_p_base,
             cycle_estimate=estimate_op_cycles(Opcode.RMSNORM, [hidden_size]),
         )
     )

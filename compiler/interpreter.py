@@ -17,7 +17,7 @@ from typing import Any
 import numpy as np
 
 from compiler.schedule import Opcode
-from numerics.ops import requant, rshift_rnd, sat
+from numerics.ops import build_exp2_fraction_lut, requant, rshift_rnd, sat
 
 
 class CompiledArtifactInterpreter:
@@ -106,17 +106,22 @@ class CompiledArtifactInterpreter:
 
         # rsqrt mantissa LUT
         r_info = tbl_info["rsqrt_mantissa_lut"]
-        self.rsqrt_lut = self.table_rom[r_info["base_addr"] : r_info["base_addr"] + r_info["length"]]
+        self.rsqrt_lut = (
+            self.table_rom[r_info["base_addr"] : r_info["base_addr"] + r_info["length"]]
+            .astype(np.uint16)
+            .astype(np.int64)
+        )
 
-        # exp2 LUT
-        e_info = tbl_info["exp2_lut"]
-        self.exp2_lut = self.table_rom[e_info["base_addr"] : e_info["base_addr"] + e_info["length"]]
+        # exp2 LUT (18-bit precision, Q0.16)
+        self.exp2_lut = build_exp2_fraction_lut(256, 16)
 
         # reciprocal LUT
         rec_info = tbl_info["reciprocal_lut"]
-        self.recip_lut = self.table_rom[
-            rec_info["base_addr"] : rec_info["base_addr"] + rec_info["length"]
-        ]
+        self.recip_lut = (
+            self.table_rom[rec_info["base_addr"] : rec_info["base_addr"] + rec_info["length"]]
+            .astype(np.uint16)
+            .astype(np.int64)
+        )
 
         # SiLU LUT
         silu_info = tbl_info["silu_lut"]
@@ -262,14 +267,16 @@ class CompiledArtifactInterpreter:
             p_info = self.addr_map["requant_params"].get(node_key)
             if p_info:
                 p_base = p_info["base_addr"]
-                n_ch = w.shape[0]
-                params = self.requant_rom[p_base : p_base + n_ch]
-                m_arr = np.array([p[0] for p in params], dtype=np.int64)
-                s_val = params[0][1] if params else 16
-                # Requantize
+                params = self.requant_rom[p_base : p_base + len(acc)]
                 out_min = -8388608 if dst in (0, 9) else -127
                 out_max = 8388607 if dst in (0, 9) else 127
-                res = requant(acc, m_arr, s_val, out_min, out_max)
+                res = np.array(
+                    [
+                        requant(int(acc[i]), int(params[i][0]), int(params[i][1]), out_min, out_max)
+                        for i in range(len(acc))
+                    ],
+                    dtype=np.int64 if dst in (0, 9) else np.int8,
+                )
             else:
                 res = acc
 
@@ -323,22 +330,16 @@ class CompiledArtifactInterpreter:
                 max_score = int(np.max(scores))
                 delta = scores - max_score  # <= 0
 
-                int_part = -delta >> 6
-                frac_part = ((-delta) & 0x3F) << 2
-                exp_vals = np.array(
-                    [
-                        (int(self.exp2_lut[f]) >> min(16, int(i)))
-                        for i, f in zip(int_part, frac_part, strict=False)
-                    ],
-                    dtype=np.int64,
-                )
-
-                sum_exp = max(1, int(np.sum(exp_vals)))
-                lzc = 64 - sum_exp.bit_length()
-                shift = max(0, 64 - lzc - 8)
-                mantissa = (sum_exp >> shift) & 0xFF
-                recip = int(self.recip_lut[mantissa])
-                probs = rshift_rnd(exp_vals * recip, 16)
+                exp_vals_list = []
+                for d in delta:
+                    int_part = abs(int(d)) >> 8
+                    frac_idx = abs(int(d)) & 0xFF
+                    frac_val = int(self.exp2_lut[frac_idx])
+                    exp_v = frac_val >> min(16, int_part)
+                    exp_vals_list.append(max(1, exp_v))
+                exp_arr = np.array(exp_vals_list, dtype=np.int64)
+                sigma = max(1, int(np.sum(exp_arr)))
+                probs = (exp_arr * 32767) // sigma
                 ctx = rshift_rnd(probs @ v_head, 15)
                 attn_out[q_idx] = ctx
 
