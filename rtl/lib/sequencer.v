@@ -36,7 +36,7 @@ module sequencer #(
     input  wire [127:0]                  prog_rom_data,
 
     // Layer Base Table Interface
-    output wire [7:0]                    layer_table_addr,
+    output wire [LAYER_W+3:0]            layer_table_addr,
     input  wire [ROM_ADDR_W-1:0]         layer_table_weight_base,
     input  wire [ROM_ADDR_W-1:0]         layer_table_param_base,
 
@@ -103,7 +103,7 @@ module sequencer #(
     // Relative PC inside layer loop
     wire in_layer_loop = (cur_pc >= layer_loop_start) && (cur_pc <= layer_loop_end);
     wire [3:0] layer_op_idx = cur_pc[3:0] - layer_loop_start[3:0];
-    assign layer_table_addr = {cur_layer[3:0], layer_op_idx};
+    assign layer_table_addr = {cur_layer[LAYER_W-1:0], layer_op_idx};
 
     // Active unit done wire mux
     reg active_unit_done;

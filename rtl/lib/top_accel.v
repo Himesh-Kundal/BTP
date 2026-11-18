@@ -20,10 +20,13 @@ module top_accel #(
     parameter TILE_C            = 16,
     parameter PROG_ADDR_W       = 8,
     parameter LAYER_W           = 5,
+    parameter ROM_WEIGHTS_ADDR_W = 24,
+    parameter ROM_PARAMS_ADDR_W  = 20,
+    parameter ROM_BASES_ADDR_W   = 9,
     parameter ROM_WEIGHTS_DEPTH = 32768,
     parameter ROM_PARAMS_DEPTH  = 2048,
     parameter ROM_PROG_DEPTH    = 256,
-    parameter ROM_BASES_DEPTH   = 256,
+    parameter ROM_BASES_DEPTH   = 512,
     parameter ROM_WEIGHTS_FILE  = "",
     parameter ROM_PARAMS_FILE   = "",
     parameter ROM_PROG_FILE     = "",
@@ -107,12 +110,12 @@ module top_accel #(
         .data_out(prog_rom_data)
     );
 
-    wire [7:0]  layer_table_addr;
-    wire [63:0] layer_table_data;
+    wire [ROM_BASES_ADDR_W-1:0] layer_table_addr;
+    wire [63:0]                 layer_table_data;
 
     rom_sync #(
         .DATA_WIDTH(64),
-        .ADDR_WIDTH(8),
+        .ADDR_WIDTH(ROM_BASES_ADDR_W),
         .DEPTH(ROM_BASES_DEPTH),
         .INIT_FILE(ROM_BASES_FILE)
     ) layer_bases_rom_inst (
@@ -204,12 +207,12 @@ module top_accel #(
     // =========================================================================
     // 4. Weight ROM & Requant Parameter ROM Instances
     // =========================================================================
-    wire [15:0]  weight_rom_addr;
-    wire [127:0] weight_rom_data;
+    wire [ROM_WEIGHTS_ADDR_W-1:0] weight_rom_addr;
+    wire [127:0]                  weight_rom_data;
 
     rom_sync #(
         .DATA_WIDTH(128),
-        .ADDR_WIDTH(16),
+        .ADDR_WIDTH(ROM_WEIGHTS_ADDR_W),
         .DEPTH(ROM_WEIGHTS_DEPTH),
         .INIT_FILE(ROM_WEIGHTS_FILE)
     ) rom_weights_inst (
@@ -218,12 +221,12 @@ module top_accel #(
         .data_out(weight_rom_data)
     );
 
-    wire [15:0] param_rom_addr;
-    wire [63:0] param_rom_data;
+    wire [ROM_PARAMS_ADDR_W-1:0] param_rom_addr;
+    wire [63:0]                  param_rom_data;
 
     rom_sync #(
         .DATA_WIDTH(64),
-        .ADDR_WIDTH(16),
+        .ADDR_WIDTH(ROM_PARAMS_ADDR_W),
         .DEPTH(ROM_PARAMS_DEPTH),
         .INIT_FILE(ROM_PARAMS_FILE)
     ) rom_params_inst (
@@ -346,16 +349,16 @@ module top_accel #(
     wire [15:0] embed_dst_addr;
     wire signed [23:0] embed_dst_data;
 
-    // Tiled weight mapping for embedding gather:
-    wire [15:0] embed_tok_id = tok_in;
-    wire [15:0] embed_cnt    = embed_addr[15:0] - (embed_tok_id * HIDDEN_SIZE[15:0]);
-    wire [15:0] embed_tc     = embed_cnt >> 4;
-    wire [3:0]  embed_c      = embed_cnt[3:0];
-    wire [15:0] embed_tr     = embed_tok_id >> 3;
-    wire [2:0]  embed_r      = embed_tok_id[2:0];
-    wire [15:0] embed_num_tc = HIDDEN_SIZE >> 4;
-    wire [31:0] embed_word_idx = (embed_tr * embed_num_tc + embed_tc) * 8 + embed_r;
-    wire [15:0] embed_word_addr = (cur_weight_base[19:4]) + embed_word_idx[15:0];
+    // Tiled weight mapping for embedding gather (32-bit clean for large vocab):
+    wire [31:0] embed_tok_id   = {16'd0, tok_in};
+    wire [31:0] embed_cnt      = embed_addr - (embed_tok_id * HIDDEN_SIZE);
+    wire [31:0] embed_tc       = embed_cnt >> 4;
+    wire [3:0]  embed_c        = embed_cnt[3:0];
+    wire [31:0] embed_tr       = embed_tok_id >> 3;
+    wire [2:0]  embed_r        = embed_tok_id[2:0];
+    wire [31:0] embed_num_tc   = HIDDEN_SIZE >> 4;
+    wire [31:0] embed_word_idx = (embed_tr * embed_num_tc + embed_tc) * 8 + {29'd0, embed_r};
+    wire [31:0] embed_word_addr = {4'd0, cur_weight_base[31:4]} + embed_word_idx;
     reg [3:0] embed_c_pipe;
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -823,10 +826,11 @@ module top_accel #(
     end
 
     // ROM address muxing:
-    assign weight_rom_addr = embed_busy ? embed_word_addr[15:0] : linear_weight_rd_addr[15:0];
-    assign param_rom_addr  = embed_busy ? (cur_param_base[15:0] + tok_in) :
-                             (norm_busy ? (cur_param_base[15:0] + norm_gamma_addr) :
-                             linear_param_rd_addr[15:0]);
+    assign weight_rom_addr = embed_busy ? embed_word_addr[ROM_WEIGHTS_ADDR_W-1:0] :
+                             linear_weight_rd_addr[ROM_WEIGHTS_ADDR_W-1:0];
+    assign param_rom_addr  = embed_busy ? (cur_param_base[ROM_PARAMS_ADDR_W-1:0] + {{(ROM_PARAMS_ADDR_W-16){1'b0}}, tok_in}) :
+                             (norm_busy ? (cur_param_base[ROM_PARAMS_ADDR_W-1:0] + {{(ROM_PARAMS_ADDR_W-16){1'b0}}, norm_gamma_addr}) :
+                             linear_param_rd_addr[ROM_PARAMS_ADDR_W-1:0]);
 
 endmodule
 /* verilator lint_on WIDTHEXPAND */

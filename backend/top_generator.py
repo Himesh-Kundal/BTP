@@ -18,6 +18,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
 from compiler.format_assignment import assign_formats_and_scales
 from compiler.rom_packing import pack_rom_artifacts
 from compiler.schedule import generate_schedule
@@ -28,6 +30,7 @@ def generate_top_accel_verilog(
     config: dict[str, Any],
     rom_files: dict[str, str] | None = None,
     module_name: str = "top_accel",
+    rom_depths: dict[str, int] | None = None,
 ) -> str:
     """Generate parameterized top-level Verilog composition for the model accelerator.
 
@@ -35,6 +38,7 @@ def generate_top_accel_verilog(
         config: Model configuration dictionary (vocab_size, hidden_size, etc.).
         rom_files: Optional mapping of ROM names to hex file paths.
         module_name: Top-level module name.
+        rom_depths: Optional mapping of ROM depths (weights, params, prog, bases).
 
     Returns:
         Verilog source string for top_accel.
@@ -49,6 +53,16 @@ def generate_top_accel_verilog(
     max_ctx = config.get("max_position_embeddings", 32)
     tile_r = config.get("tile_r", 8)
     tile_c = config.get("tile_c", 16)
+
+    depths = rom_depths or {}
+    w_depth = max(32768, depths.get("weights", 32768))
+    p_depth = max(2048, depths.get("params", 2048))
+    prog_depth = max(256, depths.get("prog", 256))
+    bases_depth = max(512, depths.get("bases", 512))
+
+    w_addr_w = max(16, (w_depth - 1).bit_length())
+    p_addr_w = max(16, (p_depth - 1).bit_length())
+    bases_addr_w = max(9, (bases_depth - 1).bit_length())
 
     files = rom_files or {}
     w_file = files.get("weights", "")
@@ -79,10 +93,13 @@ def generate_top_accel_verilog(
         f"    parameter TILE_C            = {tile_c},\n"
         f"    parameter PROG_ADDR_W       = 8,\n"
         f"    parameter LAYER_W           = 5,\n"
-        f"    parameter ROM_WEIGHTS_DEPTH = 32768,\n"
-        f"    parameter ROM_PARAMS_DEPTH  = 2048,\n"
-        f"    parameter ROM_PROG_DEPTH    = 256,\n"
-        f"    parameter ROM_BASES_DEPTH   = 256,\n"
+        f"    parameter ROM_WEIGHTS_ADDR_W = {w_addr_w},\n"
+        f"    parameter ROM_PARAMS_ADDR_W  = {p_addr_w},\n"
+        f"    parameter ROM_BASES_ADDR_W   = {bases_addr_w},\n"
+        f"    parameter ROM_WEIGHTS_DEPTH = {w_depth},\n"
+        f"    parameter ROM_PARAMS_DEPTH  = {p_depth},\n"
+        f"    parameter ROM_PROG_DEPTH    = {prog_depth},\n"
+        f"    parameter ROM_BASES_DEPTH   = {bases_depth},\n"
         f'    parameter ROM_WEIGHTS_FILE  = "{w_file}",\n'
         f'    parameter ROM_PARAMS_FILE   = "{p_file}",\n'
         f'    parameter ROM_PROG_FILE     = "{prog_file}",\n'
@@ -143,20 +160,37 @@ def emit_hardware_bundle(
     microprog.save(out_path)
 
     # 4. Emit 128-bit words for weights (weights_128b.hex)
-    raw_weights_lines = (out_path / "weights.hex").read_text(encoding="utf-8").strip().splitlines()
-    weights_128b_lines: list[str] = []
-    chunk_size = tile_c  # 16 bytes = 128 bits
-    for i in range(0, len(raw_weights_lines), chunk_size):
-        chunk = raw_weights_lines[i : i + chunk_size]
-        # Pad with zeros if partial
-        while len(chunk) < chunk_size:
-            chunk.append("00")
-        # Little-endian hex packing: byte 15 down to byte 0
-        word_hex = "".join(reversed(chunk))
-        weights_128b_lines.append(word_hex)
-
+    w_hex_path = out_path / "weights.hex"
     w128_path = out_path / "weights_128b.hex"
-    w128_path.write_text("\n".join(weights_128b_lines) + "\n", encoding="utf-8")
+    raw_w_bytes = w_hex_path.read_bytes()
+    chunk_size = tile_c  # 16 bytes = 128 bits
+
+    if len(raw_w_bytes) > 0 and len(raw_w_bytes) % 3 == 0:
+        # Fast path: every line in weights.hex is exactly 'xx\n' (3 bytes)
+        byte_arr = np.frombuffer(raw_w_bytes, dtype=np.uint8).reshape(-1, 3)[:, :2]
+        n_bytes = byte_arr.shape[0]
+        rem = n_bytes % chunk_size
+        if rem != 0:
+            pad_len = chunk_size - rem
+            pad_arr = np.full((pad_len, 2), ord("0"), dtype=np.uint8)
+            byte_arr = np.vstack([byte_arr, pad_arr])
+        words_arr = byte_arr.reshape(-1, chunk_size, 2)[:, ::-1, :].reshape(-1, chunk_size * 2)
+        w128_count = words_arr.shape[0]
+        nl_col = np.full((w128_count, 1), ord("\n"), dtype=np.uint8)
+        out_arr = np.hstack([words_arr, nl_col])
+        with open(w128_path, "wb") as f128:
+            # Write in 1M-word chunks to bound memory
+            f128.writelines(out_arr[idx : idx + 1_048_576].tobytes() for idx in range(0, w128_count, 1_048_576))
+    else:
+        raw_weights_lines = raw_w_bytes.decode("utf-8").strip().splitlines()
+        weights_128b_lines: list[str] = []
+        for i in range(0, len(raw_weights_lines), chunk_size):
+            chunk = raw_weights_lines[i : i + chunk_size]
+            while len(chunk) < chunk_size:
+                chunk.append("00")
+            weights_128b_lines.append("".join(reversed(chunk)))
+        w128_count = len(weights_128b_lines)
+        w128_path.write_text("\n".join(weights_128b_lines) + "\n", encoding="utf-8")
 
     # 5. Emit Layer Bases ROM hex (layer_bases.hex)
     layer_bases_lines: list[str] = []
@@ -232,7 +266,14 @@ def emit_hardware_bundle(
         "rope_sin": (out_path / "tables_rope_sin.hex").as_posix(),
     }
 
-    top_verilog = generate_top_accel_verilog(config, rom_files=rom_files)
+    rom_depths = {
+        "weights": w128_count,
+        "params": addr_map.get("requant_image", {}).get("total_words", 2048),
+        "prog": 256,
+        "bases": max(512, len(layer_bases_lines)),
+    }
+
+    top_verilog = generate_top_accel_verilog(config, rom_files=rom_files, rom_depths=rom_depths)
     top_file = out_path / "top_accel.v"
     top_file.write_text(top_verilog, encoding="utf-8")
 

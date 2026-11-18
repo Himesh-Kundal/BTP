@@ -1,0 +1,56 @@
+{
+  "task": "UE.1",
+  "model_id": "HuggingFaceTB/SmolLM2-135M",
+  "revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+  "config": {
+    "head_dim": 64,
+    "hidden_size": 576,
+    "intermediate_size": 1536,
+    "max_position_embeddings": 8192,
+    "num_attention_heads": 9,
+    "num_hidden_layers": 30,
+    "num_key_value_heads": 3,
+    "rms_norm_eps": 1e-05,
+    "rope_theta": 100000.0,
+    "tie_word_embeddings": true,
+    "vocab_size": 49152
+  },
+  "timings_sec": {
+    "extract_sec": 3.257,
+    "graph_build_sec": 1.963,
+    "emit_bundle_sec": 5.776,
+    "total_sec": 10.996
+  },
+  "peak_rss_gb": 2.505,
+  "rom_words": {
+    "weights_8b_words": 162791424,
+    "weights_128b_words": 10174464,
+    "requant_params_64b_words": 288990,
+    "program_128b_words": 20
+  },
+  "file_sizes_bytes": {
+    "address_map.json": 96362,
+    "format_table.json": 8475877,
+    "layer_bases.hex": 8160,
+    "program.hex": 660,
+    "requant_params.hex": 4912830,
+    "schedule.json": 20981,
+    "tables.hex": 87296,
+    "tables_exp2.hex": 1536,
+    "tables_rope_cos.hex": 40960,
+    "tables_rope_sin.hex": 40960,
+    "tables_rsqrt.hex": 1280,
+    "tables_silu.hex": 1536,
+    "top_accel.v": 27293,
+    "weights.hex": 488374272,
+    "weights_128b.hex": 335757312
+  },
+  "total_hw_bundle_mb": 799.03,
+  "budget_check": {
+    "host_ram_available_gb": 8.97,
+    "within_ram_budget": true,
+    "host_disk_free_gb": 598.26,
+    "within_disk_budget": true
+  },
+  "status": "PASS"
+}

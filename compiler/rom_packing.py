@@ -72,69 +72,69 @@ def pack_rom_artifacts(
     # =========================================================================
     # 1. Pack Weight ROM (weights.hex)
     # =========================================================================
-    weight_hex_lines: list[str] = []
+    hex_byte_nl_lut = np.array([f"{i:02x}\n".encode("ascii") for i in range(256)], dtype="S3")
     current_weight_offset = 0
+    w_hasher = hashlib.sha256()
 
     # Collect all linear/embedding nodes
     weight_nodes = [
         n for n in graph.nodes if n.op in (OpKind.Linear, OpKind.Embed) and len(n.inputs) > 1
     ]
 
-    for node in weight_nodes:
-        w_name = node.inputs[1]
-        w_arr = weights_dict.get(w_name)
-        if w_arr is None:
-            continue
-
-        # Quantize float weights to symmetric INT8 [-127, 127]
-        if w_arr.dtype != np.int8:
-            ch_max = np.max(np.abs(w_arr), axis=-1, keepdims=True)
-            ch_max = np.maximum(ch_max, 1e-8)
-            w_int8 = np.clip(np.round(w_arr / ch_max * 127.0), -127, 127).astype(np.int8)
-        else:
-            w_int8 = w_arr
-
-        # Pad matrix to exact (tile_r, tile_c) multiples
-        w_padded, n_pad, k_pad = pad_matrix(w_int8, tile_n=tile_r, tile_k=tile_c)
-
-        # Tile ordering: loop over tile rows, then tile cols, then inner tile elements
-        num_tiles_r = n_pad // tile_r
-        num_tiles_c = k_pad // tile_c
-
-        start_offset = current_weight_offset
-        tile_count = 0
-
-        for tr in range(num_tiles_r):
-            for tc in range(num_tiles_c):
-                tile = w_padded[tr * tile_r : (tr + 1) * tile_r, tc * tile_c : (tc + 1) * tile_c]
-                # Emit row-major tile elements
-                for r in range(tile_r):
-                    for c in range(tile_c):
-                        val = int(tile[r, c])
-                        weight_hex_lines.append(int_to_twos_comp_hex(val, 8))
-                        current_weight_offset += 1
-                tile_count += 1
-
-        length = current_weight_offset - start_offset
-        address_map["weights"][node.id] = {
-            "tensor_name": w_name,
-            "base_addr": start_offset,
-            "length": length,
-            "orig_shape": list(w_arr.shape),
-            "padded_shape": [n_pad, k_pad],
-            "num_tiles": [num_tiles_r, num_tiles_c],
-        }
-
     weight_hex_file = out_path / "weights.hex"
-    with open(weight_hex_file, "w", encoding="utf-8") as f:
-        f.write("\n".join(weight_hex_lines) + "\n")
+    with open(weight_hex_file, "wb") as f_w:
+        for node in weight_nodes:
+            w_name = node.inputs[1]
+            w_arr = weights_dict.get(w_name)
+            if w_arr is None:
+                continue
 
-    weight_bytes = weight_hex_file.read_bytes()
+            # Quantize float weights to symmetric INT8 [-127, 127]
+            if w_arr.dtype != np.int8:
+                ch_max = np.max(np.abs(w_arr), axis=-1, keepdims=True)
+                ch_max = np.maximum(ch_max, 1e-8)
+                w_int8 = np.clip(np.round(w_arr / ch_max * 127.0), -127, 127).astype(np.int8)
+            else:
+                w_int8 = w_arr
+
+            # Pad matrix to exact (tile_r, tile_c) multiples
+            w_padded, n_pad, k_pad = pad_matrix(w_int8, tile_n=tile_r, tile_k=tile_c)
+
+            # Tile ordering: (num_tiles_r, num_tiles_c, tile_r, tile_c)
+            num_tiles_r = n_pad // tile_r
+            num_tiles_c = k_pad // tile_c
+
+            start_offset = current_weight_offset
+            w_u8 = w_padded.view(np.uint8)
+            w_tiled = (
+                w_u8.reshape(num_tiles_r, tile_r, num_tiles_c, tile_c)
+                .transpose(0, 2, 1, 3)
+                .reshape(-1)
+            )
+            length = int(w_tiled.size)
+
+            # Stream-write in 4M-element chunks to bound memory usage
+            chunk_elems = 4_194_304
+            for idx in range(0, length, chunk_elems):
+                chunk_bytes = hex_byte_nl_lut[w_tiled[idx : idx + chunk_elems]].tobytes()
+                f_w.write(chunk_bytes)
+                w_hasher.update(chunk_bytes)
+
+            current_weight_offset += length
+            address_map["weights"][node.id] = {
+                "tensor_name": w_name,
+                "base_addr": start_offset,
+                "length": length,
+                "orig_shape": list(w_arr.shape),
+                "padded_shape": [n_pad, k_pad],
+                "num_tiles": [num_tiles_r, num_tiles_c],
+            }
+
     address_map["weights_image"] = {
         "file": "weights.hex",
         "total_words": current_weight_offset,
         "word_bits": 8,
-        "sha256": compute_bytes_sha256(weight_bytes),
+        "sha256": w_hasher.hexdigest(),
     }
 
     # =========================================================================
