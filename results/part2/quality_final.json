@@ -1,0 +1,42 @@
+{
+  "task": "UE.7",
+  "model_id": "HuggingFaceTB/SmolLM2-135M",
+  "revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+  "eval_dataset": {
+    "name": "wikitext-2-raw-v1",
+    "split": "test",
+    "num_windows": 10,
+    "window_length": 64,
+    "total_predicted_tokens": 630
+  },
+  "fp32_metrics": {
+    "cross_entropy": 4.4962,
+    "perplexity": 89.6749
+  },
+  "int_metrics": {
+    "cross_entropy": 13.9384,
+    "perplexity": 1130744.2269
+  },
+  "comparison": {
+    "delta_ppl": 1130654.552,
+    "mean_kl_div": 9.4782,
+    "top1_agreement_pct": 0.16,
+    "mean_greedy_match_length": 0,
+    "median_greedy_match_length": 0.0
+  },
+  "frozen_thresholds_ha": {
+    "max_delta_ppl": 25.0,
+    "min_top1_agreement_pct": 35.0,
+    "max_mean_kl_div": 0.15
+  },
+  "meets_ha_thresholds": false,
+  "rtl_equivalence_link": {
+    "source_report": "results/part2/full_decode.json",
+    "ue4_prompts_exact": "10/10",
+    "ue4_total_decode_steps": 285,
+    "ue4_sampled_trace_identical": true,
+    "ue4_sampled_trace_elements_checked": 2279424
+  },
+  "eval_wall_sec": 158.23,
+  "status": "THRESHOLD_VIOLATION"
+}

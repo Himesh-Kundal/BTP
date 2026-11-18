@@ -16,12 +16,12 @@
     "vocab_size": 49152
   },
   "timings_sec": {
-    "extract_sec": 3.257,
-    "graph_build_sec": 1.963,
-    "emit_bundle_sec": 5.776,
-    "total_sec": 10.996
+    "extract_sec": 0.0,
+    "graph_build_sec": 1.604,
+    "emit_bundle_sec": 5.232,
+    "total_sec": 6.836
   },
-  "peak_rss_gb": 2.505,
+  "peak_rss_gb": 2.048,
   "rom_words": {
     "weights_8b_words": 162791424,
     "weights_128b_words": 10174464,
@@ -41,11 +41,12 @@
     "tables_rope_sin.hex": 40960,
     "tables_rsqrt.hex": 1280,
     "tables_silu.hex": 1536,
+    "tb_top_accel.v": 9454,
     "top_accel.v": 27293,
     "weights.hex": 488374272,
     "weights_128b.hex": 335757312
   },
-  "total_hw_bundle_mb": 799.03,
+  "total_hw_bundle_mb": 799.04,
   "budget_check": {
     "host_ram_available_gb": 8.97,
     "within_ram_budget": true,
