@@ -61,6 +61,19 @@ class CompiledArtifactInterpreter:
 
     def _load_hex_file(self, path: Path, bits: int, signed: bool = True) -> np.ndarray:
         """Load hex lines into a NumPy integer array."""
+        if bits == 8:
+            raw = path.read_bytes()
+            if len(raw) > 0 and len(raw) % 3 == 0:
+                lut = np.zeros(256, dtype=np.uint8)
+                for i in range(10):
+                    lut[ord("0") + i] = i
+                for i in range(6):
+                    lut[ord("a") + i] = 10 + i
+                    lut[ord("A") + i] = 10 + i
+                arr = np.frombuffer(raw, dtype=np.uint8).reshape(-1, 3)
+                vals = (lut[arr[:, 0]] << 4) | lut[arr[:, 1]]
+                return vals.view(np.int8) if signed else vals
+
         lines = path.read_text(encoding="utf-8").strip().splitlines()
         values: list[int] = []
         mask = (1 << bits) - 1
@@ -123,11 +136,13 @@ class CompiledArtifactInterpreter:
             .astype(np.int64)
         )
 
-        # SiLU LUT
+        # SiLU LUT (8-bit signed entries)
         silu_info = tbl_info["silu_lut"]
-        self.silu_lut = self.table_rom[
-            silu_info["base_addr"] : silu_info["base_addr"] + silu_info["length"]
-        ]
+        self.silu_lut = (
+            self.table_rom[silu_info["base_addr"] : silu_info["base_addr"] + silu_info["length"]]
+            .astype(np.int8)
+            .astype(np.int64)
+        )
 
     def reset(self) -> None:
         """Reset internal buffers, traces, and KV cache."""
@@ -246,9 +261,13 @@ class CompiledArtifactInterpreter:
             if p_info:
                 p_base = p_info["base_addr"]
                 params = self.requant_rom[p_base : p_base + d]
-                m_arr = np.array([p[0] for p in params], dtype=np.int64)
-                s_val = params[0][1] if params else 16
-                out = requant(scaled_x * m_arr, 1, s_val, -127, 127)
+                out = np.array(
+                    [
+                        requant(int(scaled_x[i]) * int(params[i][0]), 1, int(params[i][1]), -127, 127)
+                        for i in range(d)
+                    ],
+                    dtype=np.int64,
+                )
             else:
                 out = sat(scaled_x, -127, 127)
 
@@ -268,14 +287,15 @@ class CompiledArtifactInterpreter:
             if p_info:
                 p_base = p_info["base_addr"]
                 params = self.requant_rom[p_base : p_base + len(acc)]
-                out_min = -8388608 if dst in (0, 9) else -127
-                out_max = 8388607 if dst in (0, 9) else 127
+                is_res_out = dst in (0, 9) or ("o_proj" in name) or ("down_proj" in name)
+                out_min = -8388608 if is_res_out else -127
+                out_max = 8388607 if is_res_out else 127
                 res = np.array(
                     [
                         requant(int(acc[i]), int(params[i][0]), int(params[i][1]), out_min, out_max)
                         for i in range(len(acc))
                     ],
-                    dtype=np.int64 if dst in (0, 9) else np.int8,
+                    dtype=np.int64 if is_res_out else np.int8,
                 )
             else:
                 res = acc

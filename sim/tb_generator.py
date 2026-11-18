@@ -397,6 +397,7 @@ def generate_top_accel_tb_verilog(
         "        end",
         "",
         "        // Summary Result Line",
+        "        $display(\"TOTAL_CYCLES=%0d\", cycle_cnt);",
         "        $display(\"TB2_RESULT TOKENS=%0d TOK_MISMATCH=%0d TRACE_CHECKED=%0d TRACE_MISMATCH=%0d TIMING_ERR=%0d\",",
         "                 TOTAL_STEPS, tok_mismatch_cnt, trace_checked_cnt, trace_mismatch_cnt, timing_err_cnt);",
         "        $finish;",
@@ -419,14 +420,24 @@ def run_top_accel_simulation(
     expected_tokens: list[int] | None = None,
     simulator: str = "iverilog",
     timeout_cycles: int = 10000000,
+    model_config: dict | None = None,
 ) -> Tb2SimulationResult:
     """Compile and execute top_accel testbench with iverilog or Verilator."""
     b_path = Path(bundle_dir)
+    cfg = model_config or {}
+    num_layers = cfg.get("num_hidden_layers", 8)
+    hidden_size = cfg.get("hidden_size", 64)
+    intermediate_size = cfg.get("intermediate_size", 128)
+    vocab_size = cfg.get("vocab_size", 256)
+    num_q_heads = cfg.get("num_attention_heads", 4)
+    num_kv_heads = cfg.get("num_key_value_heads", 2)
+    head_dim = cfg.get("head_dim", 16)
+
     total_tokens = len(prompt_tokens) + num_generate
     t_path = Path(trace_dir) if trace_dir is not None else None
     if t_path is not None:
         for s in range(total_tokens):
-            for l in range(8):  # Covers all layers
+            for l in range(num_layers):
                 (t_path / f"seq{seq_id}" / f"tok{s}" / f"L{l}").mkdir(parents=True, exist_ok=True)
 
     # 1. Generate testbench
@@ -437,6 +448,12 @@ def run_top_accel_simulation(
         trace_dir=t_path,
         expected_tokens=expected_tokens,
         timeout_cycles=timeout_cycles,
+        hidden_size=hidden_size,
+        intermediate_size=intermediate_size,
+        vocab_size=vocab_size,
+        num_q_heads=num_q_heads,
+        num_kv_heads=num_kv_heads,
+        head_dim=head_dim,
     )
     tb_file = b_path / "tb_top_accel.v"
     tb_file.write_text(tb_code, encoding="utf-8")
@@ -550,6 +567,9 @@ def run_top_accel_simulation(
         and (timing_err == 0)
     )
 
+    m_cyc = re.search(r"TOTAL_CYCLES=(\d+)", raw_output)
+    total_cycles = int(m_cyc.group(1)) if m_cyc else 0
+
     return Tb2SimulationResult(
         success=success,
         tokens=tokens_generated,
@@ -558,7 +578,7 @@ def run_top_accel_simulation(
         trace_checked=trace_checked,
         trace_mismatch=trace_mismatch,
         timing_err=timing_err,
-        cycles=0,
+        cycles=total_cycles,
         raw_output=raw_output,
         diff_result=diff_res,
     )

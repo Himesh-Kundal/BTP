@@ -1,0 +1,19 @@
+{
+  "task": "UE.2",
+  "build_success": true,
+  "build_time_sec": 3.187,
+  "build_peak_rss_gb": 0.261,
+  "binary_size_mb": 0.2,
+  "sim_steps": 2,
+  "tokens_out": [
+    1029,
+    11121
+  ],
+  "sim_wall_time_sec": 32.987,
+  "sim_peak_rss_gb": 0.392,
+  "total_cycles": 27220724,
+  "cycles_per_token": 13610362,
+  "sim_speed_cycles_per_sec": 825197.1,
+  "sim_speed_kcycles_per_sec": 825.2,
+  "status": "PASS"
+}

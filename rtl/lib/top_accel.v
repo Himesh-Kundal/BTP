@@ -708,7 +708,7 @@ module top_accel #(
     swiglu #(
         .DATA_WIDTH(8),
         .LUT_WIDTH(8),
-        .LUT_SIZE(256),
+        .LUT_SIZE(512),
         .OUT_WIDTH(8),
         .OUT_MIN(-8'sd127),
         .OUT_MAX(8'sd127)
