@@ -300,6 +300,7 @@ class CompiledArtifactInterpreter:
 
             out = np.concatenate([out1, out2], axis=-1)
             self.buffers[dst] = sat(out.reshape(num_heads * hd), -127, 127).astype(np.int8)
+            self.traces[f"{name}_L{layer_idx}"] = self.buffers[dst]
 
         elif opcode == Opcode.ATTENTION:
             num_q_heads, num_kv_heads, hd = dims[0], dims[1], dims[2]

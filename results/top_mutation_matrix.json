@@ -1,0 +1,59 @@
+{
+  "suite": "top_accel_mutation_suite_v2",
+  "timestamp_utc": "2026-11-18T14:54:03.836932+00:00",
+  "total_mutants": 7,
+  "killed_mutants": 7,
+  "survived_mutants": 0,
+  "kill_rate_pct": 100.0,
+  "results": [
+    {
+      "id": "TM1",
+      "name": "causal_off",
+      "description": "Causal mask off: Softmax normalizes past current position (pos+2)",
+      "status": "KILLED",
+      "kill_reason": "tok_mismatch=0, trace_mismatch=1"
+    },
+    {
+      "id": "TM2",
+      "name": "kv_head_map",
+      "description": "GQA KV-head mapping uses modulo instead of floor division",
+      "status": "KILLED",
+      "kill_reason": "tok_mismatch=0, trace_mismatch=1"
+    },
+    {
+      "id": "TM3",
+      "name": "pos_off_by_one",
+      "description": "Sequencer / datapath position counter initialized to 1 instead of 0",
+      "status": "KILLED",
+      "kill_reason": "tok_mismatch=0, trace_mismatch=1"
+    },
+    {
+      "id": "TM4",
+      "name": "rope_table_shift",
+      "description": "RoPE table index shifted by +1 entry",
+      "status": "KILLED",
+      "kill_reason": "tok_mismatch=0, trace_mismatch=1"
+    },
+    {
+      "id": "TM5",
+      "name": "residual_scale",
+      "description": "Residual addition inverted: subtracts residual instead of adding",
+      "status": "KILLED",
+      "kill_reason": "tok_mismatch=0, trace_mismatch=1"
+    },
+    {
+      "id": "TM6",
+      "name": "tie_break",
+      "description": "Argmax tie-break inverted: selects highest index instead of lowest",
+      "status": "KILLED",
+      "kill_reason": "tok_mismatch=2, tokens=[254, 254] (expected [0, 0])"
+    },
+    {
+      "id": "TM7",
+      "name": "rom_word_swap",
+      "description": "Weight ROM word swap: swap words 0 and 1 in weights_128b.hex",
+      "status": "KILLED",
+      "kill_reason": "tok_mismatch=0, trace_mismatch=1"
+    }
+  ]
+}
