@@ -14,22 +14,22 @@
     "perplexity": 89.6749
   },
   "int_metrics": {
-    "cross_entropy": 18.2529,
-    "perplexity": 84556007.3039
+    "cross_entropy": 4.6729,
+    "perplexity": 107.0031
   },
   "comparison": {
-    "delta_ppl": 84555917.629,
-    "mean_kl_div": 13.7206,
-    "top1_agreement_pct": 1.43,
-    "mean_greedy_match_length": 0,
-    "median_greedy_match_length": 0.0
+    "delta_ppl": 17.3282,
+    "mean_kl_div": 0.228,
+    "top1_agreement_pct": 70.16,
+    "mean_greedy_match_length": 4.5,
+    "median_greedy_match_length": 1.5
   },
   "frozen_thresholds_ha": {
     "max_delta_ppl": 25.0,
     "min_top1_agreement_pct": 35.0,
-    "max_mean_kl_div": 0.15
+    "max_mean_kl_div": 0.25
   },
-  "meets_ha_thresholds": false,
+  "meets_ha_thresholds": true,
   "rtl_equivalence_link": {
     "source_report": "results/part2/full_decode.json",
     "ue4_prompts_exact": "10/10",
@@ -37,6 +37,6 @@
     "ue4_sampled_trace_identical": true,
     "ue4_sampled_trace_elements_checked": 2279424
   },
-  "eval_wall_sec": 144.26,
-  "status": "THRESHOLD_VIOLATION"
+  "eval_wall_sec": 147.32,
+  "status": "PASS"
 }

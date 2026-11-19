@@ -335,8 +335,8 @@ module attention #(
                         dot_acc <= dot_acc + (q_local[pipe_dim[1]] * kv_rd_data);
 
                         if (pipe_dim[1] + 1'b1 == HEAD_DIM) begin
-                            // Last element of position: store score = (dot + term) >>> 2
-                            scores_mem[pipe_pos[1]] <= (dot_acc + (q_local[pipe_dim[1]] * kv_rd_data)) >>> 2;
+                            // Last element of position: store score = (dot + term) >>> 1
+                            scores_mem[pipe_pos[1]] <= (dot_acc + (q_local[pipe_dim[1]] * kv_rd_data)) >>> 1;
                             dot_acc <= 32'sd0;
 
                             if (pipe_pos[1] == pos[POS_W-1:0]) begin

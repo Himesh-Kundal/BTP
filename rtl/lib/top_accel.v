@@ -718,7 +718,7 @@ module top_accel #(
         .start(swiglu_start),
         .dim(cur_dim0),
         .M(32'sd1),
-        .s(6'd7),
+        .s(6'd6),
         .busy(swiglu_busy),
         .done(swiglu_done),
         .gate_addr(swiglu_gate_addr),

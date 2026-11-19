@@ -351,7 +351,7 @@ class CompiledArtifactInterpreter:
                 v_head = v_cache[kv_idx, : pos + 1, :].astype(np.int64)
                 q_head = q[q_idx].astype(np.int64)
 
-                scores = (q_head @ k_head.T) >> 2  # INT32
+                scores = (q_head @ k_head.T) >> 1  # INT32
                 max_score = int(np.max(scores))
                 delta = scores - max_score  # <= 0
 
@@ -382,7 +382,7 @@ class CompiledArtifactInterpreter:
             up = self.buffers[7].astype(np.int64)
             silu_out = np.array([self.silu_lut[int(g) + 256] for g in gate], dtype=np.int64)
             prod = silu_out * up
-            self.buffers[dst] = sat(rshift_rnd(prod, 7), -127, 127).astype(np.int8)
+            self.buffers[dst] = sat(rshift_rnd(prod, 6), -127, 127).astype(np.int8)
             self.traces[f"{name}_L{layer_idx}"] = self.buffers[dst]
 
         elif opcode == Opcode.ARGMAX:

@@ -14,8 +14,10 @@ from pathlib import Path
 from typing import Any
 
 from backend.top_generator import emit_hardware_bundle
+from eval.harness import get_tokenized_windows
 from frontend.importer_v2 import (
     build_graph_v2_from_artifacts,
+    calibrate_and_migrate_artifacts_v2,
     extract_and_dump_model_v2,
     load_model_artifacts_v2,
 )
@@ -37,9 +39,17 @@ def main() -> None:
 
     t0 = time.perf_counter()
 
-    # Step 1: Extract model artifacts if not already present
-    if not (artifacts_dir / "manifest.json").exists():
-        print(f"[*] Loading {DEFAULT_MODEL_ID} ({PINNED_REVISION}) from local cache...")
+    # Step 1: Extract and calibrate model artifacts if not already present with ADR-2-2 calibration
+    calib_file = artifacts_dir / "calib_scales.json"
+    needs_extract = not (artifacts_dir / "manifest.json").exists() or not calib_file.exists()
+    if not needs_extract:
+        with open(calib_file, "r", encoding="utf-8") as f:
+            existing_calib = json.load(f)
+        if "__s_gate__" not in existing_calib:
+            needs_extract = True
+
+    if needs_extract:
+        print(f"[*] Loading {DEFAULT_MODEL_ID} ({PINNED_REVISION}) and running ADR-2-2 calibration...")
         model, _ = load_model_and_tokenizer(DEFAULT_MODEL_ID, PINNED_REVISION)
         extract_and_dump_model_v2(
             model=model,
@@ -47,6 +57,20 @@ def main() -> None:
             target_dir=artifacts_dir,
             model_id=DEFAULT_MODEL_ID,
             revision=PINNED_REVISION,
+        )
+        calib_windows = get_tokenized_windows(
+            model_id=DEFAULT_MODEL_ID,
+            revision=PINNED_REVISION,
+            num_windows=4,
+            window_length=64,
+        )
+        calibrate_and_migrate_artifacts_v2(
+            model=model,
+            calibration_windows=calib_windows,
+            target_dir=artifacts_dir,
+            s_gate=0.10,
+            swig_shift=6,
+            score_shift=1,
         )
         del model
     t_extract = time.perf_counter()

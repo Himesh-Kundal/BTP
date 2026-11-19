@@ -26,6 +26,7 @@ class FormatAssignmentResult:
     graph: GraphV2
     format_table: dict[str, Any]
     requant_params: dict[str, dict[str, list[int]]]
+    silu_scale: float = 0.05
 
     def save_json(self, path: str | Path) -> None:
         p = Path(path)
@@ -33,6 +34,7 @@ class FormatAssignmentResult:
         data = {
             "format_table": self.format_table,
             "requant_params": self.requant_params,
+            "silu_scale": self.silu_scale,
         }
         with open(p, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, sort_keys=True)
@@ -42,7 +44,7 @@ def assign_formats_and_scales(
     graph: GraphV2,
     weights_dict: dict[str, np.ndarray],
     frozen_config: dict[str, Any],
-    calib_scales: dict[str, float] | None = None,
+    calib_scales: dict[str, Any] | None = None,
 ) -> FormatAssignmentResult:
     """Execute format and dyadic scale assignment pass on Graph IR v2."""
     if calib_scales is None:
@@ -56,6 +58,7 @@ def assign_formats_and_scales(
     # Standard scales from calibration / numerics config
     s_act = 0.05
     s_res = 0.01
+    silu_scale = float(calib_scales.get("__s_gate__", s_act))
 
     fmt_token = EdgeFormat(bits=16, signed=False, scale=1.0, fixed_point="UINT16")
     fmt_res = EdgeFormat(
@@ -102,7 +105,8 @@ def assign_formats_and_scales(
         elif ("norm" not in name) and ("logits" in name or "res" in name or "down_" in name or "o_proj_" in name or name == "h_embed"):
             tensor.format = fmt_res
         else:
-            t_scale = calib_scales.get(name, s_act)
+            raw_sc = calib_scales.get(name, s_act)
+            t_scale = float(raw_sc) if not isinstance(raw_sc, list) else s_act
             tensor.format = EdgeFormat(
                 bits=act_bits,
                 signed=True,
@@ -164,18 +168,26 @@ def assign_formats_and_scales(
                 ch_max = np.max(np.abs(w_arr), axis=-1)
                 ch_max = np.maximum(ch_max, 1e-8)
                 ch_scales = ch_max / 127.0
-                # Target output scale
+                # Target output scale (scalar or per-channel calibrated list)
                 out_tensor = graph.tensors[node.outputs[0]]
                 s_out = out_tensor.format.scale
                 s_in = graph.tensors[node.inputs[0]].format.scale
+                ch_out_list = calib_scales.get(f"__ch_scale__{node.id}")
 
                 m_list = []
                 s_list = []
-                for s_w in ch_scales:
-                    real_scale = (s_in * s_w) / s_out
-                    M, s = float_to_dyadic_scale(float(real_scale))
-                    m_list.append(M)
-                    s_list.append(s)
+                if isinstance(ch_out_list, list) and len(ch_out_list) == len(ch_scales):
+                    for s_w, s_out_c in zip(ch_scales, ch_out_list, strict=False):
+                        real_scale = (s_in * s_w) / float(s_out_c)
+                        M, s = float_to_dyadic_scale(float(real_scale))
+                        m_list.append(M)
+                        s_list.append(s)
+                else:
+                    for s_w in ch_scales:
+                        real_scale = (s_in * s_w) / s_out
+                        M, s = float_to_dyadic_scale(float(real_scale))
+                        m_list.append(M)
+                        s_list.append(s)
                 requant_params[node.id] = {"M": m_list, "shift": s_list}
 
         elif node.op == OpKind.Attention:
@@ -189,4 +201,5 @@ def assign_formats_and_scales(
         graph=graph,
         format_table=format_table,
         requant_params=requant_params,
+        silu_scale=silu_scale,
     )

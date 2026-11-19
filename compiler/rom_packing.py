@@ -217,7 +217,8 @@ def pack_rom_artifacts(
     _add_table("reciprocal_lut", recip_lut, 16)
 
     # 3e. SwiGLU SiLU LUT (512 entries, 8 bits)
-    silu_lut = build_silu_lut(in_min=-256, in_max=255)
+    s_gate = float(getattr(format_result, "silu_scale", 0.05))
+    silu_lut = build_silu_lut(in_min=-256, in_max=255, in_scale=s_gate, out_scale=s_gate)
     _add_table("silu_lut", silu_lut, 8)
 
     table_hex_file = out_path / "tables.hex"

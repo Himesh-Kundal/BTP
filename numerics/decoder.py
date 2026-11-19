@@ -227,8 +227,8 @@ class IntegerDecoder:
                 v_head = v_hist[kv_idx].astype(np.int64)  # [pos+1, hd]
                 q_head = q[q_idx].astype(np.int64)  # [hd]
 
-                # Dot products (folded 1/sqrt(hd) shift by 2 or 3)
-                scores = (q_head @ k_head.T) >> 2  # INT32
+                # Dot products (folded 1/sqrt(hd) shift by 1)
+                scores = (q_head @ k_head.T) >> 1  # INT32
                 m = int(np.max(scores))
                 delta = scores - m  # non-positive differences
 
@@ -264,7 +264,7 @@ class IntegerDecoder:
             # SiLU LUT lookup (offset by 128 for index)
             silu_indices = (gate.astype(np.int64) + 128).clip(0, 255)
             silu_val = self.silu_lut[silu_indices].astype(np.int64)
-            swiglu_prod = requant(silu_val * up.astype(np.int64), 1, 7)
+            swiglu_prod = requant(silu_val * up.astype(np.int64), 1, 6)
 
             down_acc = swiglu_prod.astype(np.int64) @ layer.down_proj.T
             down_res = rshift_rnd(down_acc * layer.down_M, layer.down_s)

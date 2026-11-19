@@ -108,26 +108,27 @@ def test_float_to_dyadic_scale():
 
 
 def test_build_exp2_fraction_lut():
-    """Verify properties of the base-2 fractional exponent LUT."""
+    """Verify properties of the base-2 negative fractional exponent LUT (ADR-2-2)."""
     lut = build_exp2_fraction_lut(table_size=256, out_bits=16)
     assert len(lut) == 256
-    # 2^0 * 2^16 = 65536
+    # 2^(-0) * 2^16 = 65536
     assert lut[0] == 65536
-    # 2^(255/256) * 2^16 < 131072
-    assert 65536 <= lut[-1] < 131072
-    # Monotonically increasing
-    assert np.all(np.diff(lut) >= 0)
+    # 2^(-255/256) * 2^16 ≈ 32857
+    assert 32800 <= lut[-1] <= 32900
+    # Monotonically decreasing
+    assert np.all(np.diff(lut) <= 0)
 
 
 def test_build_rsqrt_mantissa_lut():
-    """Verify properties of reciprocal square root mantissa LUT."""
+    """Verify properties of reciprocal square root mantissa LUT (ADR-2-2)."""
     lut = build_rsqrt_mantissa_lut(table_size=256, out_bits=16)
     assert len(lut) == 256
-    # 1 / sqrt(1.0) * 2^16 = 65536
-    assert lut[0] == 65536
-    # 1 / sqrt(2.0) * 2^16 ≈ 46341
-    assert 46300 <= lut[-1] <= 46400
-    # Monotonically decreasing
+    # Clamped to 16-bit unsigned max 65535 for k <= 64
+    assert lut[0] == 65535
+    assert lut[64] == 65535
+    # 2^19 / sqrt(255) ≈ 32832
+    assert 32800 <= lut[-1] <= 32900
+    # Monotonically non-increasing
     assert np.all(np.diff(lut) <= 0)
 
 

@@ -29,7 +29,7 @@ def py_attention_oracle(q_mat, k_cache, v_cache, pos, exp2_lut, num_q_heads, num
         q_vec = q_mat[q_idx].astype(np.int64)
 
         # Dot product
-        scores = (q_vec @ k_hist.T) >> 2  # INT32
+        scores = (q_vec @ k_hist.T) >> 1  # INT32
         max_score = int(np.max(scores))
 
         # Base-2 exp decomposition matching softmax.v
@@ -348,6 +348,17 @@ def test_attention_multi_position_causal():
     )
 
     np.testing.assert_array_equal(sim_out, expected)
+
+    # Also test moderate magnitude where score differences fall within the non-saturated exp2 range
+    k_cache_mod = (k_cache // 5).astype(np.int8)
+    q_mod = (q // 5).astype(np.int8)
+    k_current_mod = k_cache_mod[:, pos, :]
+    expected_mod = py_attention_oracle(q_mod, k_cache_mod, v_cache, pos, exp2_lut, num_q, num_kv, hd)
+    sim_out_mod = run_attention_sim(
+        q_mod, k_current_mod, v_current, pos, exp2_lut, k_cache=k_cache_mod, v_cache=v_cache, num_q_heads=num_q, num_kv_heads=num_kv, hd=hd, max_ctx=16
+    )
+    np.testing.assert_array_equal(sim_out_mod, expected_mod)
+
 
 
 def test_attention_gqa_mapping():

@@ -157,7 +157,7 @@ def load_model_artifacts_v2(target_dir: Path) -> dict[str, Any]:
         loaded_tensors[name] = np.load(file_path)
 
     calib_file = target_dir / "calib_scales.json"
-    calib_scales: dict[str, float] = {}
+    calib_scales: dict[str, Any] = {}
     if calib_file.exists():
         with open(calib_file, "r", encoding="utf-8") as f:
             calib_scales = json.load(f)
@@ -168,6 +168,217 @@ def load_model_artifacts_v2(target_dir: Path) -> dict[str, Any]:
         "tensors": loaded_tensors,
         "calib_scales": calib_scales,
     }
+
+
+def calibrate_and_migrate_artifacts_v2(
+    model: Any,
+    calibration_windows: list[list[int]],
+    target_dir: Path,
+    s_gate: float = 0.10,
+    swig_shift: int = 6,
+    score_shift: int = 1,
+) -> dict[str, Any]:
+    """Run forward calibration, apply compile-time SmoothQuant & outlier migration, and update artifacts."""
+    target_dir = Path(target_dir)
+    manifest_file = target_dir / "manifest.json"
+    with open(manifest_file, "r", encoding="utf-8") as f:
+        manifest = json.load(f)
+
+    cfg = manifest["config"]
+    num_q_heads = int(cfg["num_attention_heads"])
+    num_kv_heads = int(cfg["num_key_value_heads"])
+    head_dim = int(cfg["head_dim"])
+
+    ch_max: dict[str, np.ndarray] = {}
+    t_max: dict[str, float] = {}
+
+    def _rec_ch(name: str, arr: np.ndarray) -> None:
+        a = np.abs(arr)
+        m = np.max(a, axis=(0, 1))
+        ch_max[name] = np.maximum(ch_max.get(name, np.zeros_like(m)), m)
+        t_max[name] = max(t_max.get(name, 1e-6), float(np.max(a)))
+
+    handles = []
+    for i, lyr in enumerate(model.model.layers):
+        handles.append(
+            lyr.input_layernorm.register_forward_hook(
+                lambda m, inp, out, i=i: _rec_ch(f"an_{i}", out.detach().float().cpu().numpy())
+            )
+        )
+        handles.append(
+            lyr.self_attn.q_proj.register_forward_hook(
+                lambda m, inp, out, i=i: _rec_ch(f"q_{i}", out.detach().float().cpu().numpy())
+            )
+        )
+        handles.append(
+            lyr.self_attn.k_proj.register_forward_hook(
+                lambda m, inp, out, i=i: _rec_ch(f"k_{i}", out.detach().float().cpu().numpy())
+            )
+        )
+        handles.append(
+            lyr.self_attn.v_proj.register_forward_hook(
+                lambda m, inp, out, i=i: _rec_ch(f"v_{i}", out.detach().float().cpu().numpy())
+            )
+        )
+        handles.append(
+            lyr.post_attention_layernorm.register_forward_hook(
+                lambda m, inp, out, i=i: _rec_ch(f"mn_{i}", out.detach().float().cpu().numpy())
+            )
+        )
+        handles.append(
+            lyr.mlp.gate_proj.register_forward_hook(
+                lambda m, inp, out, i=i: _rec_ch(f"gate_{i}", out.detach().float().cpu().numpy())
+            )
+        )
+        handles.append(
+            lyr.mlp.up_proj.register_forward_hook(
+                lambda m, inp, out, i=i: _rec_ch(f"up_{i}", out.detach().float().cpu().numpy())
+            )
+        )
+        handles.append(
+            lyr.mlp.down_proj.register_forward_pre_hook(
+                lambda m, inp, i=i: _rec_ch(f"swig_{i}", inp[0].detach().float().cpu().numpy())
+            )
+        )
+    handles.append(
+        model.model.norm.register_forward_hook(
+            lambda m, inp, out: _rec_ch("fn", out.detach().float().cpu().numpy())
+        )
+    )
+
+    with torch.no_grad():
+        for win in calibration_windows:
+            model(torch.tensor([win], dtype=torch.long))
+    for h in handles:
+        h.remove()
+
+    def _update_npy(tensor_key: str, arr: np.ndarray) -> None:
+        info = manifest["tensors"][tensor_key]
+        fpath = target_dir / info["path"]
+        np.save(fpath, arr.astype(np.float32))
+        info["sha256"] = compute_file_sha256(fpath)
+
+    target_sq_sk = 8.0 / ((256 << score_shift) * 1.4426950408889634)
+    s_q_base = float(np.sqrt(target_sq_sk))
+    s_k_base = float(np.sqrt(target_sq_sk))
+    gqa_rep = num_q_heads // num_kv_heads
+    half_hd = head_dim // 2
+
+    calib_scales: dict[str, Any] = {"__s_gate__": float(s_gate)}
+
+    for i, lyr in enumerate(model.model.layers):
+        l_prefix = f"model.layers.{i}"
+        in_g = lyr.input_layernorm.weight.detach().float().cpu().numpy().copy()
+        post_g = lyr.post_attention_layernorm.weight.detach().float().cpu().numpy().copy()
+        wq = lyr.self_attn.q_proj.weight.detach().float().cpu().numpy().copy()
+        wk = lyr.self_attn.k_proj.weight.detach().float().cpu().numpy().copy()
+        wv = lyr.self_attn.v_proj.weight.detach().float().cpu().numpy().copy()
+        wg = lyr.mlp.gate_proj.weight.detach().float().cpu().numpy().copy()
+        wu = lyr.mlp.up_proj.weight.detach().float().cpu().numpy().copy()
+        wd = lyr.mlp.down_proj.weight.detach().float().cpu().numpy().copy()
+
+        # 1. SmoothQuant migration on input_layernorm <-> (wq, wk, wv)
+        an_cm = np.maximum(ch_max[f"an_{i}"], 1e-5)
+        w_qkv_cm = np.maximum(np.max(np.abs(np.vstack([wq, wk, wv])), axis=0), 1e-5)
+        d_an = (an_cm / w_qkv_cm) ** 0.5
+        d_an = d_an / np.median(d_an)
+        in_g_tilde = in_g / d_an
+        wq_tilde = wq * d_an[None, :]
+        wk_tilde = wk * d_an[None, :]
+        wv_tilde = wv * d_an[None, :]
+        s_an = float(np.max(an_cm / d_an)) / 127.0
+
+        # 2. SmoothQuant migration on post_attention_layernorm <-> (wg, wu)
+        mn_cm = np.maximum(ch_max[f"mn_{i}"], 1e-5)
+        w_gu_cm = np.maximum(np.max(np.abs(np.vstack([wg, wu])), axis=0), 1e-5)
+        d_mn = (mn_cm / w_gu_cm) ** 0.5
+        d_mn = d_mn / np.median(d_mn)
+        post_g_tilde = post_g / d_mn
+        wg_tilde = wg * d_mn[None, :]
+        wu_tilde = wu * d_mn[None, :]
+        s_mn = float(np.max(mn_cm / d_mn)) / 127.0
+
+        # 3. Outlier channel migration on (gate, up) <-> down_proj
+        g_cm = ch_max[f"gate_{i}"]
+        u_cm = ch_max[f"up_{i}"]
+        sw_cm = ch_max[f"swig_{i}"]
+        beta_g = np.maximum(1.0, g_cm / (126.0 * s_gate))
+        u_cap = float(np.percentile(u_cm, 98.5))
+        sw_cap = float(np.percentile(sw_cm / beta_g, 98.5))
+        alpha_u = np.maximum(
+            1.0,
+            np.maximum(u_cm / max(u_cap, 1e-6), (sw_cm / beta_g) / max(sw_cap, 1e-6)),
+        )
+        wd_tilde = wd * (beta_g * alpha_u)[None, :]
+        s_up = max(
+            float(np.max(u_cm / alpha_u)) / 127.0,
+            float(np.max(sw_cm / (beta_g * alpha_u))) / (127.0 * (1 << swig_shift) * s_gate),
+        )
+        s_swiglu = float(1 << swig_shift) * s_gate * s_up
+
+        # 4. RoPE-invariant per-pair Q <-> K migration
+        q_cm = ch_max[f"q_{i}"].reshape(num_kv_heads, gqa_rep, 2, half_hd)
+        k_cm = ch_max[f"k_{i}"].reshape(num_kv_heads, 2, half_hd)
+        q_pair_max = np.maximum(np.max(q_cm, axis=(1, 2)), 1e-4)
+        k_pair_max = np.maximum(np.max(k_cm, axis=1), 1e-4)
+        kappa = np.sqrt(q_pair_max / k_pair_max)
+        kappa_q = np.tile(kappa[:, None, :], (1, gqa_rep, 2)).reshape(num_q_heads * head_dim)
+        kappa_k = np.tile(kappa, (1, 2)).reshape(num_kv_heads * head_dim)
+
+        s_v = float(t_max[f"v_{i}"]) / 127.0
+
+        # Save migrated weights
+        _update_npy(f"{l_prefix}.input_layernorm.weight", in_g_tilde)
+        _update_npy(f"{l_prefix}.post_attention_layernorm.weight", post_g_tilde)
+        _update_npy(f"{l_prefix}.self_attn.q_proj.weight", wq_tilde)
+        _update_npy(f"{l_prefix}.self_attn.k_proj.weight", wk_tilde)
+        _update_npy(f"{l_prefix}.self_attn.v_proj.weight", wv_tilde)
+        _update_npy(f"{l_prefix}.mlp.gate_proj.weight", wg_tilde)
+        _update_npy(f"{l_prefix}.mlp.up_proj.weight", wu_tilde)
+        _update_npy(f"{l_prefix}.mlp.down_proj.weight", wd_tilde)
+
+        # Record tensor and per-channel scales
+        calib_scales[f"h_attn_norm_{i}"] = s_an
+        calib_scales[f"q_proj_{i}"] = s_q_base
+        calib_scales[f"q_rope_{i}"] = s_q_base
+        calib_scales[f"k_proj_{i}"] = s_k_base
+        calib_scales[f"k_rope_{i}"] = s_k_base
+        calib_scales[f"v_proj_{i}"] = s_v
+        calib_scales[f"attn_context_{i}"] = s_v
+        calib_scales[f"h_mlp_norm_{i}"] = s_mn
+        calib_scales[f"gate_{i}"] = float(s_gate)
+        calib_scales[f"silu_{i}"] = float(s_gate)
+        calib_scales[f"up_{i}"] = s_up
+        calib_scales[f"swiglu_{i}"] = s_swiglu
+
+        calib_scales[f"__ch_scale__q_proj_{i}"] = (s_q_base * kappa_q).tolist()
+        calib_scales[f"__ch_scale__k_proj_{i}"] = (s_k_base / kappa_k).tolist()
+        calib_scales[f"__ch_scale__gate_proj_{i}"] = (s_gate * beta_g).tolist()
+        calib_scales[f"__ch_scale__up_proj_{i}"] = (s_up * alpha_u).tolist()
+
+    # 5. Final norm <-> lm_head migration
+    embed_w = model.model.embed_tokens.weight.detach().float().cpu().numpy().copy()
+    fn_g = model.model.norm.weight.detach().float().cpu().numpy().copy()
+    fn_cm = np.maximum(ch_max["fn"], 1e-5)
+    w_lm_cm = np.maximum(np.max(np.abs(embed_w), axis=0), 1e-5)
+    d_fn = (fn_cm / w_lm_cm) ** 0.5
+    d_fn = d_fn / np.median(d_fn)
+    fn_g_tilde = fn_g / d_fn
+    lm_w_tilde = embed_w * d_fn[None, :]
+    s_fn = float(np.max(fn_cm / d_fn)) / 127.0
+
+    _update_npy("model.norm.weight", fn_g_tilde)
+    _update_npy("lm_head.weight", lm_w_tilde)
+    calib_scales["h_final_norm"] = s_fn
+
+    with open(manifest_file, "w", encoding="utf-8") as f:
+        json.dump(manifest, f, indent=2, sort_keys=True)
+
+    calib_file = target_dir / "calib_scales.json"
+    with open(calib_file, "w", encoding="utf-8") as f:
+        json.dump(calib_scales, f, indent=2, sort_keys=True)
+
+    return calib_scales
 
 
 def build_graph_v2_from_artifacts(target_dir: Path) -> GraphV2:

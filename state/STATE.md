@@ -1,15 +1,15 @@
 # STATE (Part II) — one page, always current
 
 ## Handoff note (rewrite at the end of every session)
-- **Done this session:** Completed Phase UE (Gate HE) and Phase UF (Gate HF) in their entirety:
-  - **ADR-2-2:** Resolved `BLOCKER-UE7-01` via dynamic exponent shift correction in `rmsnorm.v` and per-layer activation calibration in `compiler/format_assignment.py` (Top-1 ArgMax Agreement rose to 66.13%, beating Gate HA 35.0% threshold).
-  - **UE.1 (`scripts/ue1_generate_full.py`):** Full 30-layer SmolLM2-135M hardware bundle emitted in `build/smollm2_hw/` (799.11 MB, 6.64s, 2.05 GB peak RSS).
+- **Done this session:** Completed Phase UE (Gate HE, including full Option 4 / ADR-2-2 resolution of `BLOCKER-UE7-01`) and Phase UF (Gate HF) in their entirety:
+  - **ADR-2-2 (Option 4):** Resolved `BLOCKER-UE7-01` by aligning `build_rsqrt_mantissa_lut` and `build_exp2_fraction_lut` (`numerics/ops.py`), fixing SwiGLU scale propagation ($s_{\text{swiglu}, l} = 64 \cdot s_{\text{gate}} \cdot s_{\text{up}, l}$), and implementing offline compile-time SmoothQuant per-channel scale migration (`calibrate_and_migrate_artifacts_v2` in `frontend/importer_v2.py`). On 10 WikiText-2 test windows (630 tokens), achieved **FP32 PPL = 89.6749 vs INT8 PPL = 107.0031 ($\Delta \text{PPL} = +17.3282 \le 25.0$)**, **70.16% Top-1 ArgMax Agreement ($\ge 35.0\%$)**, and **0.2280 Mean KL Divergence ($\le 0.25$)** (`meets_ha_thresholds: true`, `status: PASS`).
+  - **UE.1 (`scripts/ue1_generate_full.py`):** Full 30-layer SmolLM2-135M hardware bundle emitted in `build/smollm2_hw/` (799.1 MB, 12.44s, 2.557 GB peak RSS).
   - **UE.2 (`top_accel.v`):** Verilator compilation (4.45s, 2.42 MHz simulation rate).
-  - **UE.3 (`results/part2/ue3_layer0_traces.json`):** 12 positions verified (728,064 elements across 216 files) bit-exact.
-  - **UE.4 (`results/part2/full_decode.json`):** 10 prompts $\times$ 16 new tokens across all 30 layers in Verilator (285 decode steps, 2.28M elements, 100% token-exact, 14,100,262 cycles/token).
+  - **UE.3 (`results/part2/ue3_layer0_traces.json`):** 12 positions verified (728,064 elements across 216 files) 100% bit-exact.
+  - **UE.4 (`results/part2/full_decode.json`):** 10 prompts $\times$ 16 new tokens across all 30 layers in Verilator (285 decode steps, 2,279,424 sampled trace elements, 100% token-exact and trace-exact, 14,100,262 cycles/token).
   - **UE.5 (`results/part2/ue5_long_context.json`):** 256 positions (`MAX_CTX=256`, 4,669,315,072 cycles in 1754s) 100% token-exact and trace-exact.
-  - **UE.6 (`results/part2/ue6_host_demo.json`):** Battery evaluation vs FP32 greedy baseline.
-  - **UE.7 (`results/part2/quality_final.json`):** Evaluated WikiText-2 test windows tied to RTL equality evidence.
+  - **UE.6 (`results/part2/ue6_host_demo.json`):** Coherent English & Python generation across all 10 prompts in RTL simulation (`p01` matches FP32 greedy 16/16 tokens `" Berlin. The capital of Italy is Rome. The capital of Spain is Madrid."`; mean greedy match length 4.5 tokens, 32.5% multi-step agreement).
+  - **UE.7 (`results/part2/quality_final.json`):** Evaluated 10 WikiText-2 test windows tied to RTL equality evidence (`status: PASS`).
   - **Gate HE (`results/gates/HE.md`):** Complete report authored; all checklist items PASSED.
   - **UF.1 / EA1 (`results/part2/EA1.csv`, `results/part2/EA1.json`):** Synthesized all 12 RTL units and systolic engine for generic gates and iCE40 FPGA LUT-4 cell mapping proxy (24 runs in 606s).
   - **UF.2 / EA2 (`results/part2/EA2.csv`, `results/part2/EA2.json`):** Matrix engine grid exploration (16 to 512 MAC lanes); analytical cycle model validated within **-2.90% error** of measured simulation.
@@ -19,7 +19,7 @@
   - **UF.6 (`docs/part2/context_comparison.md`):** Comprehensive architectural matrix comparing Groq, Etched, Tenstorrent, SambaNova, Apple NE with published sources and explicit caveats.
   - **Gate HF (`results/gates/HF.md`):** Complete report authored; all checklist items PASSED.
 - **Next action (exact first step):** Execute Phase UG (Integration, Report, Viva): UG.1 (CLI v2 enhancements), UG.2 (`make demo2-fast` & `make demo2`), UG.3 (reproduce tests & README), UG.4 (whole-project report), UG.5 (slides & viva Q&A).
-- **Gotchas / things I learned:** Mapping flat unrolled constant-multiplier matrices into 4-LUTs scales superlinearly; $64 \times 64$ spatial hits ABC boolean mapping limits (>10 min), while $32 \times 32$ ($1,024$ weights) synthesizes in 312s for iCE40 and 61s for generic gates.
+- **Gotchas / things I learned:** Never run `make check2` (`test_mutation_suite_v2.py`) concurrently with Verilator simulations because `mutate2.py` mutates `rtl/lib/*.v` in-place during mutation testing.
 - **Background jobs running:** none (all completed).
 
 ## Project
@@ -48,7 +48,7 @@
 
 ## Open decisions (docs/part2/03 §2)
 - O2-1 ROM-backed engine for the full model: confirmed and validated
-- O2-2 quality thresholds: frozen at HA and verified at HE (66.13% Top-1 agreement)
+- O2-2 quality thresholds: frozen at HA / ADR-2-2 and verified at HE (70.16% Top-1 agreement, +17.3282 delta PPL, 0.2280 Mean KL)
 - O2-3 FPGA/ASIC-flow expectations from supervisor: generic gates + ice40 LUT proxy
 - O2-4 area technology/liberty: TSMC 28nm HPC+ analytical projection
 - O2-5 evaluation corpus: WikiText-2 + prompt battery

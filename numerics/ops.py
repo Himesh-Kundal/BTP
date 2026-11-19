@@ -125,28 +125,29 @@ def float_to_signed_dyadic_scale(scale: float, max_m_bits: int = 15) -> tuple[in
 
 
 def build_exp2_fraction_lut(table_size: int = 256, out_bits: int = 16) -> np.ndarray:
-    """Build lookup table for fractional base-2 exponent: 2^(k / table_size).
+    """Build lookup table for negative fractional base-2 exponent: 2^(-k / table_size).
     
-    Evaluates 2^f for f in [0, 1) in fixed-point format Q0.out_bits.
+    Evaluates 2^(-f) for f in [0, 1) in fixed-point format Q0.out_bits (ADR-2-2).
     """
     k = np.arange(table_size, dtype=np.float64)
     frac = k / float(table_size)
-    values = np.exp2(frac)  # in [1.0, 2.0)
+    values = np.exp2(-frac)  # in (0.5, 1.0]
     scale = float(1 << out_bits)
     lut = np.round(values * scale).astype(np.int64)
     return lut
 
 
 def build_rsqrt_mantissa_lut(table_size: int = 256, out_bits: int = 16) -> np.ndarray:
-    """Build reciprocal square root mantissa LUT for RMSNorm.
+    """Build reciprocal square root mantissa LUT for RMSNorm (ADR-2-2).
     
-    Normalized mantissa m in [1.0, 2.0), returns round(1 / sqrt(m) * 2^out_bits).
+    Returns round(2^19 / sqrt(k)) clamped to [0, 2^out_bits - 1].
     """
-    k = np.arange(table_size, dtype=np.float64)
-    m = 1.0 + (k / float(table_size))
-    values = 1.0 / np.sqrt(m)  # in (0.7071, 1.0]
-    scale = float(1 << out_bits)
-    lut = np.round(values * scale).astype(np.int64)
+    max_val = (1 << out_bits) - 1
+    lut = np.zeros(table_size, dtype=np.int64)
+    lut[0] = max_val
+    for k in range(1, table_size):
+        val = int(np.round((2.0**19) / np.sqrt(k)))
+        lut[k] = min(max_val, val)
     return lut
 
 
