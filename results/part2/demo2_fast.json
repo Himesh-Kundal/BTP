@@ -1,0 +1,21 @@
+{
+  "target": "demo2-fast",
+  "status": "PASS",
+  "wall_sec": 11.45,
+  "prompt_tokens": [
+    1,
+    10,
+    25
+  ],
+  "generated_tokens": [
+    25,
+    25,
+    25,
+    131
+  ],
+  "rtl_cycles": 115227,
+  "tokens_exact": true,
+  "audits_passed": true,
+  "unit_mutation_kill_rate_pct": 100.0,
+  "top_mutation_kill_rate_pct": 100.0
+}

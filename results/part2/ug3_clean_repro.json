@@ -1,0 +1,30 @@
+{
+  "task": "UG.3",
+  "clean_directory_verified": true,
+  "no_preexisting_build_or_artifacts": true,
+  "steps": [
+    {
+      "step": "env-check",
+      "command": "make env-check",
+      "returncode": 0,
+      "elapsed_sec": 1.95,
+      "status": "PASS"
+    },
+    {
+      "step": "demo2-fast",
+      "command": "make demo2-fast",
+      "returncode": 0,
+      "elapsed_sec": 13.11,
+      "status": "PASS"
+    },
+    {
+      "step": "cli-synth-unit",
+      "command": "make synth2",
+      "returncode": 0,
+      "elapsed_sec": 39.8,
+      "status": "PASS"
+    }
+  ],
+  "total_wall_sec": 54.96,
+  "status": "PASS"
+}

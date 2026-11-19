@@ -1,219 +1,131 @@
-# LLMHW: Model-Specific Dense Linear Layer Hardware Compiler
+# LLMHW: Model-Specific Transformer Decoder & Linear Hardware Compiler (Part I & Part II)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
-[![Verilog: 2001](https://img.shields.io/badge/Verilog-2001-green.svg)](docs/02_architecture_and_contracts.md)
+[![Verilog: 2001/2005](https://img.shields.io/badge/Verilog-2001%2F2005-green.svg)](docs/part2/02_architecture_and_contracts.md)
 [![Simulation: Icarus%20%2B%20Verilator](https://img.shields.io/badge/Simulation-Icarus%20%2B%20Verilator-purple.svg)](verification/)
 [![Synthesis: Yosys](https://img.shields.io/badge/Synthesis-Yosys-orange.svg)](synth/)
-[![Tests: 226%20Passed](https://img.shields.io/badge/Tests-226%20Passed-brightgreen.svg)](tests/)
+[![Tests: 168%20Part%20II%20Passed](https://img.shields.io/badge/Tests-100%25%20Passed-brightgreen.svg)](tests/)
 
-**LLMHW** is an end-to-end model-specific hardware compiler that translates dense linear projections of modern transformer architectures (**SmolLM2-135M**) into synthesizable, constant-weight Verilog-2001 (Design F). 
+**LLMHW** is an end-to-end model-specific hardware compiler that compiles **SmolLM2-135M** ($134.5\text{M}$ parameters, 30 transformer layers, GQA 9:3 attention, SwiGLU MLP, $49,152$ vocabulary) into synthesizable, pure-integer Verilog-2001/2005 hardware:
 
-By specializing trained weights directly as compile-time numerical constants into the datapath arithmetic, **LLMHW** completely eliminates runtime weight input ports, memory write buses, and weight register storage (Invariant I3). The resulting designs achieve a **3.0× to 3.85× standard-cell reduction**, an **up to 17.7× flip-flop reduction**, and a **20% to 32% critical path shortening** compared to programmable baselines under strict fairness protocols.
+- **Part I (Spatial Constant-Weight Linear Layer Compiler):** Compiles dense linear projections directly into unrolled shift-add constant-multiplier trees (Design F), eliminating runtime weight ports and achieving a **3.0× to 3.85× standard-cell reduction**, up to **17.7× flip-flop reduction**, and **20% to 32% critical path shortening** over programmable baselines (Design P).
+- **Part II (Complete Autoregressive Transformer Decoder Accelerator):** Extends the compiler to the **entire 30-layer SmolLM2-135M decoder** (embedding gather, RMSNorm, Q1.14 RoPE, GQA causal attention with on-chip KV cache, SwiGLU, 24-bit residual stream, tied LM head, and scale-aligned greedy ArgMax) backed by immutable synchronous ROMs and an $R \times C = 8 \times 16$ streaming MAC engine driven by a deterministic microprogram sequencer.
 
-All generated circuits are validated **bit-exact** against an independent NumPy INT64 reference oracle (**Claim C1**), withstand a **100% mutation kill rate** (Mutants M1–M9), and pass dual-simulator cross-checks across Icarus Verilog and Verilator.
+Every generated circuit is verified **100% bit-exact** against an independent pure-integer reference oracle (**Claim C1 / C1′**), achieves a **100% mutation kill rate** across 9 Part I mutants (`M1`–`M9`), 21 Part II unit mutants (`M10`–`M30`), and 7 top-level system mutants (`TM1`–`TM7`), and retains **70.16% Top-1 ArgMax agreement** ($\Delta \text{PPL} = +17.33$ on WikiText-2) with PyTorch FP32 (**Claim C2′**).
 
 ---
 
-## Key Highlights & Core Claims
+## Key Highlights & Verified Claims (Part I & Part II)
 
-| Feature / Metric | Design F (Specialized Fixed-Weight) | Design P (Programmable Baseline) | Impact / Evidence |
+| Claim / Study | Metric | Measured / Verified Value | Source File |
 |---|---|---|---|
-| **Weight Ports (I3)** | **0 bits** (Zero weight inputs) | $8 \times N \times K$ bits ($W_{\text{reg}}$ array) | No memory write logic, no bus routing |
-| **Logic Cell Count** | **155,648 cells** ($16 \times 64$) | **599,085 cells** ($16 \times 64$) | **3.85× Area Reduction** |
-| **Sequential Flops** | **491 DFFs** (pruned dynamic range) | **8,705 DFFs** ($W_{\text{reg}} + \text{acc}$) | **17.7× Storage Elimination** |
-| **Topological Depth** | **57 levels** ($8 \times 16$) | **77 levels** ($8 \times 16$) | **26% Shorter Critical Path** |
-| **Claim C1 (Equivalence)** | **0 mismatches** across all 7 projections | Reference-equivalent | Proven bit-exact against NumPy INT64 |
-| **Mutation Hardening** | **100% killed** (9/9 mutant operators) | Checked on every test | Zero survivability of datapath bugs |
-| **Generation Speed** | **0.54 seconds** for full $576 \times 576$ layer | N/A | Highly scalable parametric generator |
+| **C1 (Part I Linear Parity)** | Bit-exact linear layer equivalence vs NumPy INT64 | **0 mismatches** across 210 projections & 135 regression configs | `results/regression_summary.json` |
+| **Part I Spatial Area** | Design F vs Design P cell count ($16 \times 64$ tile) | **155,648 vs 599,085 cells (3.85× reduction)**; **17.7× fewer DFFs** | `results/E1.csv` |
+| **C1′ (Part II Full Decoder Parity)** | 30-layer SmolLM2-135M RTL vs Integer Oracle | **10/10 prompts × 16 tokens 100% token-exact** (285 steps; 2,279,424 trace elements exact) | `results/part2/full_decode.json` |
+| **C1′ Long-Context Parity** | Full 30-layer decode at `MAX_CTX = 256` | **256/256 positions token-exact & trace-exact** (4.67B cycles) | `results/part2/ue5_long_context.json` |
+| **C2′ (Quantization Quality)** | Pure INT8 W8A8/INT24 vs PyTorch FP32 (WikiText-2) | **Top-1 Agreement = 70.16%** ($\ge 35\%$); **$\Delta \text{PPL} = +17.3282$** ($89.67 \to 107.00 \le 25.0$); **KL = 0.2280** | `results/part2/quality_final.json` |
+| **Mutation Hardening** | Fault injection kill rate | **100.0%** (`9/9` Part I, `21/21` Part II units, `7/7` system mutants) | `results/mutation_matrix_v2.json` |
+| **EA1–EA3 (Hardware Cost)** | Full accelerator logic vs on-chip memory (`MAX_CTX=256`) | **78,510 generic cells** (`3,661` DFFs); **157.54 MB ROM (98.15%)** + **2.97 MB SRAM (1.85%)** | `results/part2/EA1.csv`, `EA3.json` |
+| **EA2 (Cycle Model)** | Analytical cycle model vs Verilator simulation | **13,691,648 vs 14,100,262 cycles/token (-2.90% error)** | `results/part2/EA2.json` |
+| **EA4 (Spatial vs ROM)** | Flat spatial vs ROM-sequential ($32 \times 32$ block) | **213,022 vs 21,387 generic cells (9.96×)**; full spatial extrapolates to **27.98B gates** | `results/part2/EA4.json` |
+| **EA5 (28nm ASIC Estimate)** | Pre-layout TSMC 28nm HPC+ @ 400 MHz (128 lanes) | **147.95 mm² die area** (Mid estimate), **28.37 tokens/s** ($63.37\text{ tok/s}$ @ 512 lanes) | `results/part2/EA5.json` |
 
 ---
 
-## System Architecture
-
-LLMHW enforces strict architectural layering (Golden Rule 5): model-specific inspection is confined to `frontend/`, while `ir/`, `compiler/`, `backend/`, and `verification/` are strictly model-agnostic and never import PyTorch or hardcode transformer dimensions.
+## Part II Full-Decoder Architecture
 
 ```
-┌────────────────────────────────────────────────────────┐
-│                      FRONTEND                          │
-│   HuggingFace Transformer (SmolLM2-135M @ 93efa2f)     │
-│   • Linear Extractor: 210 projections (7 types)        │
-│   • Activation Capture: Forward hooks, fixed seed 42   │
-└──────────────────────────┬─────────────────────────────┘
-                           │ weight.npy, x_sample.npy
-┌──────────────────────────▼─────────────────────────────┐
-│                 INTERMEDIATE REPRESENTATION             │
-│   Lossless AST: LinearOp, TensorRef, TileManifest      │
-└──────────────────────────┬─────────────────────────────┘
-                           │
-┌──────────────────────────▼─────────────────────────────┐
-│                        COMPILER                        │
-│   • Rule N2: Per-channel symmetric INT8 weights [-127,127]
-│   • Rule N3: Static per-tensor calibration (absmax)    │
-│   • Rule N4: Worst-case 32-bit accumulator bound check │
-│   • Specialization: CONSTANT kind, strip write paths   │
-└──────────────────────────┬─────────────────────────────┘
-                           │
-             ┌─────────────┴─────────────┐
-             ▼                           ▼
-┌────────────────────────┐  ┌────────────────────────┐
-│   BACKEND DESIGN F     │  │   BACKEND DESIGN P     │
-│  (Fixed-Weight RTL)    │  │ (Programmable Baseline)│
-│  • Parametric Tiling   │  │  • W_reg Array Storage │
-│  • Sparsity Zero-Skip  │  │  • Runtime Multipliers │
-│  • Adder Reduction     │  │  • Weight-load Phase   │
-│  • Latency L=1 Wrapper │  │  • Identical Widths    │
-└────────────┬───────────┘  └────────────┬───────────┘
-             │                           │
-             └─────────────┬─────────────┘
-                           │
-┌──────────────────────────▼─────────────────────────────┐
-│                      VERIFICATION                       │
-│   • Independent Oracle: NumPy INT64 (N1–N7)            │
-│   • Dual Simulator: Icarus Verilog (vvp) & Verilator   │
-│   • Static Weight Audit: AST parser verifies literals  │
-│   • Mutation Testing: 100% kill rate (M1–M9)           │
-│   • Logic Synthesis: Yosys Generic Gates & iCE40 Proxy │
-└────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                     FRONTEND & OFFLINE SMOOTHQUANT (ADR-2-2)                 │
+│  HuggingFace SmolLM2-135M @ 93efa2f097d58c2a74874c7e644dbc9b0cee75a2         │
+│  • Per-channel SmoothQuant migration: γ ↔ W_{q,k,v}, γ ↔ W_{gate,up},        │
+│    RoPE-pair W_q ↔ W_k, outlier migration (W_{gate}, W_{up}) ↔ W_{down}      │
+└──────────────────────────────────────┬───────────────────────────────────────┘
+                                       │ v2 artifacts + calib_scales.json
+┌──────────────────────────────────────▼───────────────────────────────────────┐
+│                   GRAPH IR v2 & COMPILER PASSES (NO TORCH)                   │
+│  • GraphV2 (I1–I7 invariants) → Format & Dyadic (M, s) Assignment            │
+│  • Immutable ROM Packing (weights_128b.hex, requant_params.hex, tables*.hex) │
+│  • Microprogram Schedule (schedule.json, program.hex) & Memory Planner       │
+│  • CompiledArtifactInterpreter (Independent Bit-Exact Software Oracle)       │
+└──────────────────────────────────────┬───────────────────────────────────────┘
+                                       │
+┌──────────────────────────────────────▼───────────────────────────────────────┐
+│                    GENERATED VERILOG ACCELERATOR (top_accel.v)               │
+│  ┌───────────────────────┐   ┌────────────────────────────────────────────┐  │
+│  │ Microprogram Sequencer├───► Immutable Synchronous ROMs (rom_sync.v)    │  │
+│  │     (sequencer.v)     │   │ • Weights (155.25 MB) • Params (2.20 MB)   │  │
+│  └───────────┬───────────┘   │ • RoPE / rsqrt / exp2 / SiLU LUTs          │  │
+│              │               └────────────────────────────────────────────┘  │
+│              ▼                                                               │
+│  ┌────────────────────────────────────────────────────────────────────────┐  │
+│  │ Streaming Datapath Units (rtl/lib/)                                    │  │
+│  │ • embed_gather.v  • rmsnorm.v (48b acc)  • linear_engine.v (8x16 MACs) │  │
+│  │ • rope.v (Q1.14)  • attention.v + softmax.v + kv_cache.v (2.81 MB)     │  │
+│  │ • swiglu.v        • residual_add.v (INT24) • argmax.v (49,152 vocab)   │  │
+│  └────────────────────────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────────────────────┘
 ```
+
+Detailed architectural specifications and contracts:
+- [`docs/part2/01_problem_and_scope.md`](docs/part2/01_problem_and_scope.md)
+- [`docs/part2/02_architecture_and_contracts.md`](docs/part2/02_architecture_and_contracts.md)
+- [`docs/part2/context_comparison.md`](docs/part2/context_comparison.md)
+- [`docs/limitations.md`](docs/limitations.md)
+- [`docs/whole_project_report.md`](docs/whole_project_report.md) & [`docs/report_traceability.md`](docs/report_traceability.md)
 
 ---
 
-## Toolchain & Requirements
+## Quickstart & Turnkey Reproduction
 
-LLMHW runs on Linux (x86_64 / aarch64) with the following open-source toolchain:
-- **Python**: $\ge 3.10$ managed via [`uv`](https://github.com/astral-sh/uv)
-- **HDL Simulators**:
-  - [Icarus Verilog](http://iverilog.icarus.com/) (`iverilog`, `vvp` $\ge 11.0$)
-  - [Verilator](https://www.veripool.org/verilator/) ($\ge 5.0$)
-- **Logic Synthesis**:
-  - [Yosys](https://yosyshq.net/yosys/) ($\ge 0.33$)
-
-Verify your environment in one command:
+### 1. Environment Check
 ```bash
 make env-check
 ```
 
----
-
-## Quickstart
-
-### 1. Installation
-Using `uv`:
+### 2. Fast Test Suites (Part I & Part II)
 ```bash
-git clone https://github.com/himesh/BTP.git llmhw
-cd llmhw
-uv sync
+make check    # Full test suite (Part I + Part II)
+make check2   # Part II lint + 168 unit, RTL, mutation, audit, and CLI tests (~2 min)
 ```
 
-### 2. Verify Repository Health
-Run linting and the entire 226-test suite:
-```bash
-make check
-```
+### 3. Part II Demonstrations (`make demo2-fast` & `make demo2`)
+- **Fast Tiny-Model End-to-End RTL & Mutation Demo (~11.5 seconds):**
+  ```bash
+  make demo2-fast
+  ```
+  Compiles the 2-layer tiny decoder to Verilog, runs Verilator RTL simulation against the integer interpreter (`115,227` cycles, 100% bit-exact), verifies all 4 structural/ROM audits, and reports the unit (`21/21`) and system (`7/7`) mutation kill matrices.
 
-### 3. Flagship Multi-Layer Demonstration
-Execute compilation, static weight audit, and bit-exact simulation across all 7 projection types of SmolLM2-135M layer 0:
-```bash
-make demo
-```
-*(Runs in under 4 seconds and outputs a formatted verification matrix).*
-
-### 4. Full Verification Regression Matrix
-Run the comprehensive multi-dimensional simulation matrix across dimensions, tile geometries, weight distributions, and input classes:
-```bash
-make regression
-```
-
-### 5. Reproduce Synthesis Experiments & Figures
-Synthesize tile configurations and regenerate publication-quality figures:
-```bash
-make synth
-make report-figs
-```
+- **Full 30-Layer SmolLM2-135M Verilator RTL Generation Demo (~106 seconds):**
+  ```bash
+  make demo2
+  ```
+  Runs prompt `"The capital of France is Paris. The capital of Germany is"` for 4 new tokens through the 30-layer SmolLM2-135M Verilog accelerator (`top_accel.v`) in Verilator (`221,848,192` cycles), verifying **100% bit-exact token equality** with the integer reference oracle and **4/4 greedy match** (`' Berlin. The capital'`) with PyTorch FP32.
 
 ---
 
-## Unified Command-Line Interface (`llmhw`)
+## Unified Command-Line Interface (`llmhw` v2)
 
-The compiler provides a unified CLI executable `./llmhw` (and `uv run llmhw`):
-
-### Extract Model Weights & Activations
 ```bash
-./llmhw extract --model HuggingFaceTB/SmolLM2-135M --layer 0 --proj q_proj --out artifacts/
+# 1. Compile tiny or full SmolLM2-135M decoder to a ROM-backed Verilog bundle
+uv run python cli.py compile-model --tiny --out build/tiny_hw
+uv run python cli.py compile-model --model HuggingFaceTB/SmolLM2-135M --out build/smollm2_hw
+
+# 2. Run autoregressive token generation (interpreter, rtl, or both)
+uv run python cli.py run --bundle build/tiny_hw --tokens "1,10,25" --max-new-tokens 4 --backend both
+uv run python cli.py run --bundle build/smollm2_hw --prompt "Once upon a time" --max-new-tokens 6 --backend interpreter
+
+# 3. Verify compiled v2 bundle (ROM immutability + no-oracle audit + Verilator RTL parity)
+uv run python cli.py verify --bundle build/tiny_hw --tokens "1,10,25" --max-new-tokens 4 --out results/verify_v2.json
+
+# 4. Synthesize any Part II RTL unit or Part I linear module via Yosys
+uv run python cli.py synth --unit rmsnorm --target generic --out results/synth_rmsnorm.json
+uv run python cli.py synth --rtl build/rtl/llmhw_l0_q_proj_s8x16.v --target generic
 ```
-
-### Compile to Fixed-Weight Verilog (Design F)
-```bash
-./llmhw compile --layer 0 --arch q_proj --slice-n 8 --slice-k 16 --design F --out build/rtl/
-```
-
-### Compile to Programmable Baseline (Design P)
-```bash
-./llmhw compile --layer 0 --arch q_proj --slice-n 8 --slice-k 16 --design P --out build/rtl/
-```
-
-### Verify RTL Against Independent Reference Oracle
-```bash
-./llmhw verify --rtl build/rtl/llmhw_l0_q_proj_s8x16.v --layer 0 --arch q_proj --sim iverilog --num-vectors 20
-```
-
-### Run Logic Synthesis via Yosys
-```bash
-./llmhw synth --rtl build/rtl/llmhw_l0_q_proj_s8x16.v --target generic --out results/my_synth.json
-```
-
----
-
-## Synthesis Evaluation Results
-
-Experiments conducted under strict fairness rules (identical bitwidths, latency $L=1$, flattening enabled):
-
-| Experiment | Focus | Key Findings |
-|---|---|---|
-| **E1 (Area Scaling)** | Tile grid scaling $(4,16)$ to $(32,64)$ | Design F is **3.0× to 3.85× smaller** than Design P; flop count drops by **17.7×**. |
-| **E2 (Weight Effects)** | Real vs Uniform INT8 vs Sparse | Real LLM weights are **~23% smaller** than uniform random INT8 due to clustering near 0. Zero-skipping prunes 99.99% of dead terms. |
-| **E3 (Critical Path)** | Topological path depth (`ltp`) | Constant shift-add shortens longest paths by **20% to 32%** (ratio 0.68 to 0.74). |
-| **E5 (Full-Layer Extrapolation)** | SmolLM2 Layer 0 (3,456 tiles) | Layer 0 is estimated at **570.6M cells** for F vs **2.075B cells** for P (**3.64× reduction**). Direct multi-tile synthesis validates model within 10.8%. |
-
-Generated publication vector plots are available under [`results/figures/`](results/figures/):
-- `fig1_area_scaling.svg` / `.png`: Standard cell count vs tile dimensions.
-- `fig2_weight_distribution.svg` / `.png`: Impact of trained weight distributions.
-- `fig3_critical_path_depth.svg` / `.png`: Critical path depth across tile grids.
-- `fig4_full_layer_extrapolation.svg` / `.png`: Multi-tile extrapolation vs direct measurements.
-
----
-
-## Repository Map
-
-```
-llmhw/
-├── frontend/       # Pinned model loader, layer extractor, activation capture (PyTorch)
-├── ir/             # Model-agnostic IR dataclasses, graph, and tensor references
-├── compiler/       # Symmetric INT8 quantization, calibration, and accumulator bounds
-├── backend/        # Verilog-2001 codegen, tiling, Design F, and Baseline Design P
-├── verification/   # Independent NumPy INT64 oracle, simulation runner, mutation engine
-├── synth/          # Automated Yosys runner, fairness auditor, and experiment drivers
-├── cli.py          # Unified CLI entry point (`llmhw`)
-├── llmhw           # Executable wrapper script
-├── Makefile        # Standardized developer targets (env-check, check, demo, synth)
-├── scripts/        # Demonstration drivers and figure generation pipelines
-├── tests/          # Comprehensive 226-test suite with 100% pass rate
-├── docs/           # Specifications, architectural contracts, and walk-throughs
-└── results/        # Experimental CSVs, JSON metrics, figures, and gate reports
-```
-
----
-
-## Limitations & Non-Goals
-
-See [`docs/limitations.md`](docs/limitations.md) for full formal scope boundaries.
-- **Part I Scope**: Focuses strictly on dense linear projections. Non-linear operations (RMSNorm, Softmax, RoPE, SiLU) are evaluated in host software.
-- **Immutable Weights**: Design F weights are hardcoded at compile time. Reprogramming requires bitstream regeneration.
-- **Pre-Layout Synthesis**: Metrics reflect standard-cell logic complexity and topological depths. Physical routing, parasitics, and clock tree synthesis depend on target ASIC PDKs.
 
 ---
 
 ## Academic Integrity & AI-Assistance Disclosure
 
-In accordance with institutional academic integrity policies, this project utilized LLM-based agentic assistance for code scaffolding, automated refactoring, and test generation under direct human architectural specification and review. All mathematical proofs, numeric contracts (Rules N1–N10), architectural invariants (I1–I5), and experimental evaluation protocols were formally audited by the student.
+In accordance with institutional academic integrity policies, this project utilized LLM-based agentic assistance (Google DeepMind Antigravity) for code scaffolding, refactoring, testbench automation, and report drafting under direct human architectural specification and review. All numeric contracts, hardware interfaces, ADRs, and experimental results were verified against executable scripts and audited by the student. See [`docs/whole_project_report.md`](docs/whole_project_report.md) Appendix D for the complete disclosure.

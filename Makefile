@@ -20,7 +20,7 @@ check: lint test
 	@echo "=== make check: PASSED ==="
 
 check2: lint
-	@$(PYTEST) -v tests/test_smoke.py tests/test_layering.py tests/test_tiny_model.py tests/test_fp32_decoder.py tests/test_eval_harness.py tests/test_numerics_ops.py tests/test_integer_decoder.py tests/test_trace_diff.py tests/test_ir_v2.py tests/test_importer_v2.py tests/test_format_assignment.py tests/test_rom_packing.py tests/test_schedule.py tests/test_memory_planner.py tests/test_interpreter.py tests/test_reference.py tests/test_weight_encoder.py tests/test_ir_complete.py tests/test_tiling.py tests/test_rtl_numerics.py tests/test_weight_audit_v2.py tests/test_rtl_rmsnorm.py tests/test_rtl_rope.py tests/test_rtl_softmax.py tests/test_rtl_swiglu.py tests/test_rtl_residual_embed.py tests/test_rtl_argmax.py tests/test_rtl_kv_cache.py tests/test_rtl_linear_engine.py tests/test_rtl_attention.py tests/test_rtl_sequencer.py tests/test_mutation_suite_v2.py tests/test_top_generator.py tests/test_tb_generator.py tests/test_tiny_model_end_to_end.py tests/test_cross_simulator.py tests/test_top_mutation.py tests/test_audits_v2.py
+	@$(PYTEST) -v tests/test_smoke.py tests/test_layering.py tests/test_tiny_model.py tests/test_fp32_decoder.py tests/test_eval_harness.py tests/test_numerics_ops.py tests/test_integer_decoder.py tests/test_trace_diff.py tests/test_ir_v2.py tests/test_importer_v2.py tests/test_format_assignment.py tests/test_rom_packing.py tests/test_schedule.py tests/test_memory_planner.py tests/test_interpreter.py tests/test_reference.py tests/test_weight_encoder.py tests/test_ir_complete.py tests/test_tiling.py tests/test_rtl_numerics.py tests/test_weight_audit_v2.py tests/test_rtl_rmsnorm.py tests/test_rtl_rope.py tests/test_rtl_softmax.py tests/test_rtl_swiglu.py tests/test_rtl_residual_embed.py tests/test_rtl_argmax.py tests/test_rtl_kv_cache.py tests/test_rtl_linear_engine.py tests/test_rtl_attention.py tests/test_rtl_sequencer.py tests/test_mutation_suite_v2.py tests/test_top_generator.py tests/test_tb_generator.py tests/test_tiny_model_end_to_end.py tests/test_cross_simulator.py tests/test_top_mutation.py tests/test_audits_v2.py tests/test_cli.py
 	@echo "=== make check2: PASSED ==="
 
 numerics:
@@ -30,13 +30,16 @@ sim:
 	@$(PYTHON) scripts/run_toy_sim.py
 
 sim-tiny:
-	@$(PYTHON) -c "from frontend.tiny_model import dump_tiny_model_artifacts; dump_tiny_model_artifacts(); print('[+] Tiny model artifacts generated and verified.')"
+	@$(PYTHON) cli.py compile-model --tiny --out build/tiny_hw && $(PYTHON) cli.py verify --bundle build/tiny_hw --tokens "1,10,25" --max-new-tokens 2 --out results/part2/sim_tiny_verify.json
 
 regression:
 	@$(PYTHON) -m verification.regression_runner
 
 synth:
 	@$(PYTHON) -m synth.yosys_runner
+
+synth2:
+	@$(PYTHON) cli.py synth --unit rmsnorm --target generic --out results/part2/cli_synth_rmsnorm.json
 
 report-figs:
 	@$(PYTHON) scripts/generate_report_figs.py
@@ -51,10 +54,11 @@ demo:
 	@$(PYTHON) scripts/run_multi_layer_demo.py
 
 demo2-fast:
-	@$(PYTHON) -c "from frontend.tiny_model import tiny_model_forward_fp32; out = tiny_model_forward_fp32([1, 10, 25]); print('Tiny Model Demo PASS: prompt=[1, 10, 25] -> next_token =', out['next_token_id'])"
+	@$(PYTHON) scripts/ug2_demo2_fast.py
 
 demo2:
-	@echo "[*] SmolLM2 full decode target (available after Phase UE)"
+	@$(PYTHON) scripts/ug2_demo2.py
 
 clean:
 	rm -rf build/ artifacts/ *.vcd __pycache__ .pytest_cache
+

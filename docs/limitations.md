@@ -1,51 +1,44 @@
-# LLMHW System Limitations and Architectural Boundaries
+# LLMHW System Limitations and Architectural Boundaries (Part I & Part II)
 
-This document formalizes the explicit boundaries, assumptions, and non-goals of the LLMHW hardware compiler for Part I of the project.
-
----
-
-## 1. Scope Boundaries (Part I)
-
-### 1.1 Linear Layer Focus
-- **Included**: All dense projection operations in transformer blocks:
-  - Multi-Head Attention projections: `q_proj`, `k_proj`, `v_proj`, `o_proj`.
-  - Feed-Forward / SwiGLU projections: `gate_proj`, `up_proj`, `down_proj`.
-- **Excluded**:
-  - Non-linear attention mechanisms: Softmax, Scaled Dot-Product Attention score matrix ($Q K^T$), and attention dropout.
-  - Normalization operators: RMSNorm, LayerNorm.
-  - Position embeddings: Rotary Positional Embeddings (RoPE).
-  - Non-linear activation functions: SiLU, GeLU, ReLU elementwise units.
-  *(These operations remain in host software or are scheduled for Part II full-pipeline integration).*
-
-### 1.2 Constant-Weight Specialization
-- **Model-Specific Hardware (Design F)**: Weights are hardcoded as compile-time numerical constants (`8'sd...`) directly within standard-cell shift-add logic and multiplier nets.
-- **No Runtime Weight Reloading**: Design F features **zero** weight input ports, **zero** write-enable strobes, **zero** address buses, and **zero** weight storage flip-flops or SRAM macros (Invariant I3).
-- **Update Model**: Changing model weights requires regenerating the Verilog source code and performing a new FPGA bitstream generation or ASIC fabrication run.
-
-### 1.3 Numeric Range and Quantization Contract
-- **INT8 Arithmetic**: Per-channel symmetric INT8 weights ($W_q \in [-127, 127]$, Rule N2) and static per-tensor symmetric INT8 activations ($X_q \in [-127, 127]$, Rule N3). The value $-128$ is explicitly unused to guarantee symmetric dynamic range without two's complement sign-flip overflow.
-- **32-Bit Accumulation**: Intermediate row products ($16$-bit signed) accumulate into $32$-bit signed registers (Rule N4, N8). Worst-case dynamic range is strictly bounded: $K \times 127 \times 127 + |b_q|_{\max} < 2^{31}$.
-- **Dequantization**: Hardware cores emit raw signed 32-bit accumulators. Rescaling by $s_x \cdot s_w$ and conversion back to floating-point representation is performed by downstream host processing in Part I.
+This document formalizes the explicit scope boundaries, hardware assumptions, numeric trade-offs, and physical design caveats across Part I (spatial constant-weight linear layers) and Part II (complete ROM-backed SmolLM2-135M transformer decoder accelerator).
 
 ---
 
-## 2. Synthesis and Physical Design Caveats
+## 1. Architectural & Functional Boundaries
 
-### 2.1 Pre-Layout Logic Synthesis
-- Synthesis evaluation is performed using **Yosys Open SYnthesis Suite** mapping to:
-  1. Generic standard gate library (`synth -top <top>; stat`).
-  2. Lattice iCE40 FPGA LUT-4 cell proxy (`synth_ice40 -top <top>; stat`).
-- **Caveat**: Reported metrics represent pre-layout logic complexity (cell counts, combinational gate equivalents, flip-flop registers, LUT-4 counts, and topological critical path depth `ltp`).
-- **Post-P&R Factors**: Interconnect delay, routing congestion, parasitic capacitance, clock tree insertion, voltage drop, and thermal density must be validated with target ASIC PDKs (e.g., SkyWater 130nm, TSMC 28nm) or production FPGA tools (Vivado, Quartus).
-
-### 2.2 Critical Path Proxy
-- Timing is characterized via Yosys Longest Topological Path (`ltp`) depth. While topological depth strongly correlates with propagation delay in combinational networks, exact operational clock frequency ($F_{\max}$) depends on specific library cell drive strengths, wireload models, and physical floorplanning.
+1. **Autoregressive Greedy Decoding (`batch_size = 1`):**
+   - The Part II hardware accelerator (`top_accel.v`) processes one token per step (`tok_in` $\to$ `tok_out`) using deterministic greedy decoding (`argmax.v` with lowest-token-ID tie-breaking).
+   - Stochastic sampling (temperature scaling, top-$k$, top-$p$ nucleus sampling) and batched beam search are excluded from the core hardware pipeline to guarantee deterministic bit-for-bit verification (Claim C1′).
+2. **Host-Side Tokenization:**
+   - Byte-Pair Encoding (BPE) string tokenization (`text` $\to$ `uint16` token IDs) and detokenization (`uint16` token IDs $\to$ `text`) run on the host CPU using the pinned HuggingFace `AutoTokenizer`. The hardware interface operates strictly on 16-bit integer token IDs (`[0, 49151]`).
+3. **Bounded Context Window (`MAX_CTX = 256`):**
+   - While SmolLM2-135M supports up to $8,192$ context positions in software, the synthesized hardware accelerator parameterizes the on-chip KV cache SRAM (`kv_cache.v`) and RoPE tables to `MAX_CTX = 256` positions ($2.81\text{ MB}$ KV SRAM) to keep Verilator simulation and on-chip SRAM capacity tractable.
+   - Because `MAX_CTX` is a top-level Verilog parameter, extending to $2,048$ or $8,192$ positions requires zero datapath logic changes—only linear scaling of the KV cache SRAM macro ($22.5\text{ MB}$ at $2,048$; $90.0\text{ MB}$ at $8,192$).
+4. **Sequential Prefill Execution:**
+   - Prompt prefill reuses the single-token decode engine sequentially across prompt positions `pos = 0 .. L_prompt - 1`. Dedicated multi-token parallel prefill systolic arrays are left to future work.
+5. **Immutable Model-Specific ROM Weights:**
+   - In Part I (Design F), weights are hardwired into combinational shift-add networks.
+   - In Part II (`top_accel.v`), all $162.79\text{M}$ weights, $288,990$ dyadic requantization parameters, lookup tables, and microprogram instructions reside in read-only synchronous ROMs (`rom_sync.v`) with **zero write ports**. Updating model weights requires regenerating the ROM initialization images (or mask-ROM / metal-layer respin in an ASIC).
 
 ---
 
-## 3. Extensibility and Roadmap to Part II
+## 2. Numeric & Quantization Limitations
 
-The modular architectural separation between `frontend/`, `ir/`, `compiler/`, `backend/`, and `verification/` enables seamless extensions in subsequent project phases:
-1. **Pipelined Reduction Trees**: Multi-cycle pipelined adder trees for ultra-wide inner dimensions ($K > 2048$).
-2. **On-Chip Activation Buffers**: Ping-pong double-buffered BRAM/URAM activation memories.
-3. **Full Transformer Layer Integration**: Integrating fixed-weight matrix multiplication cores with dedicated fused SiLU and RMSNorm hardware accelerators.
+1. **Static W8A8 Linear Arithmetic with Offline SmoothQuant Migration:**
+   - All linear projections use symmetric INT8 weights ($[-127, 127]$) and symmetric INT8 input activations ($[-127, 127]$), while the residual stream uses saturating 24-bit signed integers (`INT24`).
+   - Because SmolLM2-135M exhibits extreme activation outliers in specific layers (`L02`, `L11`, `L28`, `L29` reaching magnitudes up to $2,630$ at `pos = 0`), static per-tensor INT8 activation scaling without offline channel migration causes severe clipping or underflow (`BLOCKER-UE7-01`).
+   - Our `ADR-2-2` compile-time SmoothQuant migration folds per-channel scale balancing into the preceding/succeeding weight matrices (`weights.hex`) and dyadic multipliers (`requant_params.hex`) at compile time with zero runtime hardware overhead, achieving **70.16% Top-1 ArgMax agreement** and **$\Delta \text{PPL} = +17.33$** ($89.67 \to 107.00$) on WikiText-2.
+2. **Multi-Step Autoregressive Trajectory Divergence:**
+   - Even with 70.16% single-token Top-1 agreement and $\text{KL} = 0.2280$, autoregressive greedy decoding compounds small logit differences: once a single token diverges from the FP32 greedy choice at step $t$, subsequent tokens condition on a different prefix. Across the 10-prompt evaluation battery (`UE.6`), the mean exact greedy prefix match length before first divergence is **4.5 tokens** (ranging up to 16/16 tokens on factual completions), after which the integer hardware continues generating grammatical, coherent text along an alternative trajectory.
+
+---
+
+## 3. Synthesis, Simulation, and ASIC Projection Caveats
+
+1. **Simulation vs. Silicon:**
+   - Cycle counts ($14,100,262$ cycles/token at $8 \times 16$ MAC lanes) and bit-exact equivalence are proven via cycle-accurate RTL simulation in Icarus Verilog and Verilator, not fabricated silicon.
+2. **Pre-Layout Synthesis Proxies:**
+   - Logic cell counts (`EA1`: $78,510$ generic cells; $80,762$ iCE40 cells) and topological critical path depths (`ltp`) come from Yosys pre-layout synthesis without physical placement, routing congestion, clock-tree synthesis (CTS), or wire parasitics.
+3. **Analytical 28nm ASIC Area & Throughput Estimates (`EA5`):**
+   - All die area ($147.95\,\text{mm}^2$ Mid estimate in TSMC 28nm HPC+), clock frequency ($250\text{–}550\text{ MHz}$), and throughput ($28.37\text{ tokens/s}$ @ 400 MHz for 128 lanes) figures in `results/part2/EA5.json` are **clearly labeled analytical estimates** derived from published 28nm high-density via-programmable ROM ($0.105\,\mu\text{m}^2/\text{bit}$), 6T SRAM ($0.155\,\mu\text{m}^2/\text{bit}$), and standard-cell gate density ($1.42\times 10^6\,\text{gates/mm}^2$) literature.
+   - Die area is $96.5\%$ dominated by the $157.54\text{ MB}$ weight/parameter ROM macros ($\epsilon_{\text{ROM}} = 0.965$); a production tapeout would require commercial Foundry memory compilers, multi-banked ROM macro floorplanning, timing closure across macro-to-logic buses, and power/IR-drop signoff.

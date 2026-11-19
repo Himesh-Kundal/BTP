@@ -1,0 +1,76 @@
+{
+  "bundle": "/home/himesh/BTP/build/demo2_fast_hw",
+  "status": "PASS",
+  "prompt_tokens": [
+    1,
+    10,
+    25
+  ],
+  "golden_tokens": [
+    125,
+    10,
+    25,
+    25,
+    25,
+    131,
+    131
+  ],
+  "rtl_tokens": [
+    125,
+    10,
+    25,
+    25,
+    25,
+    131,
+    131
+  ],
+  "tokens_exact": true,
+  "total_cycles": 115227,
+  "sim_sec": 0.058,
+  "audit": {
+    "passed": true,
+    "rom_audit": {
+      "status": "PASS",
+      "input_ports": [
+        "clk",
+        "addr"
+      ],
+      "output_ports": [
+        "data_out"
+      ],
+      "violations": []
+    },
+    "no_expected_values_audit": {
+      "status": "PASS",
+      "module": "top_accel",
+      "violations": []
+    },
+    "memory_structure_audit": {
+      "status": "PASS",
+      "found_buffers": [
+        "buf_act",
+        "buf_attn_out",
+        "buf_gate",
+        "buf_k",
+        "buf_logits",
+        "buf_q",
+        "buf_res",
+        "buf_swiglu",
+        "buf_up",
+        "buf_v"
+      ],
+      "instantiated_roms": [
+        "prog_rom_inst",
+        "layer_bases_rom_inst",
+        "rom_weights_inst",
+        "rom_params_inst",
+        "rom_rope_cos_inst",
+        "rom_rope_sin_inst",
+        "rom_rsqrt_inst",
+        "rom_exp2_inst",
+        "rom_silu_inst"
+      ],
+      "violations": []
+    }
+  }
+}

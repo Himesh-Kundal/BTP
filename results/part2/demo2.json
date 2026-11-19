@@ -1,0 +1,49 @@
+{
+  "target": "demo2",
+  "status": "PASS",
+  "wall_sec": 106.16,
+  "prompt": "The capital of France is Paris. The capital of Germany is",
+  "prompt_tokens": [
+    504,
+    3575,
+    282,
+    4649,
+    314,
+    7042,
+    30,
+    378,
+    3575,
+    282,
+    4521,
+    314
+  ],
+  "max_new_tokens": 4,
+  "fp32_gen_tokens": [
+    11452,
+    30,
+    378,
+    3575
+  ],
+  "fp32_text": " Berlin. The capital",
+  "rtl_gen_tokens": [
+    11452,
+    30,
+    378,
+    3575
+  ],
+  "rtl_text": " Berlin. The capital",
+  "total_cycles": 221848192,
+  "sim_sec": 94.31,
+  "greedy_match_length": 4,
+  "first_divergence_step": null,
+  "exact_token_matches": 4,
+  "total_compared": 4,
+  "token_agreement_pct": 100.0,
+  "oracle_gen_tokens": [
+    11452,
+    30,
+    378,
+    3575
+  ],
+  "rtl_matches_integer_oracle": true
+}

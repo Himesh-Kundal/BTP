@@ -34,7 +34,7 @@ def test_cli_help(capsys: pytest.CaptureFixture[str]) -> None:
     assert "synth" in captured.out
 
     # Subcommands
-    for subcmd in ["extract", "compile", "verify", "synth"]:
+    for subcmd in ["extract", "compile", "compile-model", "run", "verify", "synth"]:
         with pytest.raises(SystemExit) as excinfo:
             main([subcmd, "--help"])
         assert excinfo.value.code == 0
@@ -294,3 +294,68 @@ def test_cli_extract_mocked(tmp_path: Path) -> None:
             "--no-capture-calib",
         ])
         assert ret == 0
+
+
+def test_cli_v2_compile_model_run_and_verify(tmp_path: Path) -> None:
+    """Test Part II CLI v2 'compile-model --tiny', 'run', and 'verify --bundle' end-to-end."""
+    bundle_dir = tmp_path / "tiny_bundle"
+    ret_compile = main([
+        "compile-model",
+        "--tiny",
+        "--out", str(bundle_dir),
+    ])
+    assert ret_compile == 0
+    assert (bundle_dir / "top_accel.v").is_file()
+    assert (bundle_dir / "weights.hex").is_file()
+    assert (bundle_dir / "schedule.json").is_file()
+    assert (bundle_dir / "memory_plan.json").is_file()
+
+    # Run with both interpreter and Verilator RTL
+    run_report = tmp_path / "run_report.json"
+    ret_run = main([
+        "run",
+        "--bundle", str(bundle_dir),
+        "--tokens", "1,10,25",
+        "--max-new-tokens", "2",
+        "--backend", "both",
+        "--out", str(run_report),
+    ])
+    assert ret_run == 0
+    assert run_report.is_file()
+    run_data = json.loads(run_report.read_text(encoding="utf-8"))
+    assert run_data["status"] == "PASS"
+    assert len(run_data["generated_tokens"]) == 2
+    assert run_data["rtl"]["total_cycles"] > 0
+
+    # Verify v2 bundle (audits + RTL simulation)
+    verify_report = tmp_path / "verify_v2_report.json"
+    ret_verify = main([
+        "verify",
+        "--bundle", str(bundle_dir),
+        "--tokens", "1,10,25",
+        "--max-new-tokens", "2",
+        "--out", str(verify_report),
+    ])
+    assert ret_verify == 0
+    assert verify_report.is_file()
+    ver_data = json.loads(verify_report.read_text(encoding="utf-8"))
+    assert ver_data["status"] == "PASS"
+    assert ver_data["tokens_exact"] is True
+    assert ver_data["audit"]["passed"] is True
+
+
+def test_cli_v2_synth_unit(tmp_path: Path) -> None:
+    """Test Part II CLI v2 'synth --unit residual_add' in Yosys."""
+    synth_report = tmp_path / "synth_unit_report.json"
+    ret = main([
+        "synth",
+        "--unit", "residual_add",
+        "--target", "generic",
+        "--out", str(synth_report),
+    ])
+    assert ret == 0
+    assert synth_report.is_file()
+    data = json.loads(synth_report.read_text(encoding="utf-8"))
+    assert data["returncode"] == 0
+    assert data["num_cells_total"] > 0
+

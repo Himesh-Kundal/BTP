@@ -1,0 +1,38 @@
+{
+  "bundle": "/home/himesh/BTP/build/demo2_fast_hw",
+  "backend": "both",
+  "prompt_tokens": [
+    1,
+    10,
+    25
+  ],
+  "max_new_tokens": 4,
+  "generated_tokens": [
+    25,
+    25,
+    25,
+    131
+  ],
+  "decoded_text": null,
+  "interpreter_sec": 0.0132,
+  "rtl": {
+    "all_tokens": [
+      125,
+      10,
+      25,
+      25,
+      25,
+      131,
+      131
+    ],
+    "generated_tokens": [
+      25,
+      25,
+      25,
+      131
+    ],
+    "total_cycles": 115227,
+    "sim_sec": 0.045
+  },
+  "status": "PASS"
+}
