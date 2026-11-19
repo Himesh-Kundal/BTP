@@ -284,6 +284,8 @@ pub fn run_top_accel_simulation(
     model_config: &Value,
     work_dir: Option<&Path>,
 ) -> anyhow::Result<Tb2SimulationResult> {
+    let bundle_dir = fs::canonicalize(bundle_dir)?;
+    let rtl_lib_dir = fs::canonicalize(rtl_lib_dir)?;
     let get_usize = |k: &str, def: usize| -> usize {
         model_config.get(k).and_then(|v| v.as_u64()).map(|v| v as usize).unwrap_or(def)
     };
@@ -332,7 +334,7 @@ pub fn run_top_accel_simulation(
     fs::write(&tb_file, tb_code)?;
 
     let mut sources = Vec::new();
-    for entry in fs::read_dir(rtl_lib_dir)? {
+    for entry in fs::read_dir(&rtl_lib_dir)? {
         let p = entry?.path();
         if p.extension().and_then(|e| e.to_str()) == Some("v")
             && p.file_name().and_then(|n| n.to_str()) != Some("top_accel.v")
@@ -363,7 +365,9 @@ pub fn run_top_accel_simulation(
                 String::from_utf8_lossy(&out_c.stderr)
             );
         }
-        let out_r = Command::new("vvp").arg(&vvp_out).output()?;
+        let mut run_cmd = Command::new("vvp");
+        run_cmd.arg(&vvp_out).current_dir(&bundle_dir);
+        let out_r = run_cmd.output()?;
         format!(
             "{}{}",
             String::from_utf8_lossy(&out_r.stdout),
@@ -408,7 +412,9 @@ pub fn run_top_accel_simulation(
                 String::from_utf8_lossy(&out_c.stdout)
             );
         }
-        let out_r = Command::new(obj_dir.join("Vtb_top_accel")).output()?;
+        let mut run_cmd = Command::new(obj_dir.join("Vtb_top_accel"));
+        run_cmd.current_dir(&bundle_dir);
+        let out_r = run_cmd.output()?;
         format!(
             "{}{}",
             String::from_utf8_lossy(&out_r.stdout),

@@ -172,6 +172,39 @@ fn find_tokenizer(bundle: &Path, repo_root: &Path) -> Option<PathBuf> {
     None
 }
 
+fn get_bundle_model_config(bundle: &Path, repo_root: &Path) -> Value {
+    let mp = bundle.join("memory_plan.json");
+    if mp.is_file() {
+        if let Ok(s) = fs::read_to_string(&mp) {
+            if let Ok(v) = serde_json::from_str::<Value>(&s) {
+                if let Some(cfg) = v.get("model_config") {
+                    return cfg.clone();
+                }
+            }
+        }
+    }
+    let ue1 = repo_root.join("results/part2/ue1_generation.json");
+    if ue1.is_file() {
+        if let Ok(s) = fs::read_to_string(&ue1) {
+            if let Ok(v) = serde_json::from_str::<Value>(&s) {
+                if let Some(cfg) = v.get("config") {
+                    return cfg.clone();
+                }
+            }
+        }
+    }
+    json!({
+        "hidden_size": 576,
+        "intermediate_size": 1536,
+        "num_attention_heads": 9,
+        "num_key_value_heads": 3,
+        "head_dim": 64,
+        "num_hidden_layers": 30,
+        "vocab_size": 49152,
+        "max_position_embeddings": 256
+    })
+}
+
 fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
     let repo_root = find_repo_root();
@@ -374,9 +407,7 @@ fn main() -> anyhow::Result<()> {
             let mut rtl_sec = None;
             if backend == "rtl" || backend == "both" {
                 println!("[*] Running Verilator RTL hardware simulation...");
-                let mem_plan: Value =
-                    serde_json::from_str(&fs::read_to_string(bundle.join("memory_plan.json"))?)?;
-                let cfg = &mem_plan["model_config"];
+                let cfg = get_bundle_model_config(&bundle, &repo_root);
                 let sim_res = run_top_accel_simulation(
                     &bundle,
                     &repo_root.join("rtl/lib"),
@@ -387,7 +418,7 @@ fn main() -> anyhow::Result<()> {
                     Some(&interp_all),
                     "verilator",
                     1_000_000_000,
-                    cfg,
+                    &cfg,
                     None,
                 )?;
                 if sim_res.tokens != interp_all {
@@ -558,8 +589,7 @@ fn main() -> anyhow::Result<()> {
             let interp_sec = t0.elapsed().as_secs_f64();
             let gen_ids = golden_all[prompt_ids.len() - 1..prompt_ids.len() - 1 + max_new_tokens].to_vec();
 
-            let mem_plan: Value =
-                serde_json::from_str(&fs::read_to_string(bundle.join("memory_plan.json"))?)?;
+            let cfg = get_bundle_model_config(&bundle, &repo_root);
             let sim_res = run_top_accel_simulation(
                 &bundle,
                 &repo_root.join("rtl/lib"),
@@ -570,7 +600,7 @@ fn main() -> anyhow::Result<()> {
                 Some(&golden_all),
                 "verilator",
                 1_000_000_000,
-                &mem_plan["model_config"],
+                &cfg,
                 None,
             )?;
             if sim_res.tokens != golden_all {
@@ -618,9 +648,7 @@ fn main() -> anyhow::Result<()> {
                 golden_all.push(tok_out);
             }
 
-            let mem_plan: Value =
-                serde_json::from_str(&fs::read_to_string(bundle.join("memory_plan.json"))?)?;
-            let cfg = &mem_plan["model_config"];
+            let cfg = get_bundle_model_config(&bundle, &repo_root);
             let sim_res = run_top_accel_simulation(
                 &bundle,
                 &rtl_lib,
@@ -631,7 +659,7 @@ fn main() -> anyhow::Result<()> {
                 Some(&golden_all),
                 "verilator",
                 1_000_000_000,
-                cfg,
+                &cfg,
                 None,
             )?;
 
