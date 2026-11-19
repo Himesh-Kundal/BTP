@@ -1,0 +1,17 @@
+[package]
+name = "llmhw-synth"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+llmhw-ir.workspace = true
+llmhw-backend.workspace = true
+llmhw-verify.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+regex.workspace = true
+tempfile.workspace = true
+csv.workspace = true
+anyhow.workspace = true

@@ -1,0 +1,30 @@
+{
+  "rust_version": "rustc 1.99.1",
+  "smollm2_full_bundle_codegen": {
+    "python_emit_sec": 3.588,
+    "requant_hex_sha256": "3827b7a21da803e902d7e18b62625252d207866b20c39bcba6f6caa3f78cef6c",
+    "requant_sha256_matches_python": true,
+    "rust_emit_sec": 4.194,
+    "tables_hex_sha256": "6a6b1ef95044587dbb70c466c934f9bf5255b8716575ba91fb2fbeb7ad5d8f05",
+    "tables_sha256_matches_python": true,
+    "weights_hex_sha256": "4ae8968f696fe24f989c3235637f3aed74eb0ba75da581d9170d3436acb4257d",
+    "weights_sha256_matches_python": true
+  },
+  "smollm2_rom_load_sec": 0.884,
+  "status": "PASS",
+  "tiny_model_compile": {
+    "python_sec": 1.47,
+    "rust_sec": 0.01,
+    "speedup_x": 151.8,
+    "weight_words": 106496
+  },
+  "ue3_12pos_30layer_decode": {
+    "python_sec": 4.6,
+    "rust_sec": 0.318,
+    "speedup_x": 14.46,
+    "tokens_bit_exact_with_python_and_verilator": true,
+    "tokens_checked": 12
+  },
+  "ue4_reference_prompts_count": 10,
+  "workspace_crates": 10
+}

@@ -3,6 +3,7 @@
 .python-version
 
 # Build & runtime artifacts (model weights & temporary hardware builds)
+/target/
 artifacts/
 build/
 obj_dir/

@@ -1,0 +1,25 @@
+[package]
+name = "llmhw-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "llmhw"
+path = "src/main.rs"
+
+[dependencies]
+llmhw-numerics.workspace = true
+llmhw-ir.workspace = true
+llmhw-compiler.workspace = true
+llmhw-backend.workspace = true
+llmhw-sim.workspace = true
+llmhw-verify.workspace = true
+llmhw-synth.workspace = true
+llmhw-frontend.workspace = true
+llmhw-eval.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true

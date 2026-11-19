@@ -1,0 +1,49 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/llmhw-numerics",
+    "crates/llmhw-ir",
+    "crates/llmhw-compiler",
+    "crates/llmhw-backend",
+    "crates/llmhw-sim",
+    "crates/llmhw-verify",
+    "crates/llmhw-synth",
+    "crates/llmhw-frontend",
+    "crates/llmhw-eval",
+    "crates/llmhw-cli",
+]
+
+[workspace.package]
+version = "2.0.0"
+edition = "2021"
+authors = ["Himesh Kundal <23EC10030@iitkgp.ac.in>"]
+license = "MIT"
+repository = "https://github.com/himesh/BTP"
+
+[workspace.dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sha2 = "0.10"
+hex = "0.4"
+regex = "1.10"
+rayon = "1.10"
+anyhow = "1.0"
+thiserror = "1.0"
+tempfile = "3.10"
+clap = { version = "4.5", features = ["derive"] }
+csv = "1.3"
+safetensors = "0.4"
+memmap2 = "0.9"
+rand = "0.8"
+rand_chacha = "0.3"
+rand_distr = "0.4"
+
+llmhw-numerics = { path = "crates/llmhw-numerics" }
+llmhw-ir = { path = "crates/llmhw-ir" }
+llmhw-compiler = { path = "crates/llmhw-compiler" }
+llmhw-backend = { path = "crates/llmhw-backend" }
+llmhw-sim = { path = "crates/llmhw-sim" }
+llmhw-verify = { path = "crates/llmhw-verify" }
+llmhw-synth = { path = "crates/llmhw-synth" }
+llmhw-frontend = { path = "crates/llmhw-frontend" }
+llmhw-eval = { path = "crates/llmhw-eval" }
