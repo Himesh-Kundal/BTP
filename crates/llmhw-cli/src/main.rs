@@ -83,14 +83,30 @@ enum Commands {
     Run {
         #[arg(long, default_value = "build/smollm2_hw")]
         bundle: PathBuf,
-        #[arg(long, default_value = "1,10,25")]
-        tokens: String,
+        #[arg(long)]
+        prompt: Option<String>,
+        #[arg(long)]
+        tokens: Option<String>,
         #[arg(long, default_value_t = 4)]
         max_new_tokens: usize,
         #[arg(long, default_value = "interpreter")]
         backend: String,
         #[arg(long)]
         out: Option<PathBuf>,
+    },
+    /// Fast 2-layer tiny model demonstration in Verilator RTL (Turnkey check)
+    DemoFast {
+        #[arg(long, default_value = "build/tiny_hw")]
+        out: PathBuf,
+    },
+    /// Full SmolLM2-135M prompt generation on Verilator RTL and fast interpreter
+    Demo {
+        #[arg(long, default_value = "build/smollm2_hw")]
+        bundle: PathBuf,
+        #[arg(long, default_value = "The capital of France is Paris. The capital of Germany is")]
+        prompt: String,
+        #[arg(long, default_value_t = 4)]
+        max_new_tokens: usize,
     },
     /// Verify compiled v2 hardware bundle (ROM/structural audits + Verilator RTL vs interpreter parity)
     Verify {
@@ -136,6 +152,24 @@ fn find_repo_root() -> PathBuf {
         }
     }
     cwd
+}
+
+fn find_tokenizer(bundle: &Path, repo_root: &Path) -> Option<PathBuf> {
+    let cand1 = bundle.join("tokenizer.json");
+    if cand1.is_file() {
+        return Some(cand1);
+    }
+    let cand2 = repo_root.join("artifacts/tokenizer.json");
+    if cand2.is_file() {
+        return Some(cand2);
+    }
+    if let Ok(home) = std::env::var("HOME") {
+        let hf_cache = PathBuf::from(home).join(".cache/huggingface/hub/models--HuggingFaceTB--SmolLM2-135M/snapshots/93efa2f097d58c2a74874c7e644dbc9b0cee75a2/tokenizer.json");
+        if hf_cache.is_file() {
+            return Some(hf_cache);
+        }
+    }
+    None
 }
 
 fn main() -> anyhow::Result<()> {
@@ -284,15 +318,40 @@ fn main() -> anyhow::Result<()> {
         }
         Some(Commands::Run {
             bundle,
+            prompt,
             tokens,
             max_new_tokens,
             backend,
             out,
         }) => {
-            let prompt_ids: Vec<usize> = tokens
-                .split(',')
-                .filter_map(|s| s.trim().parse::<usize>().ok())
-                .collect();
+            let (prompt_ids, prompt_repr, tokenizer_opt) = if let Some(ref p_text) = prompt {
+                let tok_path = find_tokenizer(&bundle, &repo_root).ok_or_else(|| {
+                    anyhow::anyhow!("tokenizer.json not found in bundle, artifacts, or HuggingFace cache")
+                })?;
+                let tokenizer = tokenizers::Tokenizer::from_file(tok_path)
+                    .map_err(|e| anyhow::anyhow!("Failed to load tokenizer: {e}"))?;
+                let encoding = tokenizer
+                    .encode(p_text.as_str(), false)
+                    .map_err(|e| anyhow::anyhow!("Failed to tokenize prompt: {e}"))?;
+                let ids: Vec<usize> = encoding.get_ids().iter().map(|&x| x as usize).collect();
+                (ids, format!("{p_text:?}"), Some(tokenizer))
+            } else {
+                let tok_str = tokens.unwrap_or_else(|| "1,10,25".to_string());
+                let ids: Vec<usize> = tok_str
+                    .split(',')
+                    .filter_map(|s| s.trim().parse::<usize>().ok())
+                    .collect();
+                (ids.clone(), format!("tokens={ids:?}"), None)
+            };
+
+            println!("================================================================================");
+            println!(" LLMHW (RUST) RUN — AUTOREGRESSIVE DECODER EXECUTION");
+            println!("================================================================================");
+            println!("[*] Hardware Bundle: {}", bundle.display());
+            println!("[*] Backend Engine : {backend}");
+            println!("[*] Prompt         : {prompt_repr} (ids={prompt_ids:?})");
+            println!("[*] Max New Tokens : {max_new_tokens}");
+
             let t0 = Instant::now();
             let mut interp = CompiledArtifactInterpreter::new(&bundle)?;
             let mut interp_all = Vec::with_capacity(prompt_ids.len() + max_new_tokens);
@@ -311,7 +370,10 @@ fn main() -> anyhow::Result<()> {
                 interp_all[prompt_ids.len() - 1..prompt_ids.len() - 1 + max_new_tokens].to_vec();
 
             let mut rtl_json = Value::Null;
+            let mut rtl_cycles = None;
+            let mut rtl_sec = None;
             if backend == "rtl" || backend == "both" {
+                println!("[*] Running Verilator RTL hardware simulation...");
                 let mem_plan: Value =
                     serde_json::from_str(&fs::read_to_string(bundle.join("memory_plan.json"))?)?;
                 let cfg = &mem_plan["model_config"];
@@ -335,6 +397,14 @@ fn main() -> anyhow::Result<()> {
                         interp_all
                     );
                 }
+                println!(
+                    "[+] RTL vs Interpreter Parity: 100% BIT-EXACT ({}/{} steps, {} cycles)",
+                    interp_all.len(),
+                    interp_all.len(),
+                    sim_res.cycles
+                );
+                rtl_cycles = Some(sim_res.cycles);
+                rtl_sec = Some(sim_res.sim_sec);
                 rtl_json = json!({
                     "all_tokens": sim_res.tokens,
                     "generated_tokens": gen_ids,
@@ -343,10 +413,24 @@ fn main() -> anyhow::Result<()> {
                 });
             }
 
-            println!(
-                "[+] LLMHW (Rust) Run PASS: generated={:?} (interp={:.4}s)",
-                gen_ids, interp_sec
-            );
+            let decoded_text = if let Some(ref tokenizer) = tokenizer_opt {
+                let u32_ids: Vec<u32> = gen_ids.iter().map(|&x| x as u32).collect();
+                tokenizer.decode(&u32_ids, true).ok()
+            } else {
+                None
+            };
+
+            println!("--------------------------------------------------------------------------------");
+            println!("[+] Generated IDs  : {:?}", gen_ids);
+            if let Some(ref txt) = decoded_text {
+                println!("[+] Generated Text : {:?}", txt);
+            }
+            println!("[+] Interpreter Sec: {:.4} s", interp_sec);
+            if let (Some(cyc), Some(sec)) = (rtl_cycles, rtl_sec) {
+                println!("[+] RTL Cycles     : {} ({:.2} s)", cyc, sec);
+            }
+            println!("--------------------------------------------------------------------------------");
+
             if let Some(out_path) = out {
                 if let Some(p) = out_path.parent() {
                     fs::create_dir_all(p)?;
@@ -357,12 +441,150 @@ fn main() -> anyhow::Result<()> {
                     "prompt_tokens": prompt_ids,
                     "max_new_tokens": max_new_tokens,
                     "generated_tokens": gen_ids,
+                    "decoded_text": decoded_text,
                     "interpreter_sec": interp_sec,
                     "rtl": rtl_json,
                     "status": "PASS",
                 });
                 fs::write(&out_path, serde_json::to_string_pretty(&report)?)?;
+                println!("[+] Run Report     : {}", out_path.display());
             }
+            Ok(())
+        }
+        Some(Commands::DemoFast { out }) => {
+            println!("=== LLMHW (Rust) Turnkey Demo 2 Fast (Tiny Model) ===");
+            println!("[*] Compiling tiny model bundle into {}...", out.display());
+            let art_dir = out.join("artifacts_v2");
+            fs::create_dir_all(&art_dir)?;
+            generate_and_dump_tiny_model_v2(&art_dir, 42)?;
+            let loaded = load_model_artifacts_v2(&art_dir)?;
+            let graph = build_graph_v2_from_artifacts(&art_dir)?;
+            let mut cfg = loaded.config.clone();
+            cfg["max_position_embeddings"] = json!(16);
+            let frozen_cfg: Value = serde_json::from_str(&fs::read_to_string(
+                repo_root.join("numerics/config_frozen.json"),
+            )?)?;
+            let top_template = fs::read_to_string(repo_root.join("rtl/lib/top_accel.v"))?;
+            let bundle_res = emit_hardware_bundle(
+                graph,
+                &loaded.tensors,
+                &cfg,
+                &frozen_cfg,
+                &out,
+                8,
+                16,
+                16,
+                Some(&loaded.calib_scales),
+                &top_template,
+            )?;
+            let mem_plan = plan_memory(&cfg, 16, 24);
+            fs::write(
+                out.join("memory_plan.json"),
+                serde_json::to_string_pretty(&mem_plan)?,
+            )?;
+            println!(
+                "[+] Compiled tiny bundle (weights={} bytes)",
+                bundle_res.address_map["weights_image"]["total_words"]
+            );
+
+            let prompt_ids = vec![1, 10, 25];
+            let max_new_tokens = 2;
+            let mut interp = CompiledArtifactInterpreter::new(&out)?;
+            let mut golden_all = Vec::with_capacity(prompt_ids.len() + max_new_tokens);
+            for pos in 0..(prompt_ids.len() + max_new_tokens) {
+                let tok_in = if pos < prompt_ids.len() {
+                    prompt_ids[pos]
+                } else {
+                    *golden_all.last().unwrap()
+                };
+                let (_, tok_out) = interp.decode_step(tok_in, pos);
+                golden_all.push(tok_out);
+            }
+            let sim_res = run_top_accel_simulation(
+                &out,
+                &repo_root.join("rtl/lib"),
+                &prompt_ids,
+                max_new_tokens,
+                0,
+                None,
+                Some(&golden_all),
+                "verilator",
+                1_000_000_000,
+                &cfg,
+                None,
+            )?;
+            if sim_res.tokens != golden_all {
+                anyhow::bail!("RTL simulation diverged from interpreter");
+            }
+            println!(
+                "[+] Demo 2 Fast SUCCESS: 100% bit-exact tokens={:?}, cycles={}",
+                sim_res.tokens, sim_res.cycles
+            );
+            Ok(())
+        }
+        Some(Commands::Demo {
+            bundle,
+            prompt,
+            max_new_tokens,
+        }) => {
+            println!("=== LLMHW (Rust) Turnkey Demo 2 (SmolLM2-135M Decoder) ===");
+            let tok_path = find_tokenizer(&bundle, &repo_root)
+                .ok_or_else(|| anyhow::anyhow!("tokenizer.json not found"))?;
+            let tokenizer = tokenizers::Tokenizer::from_file(tok_path)
+                .map_err(|e| anyhow::anyhow!("Failed to load tokenizer: {e}"))?;
+            let encoding = tokenizer
+                .encode(prompt.as_str(), false)
+                .map_err(|e| anyhow::anyhow!("Failed to tokenize prompt: {e}"))?;
+            let prompt_ids: Vec<usize> = encoding.get_ids().iter().map(|&x| x as usize).collect();
+
+            println!("[*] Prompt         : {:?} (ids={:?})", prompt, prompt_ids);
+            println!(
+                "[*] Decoding {} new tokens on Verilator RTL + fast interpreter...",
+                max_new_tokens
+            );
+
+            let t0 = Instant::now();
+            let mut interp = CompiledArtifactInterpreter::new(&bundle)?;
+            let mut golden_all = Vec::with_capacity(prompt_ids.len() + max_new_tokens);
+            for pos in 0..(prompt_ids.len() + max_new_tokens) {
+                let tok_in = if pos < prompt_ids.len() {
+                    prompt_ids[pos]
+                } else {
+                    *golden_all.last().unwrap()
+                };
+                let (_, tok_out) = interp.decode_step(tok_in, pos);
+                golden_all.push(tok_out);
+            }
+            let interp_sec = t0.elapsed().as_secs_f64();
+            let gen_ids = golden_all[prompt_ids.len() - 1..prompt_ids.len() - 1 + max_new_tokens].to_vec();
+
+            let mem_plan: Value =
+                serde_json::from_str(&fs::read_to_string(bundle.join("memory_plan.json"))?)?;
+            let sim_res = run_top_accel_simulation(
+                &bundle,
+                &repo_root.join("rtl/lib"),
+                &prompt_ids,
+                max_new_tokens,
+                0,
+                None,
+                Some(&golden_all),
+                "verilator",
+                1_000_000_000,
+                &mem_plan["model_config"],
+                None,
+            )?;
+            if sim_res.tokens != golden_all {
+                anyhow::bail!("RTL simulation diverged from interpreter");
+            }
+            let u32_ids: Vec<u32> = gen_ids.iter().map(|&x| x as u32).collect();
+            let text = tokenizer.decode(&u32_ids, true).unwrap_or_default();
+            println!("--------------------------------------------------------------------------------");
+            println!("[+] Generated IDs  : {:?}", gen_ids);
+            println!("[+] Generated Text : {:?}", text);
+            println!("[+] Interpreter Sec: {:.4} s", interp_sec);
+            println!("[+] RTL Cycles     : {} ({:.2} s)", sim_res.cycles, sim_res.sim_sec);
+            println!("[+] Parity Status  : 100% BIT-EXACT PASS");
+            println!("--------------------------------------------------------------------------------");
             Ok(())
         }
         Some(Commands::Verify {

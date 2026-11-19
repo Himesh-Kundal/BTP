@@ -23,3 +23,4 @@ clap.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 anyhow.workspace = true
+tokenizers = "0.23.2"
