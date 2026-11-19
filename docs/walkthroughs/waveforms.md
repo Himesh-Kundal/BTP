@@ -5,7 +5,7 @@
 - [`artifacts/waveforms/pass.vcd`](file:///home/himesh/BTP/artifacts/waveforms/pass.vcd): Bit-exact passing transaction ($L=1$ cycle latency).
 - [`artifacts/waveforms/fail_m1_sign.vcd`](file:///home/himesh/BTP/artifacts/waveforms/fail_m1_sign.vcd): Arithmetic mismatch signature (M1 sign-flip fault).
 - [`artifacts/waveforms/fail_m9_timing.vcd`](file:///home/himesh/BTP/artifacts/waveforms/fail_m9_timing.vcd): Protocol violation signature (M9 latency fault).
-- Reproduction command: `PYTHONPATH=. uv run python scripts/generate_waveforms.py`
+- Reproduction command: `cargo run --release --bin llmhw -- verify --bundle build/tiny_hw`
 
 ---
 

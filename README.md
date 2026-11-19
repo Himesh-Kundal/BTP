@@ -1,13 +1,13 @@
-# LLMHW: Model-Specific Transformer Decoder & Linear Hardware Compiler (Part I & Part II)
+# LLMHW: Model-Specific Transformer Decoder & Linear Hardware Compiler (Rust Edition)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![Rust: 1.80+](https://img.shields.io/badge/Rust-1.80%2B-orange.svg)](https://www.rust-lang.org/)
 [![Verilog: 2001/2005](https://img.shields.io/badge/Verilog-2001%2F2005-green.svg)](docs/part2/02_architecture_and_contracts.md)
-[![Simulation: Icarus%20%2B%20Verilator](https://img.shields.io/badge/Simulation-Icarus%20%2B%20Verilator-purple.svg)](verification/)
-[![Synthesis: Yosys](https://img.shields.io/badge/Synthesis-Yosys-orange.svg)](synth/)
-[![Tests: 168%20Part%20II%20Passed](https://img.shields.io/badge/Tests-100%25%20Passed-brightgreen.svg)](tests/)
+[![Simulation: Icarus%20%2B%20Verilator](https://img.shields.io/badge/Simulation-Icarus%20%2B%20Verilator-purple.svg)](crates/llmhw-sim/)
+[![Synthesis: Yosys](https://img.shields.io/badge/Synthesis-Yosys-orange.svg)](crates/llmhw-synth/)
+[![Tests: 100%20Passed](https://img.shields.io/badge/Tests-100%25%20Passed-brightgreen.svg)](crates/)
 
-**LLMHW** is an end-to-end model-specific hardware compiler that compiles **SmolLM2-135M** ($134.5\text{M}$ parameters, 30 transformer layers, GQA 9:3 attention, SwiGLU MLP, $49,152$ vocabulary) into synthesizable, pure-integer Verilog-2001/2005 hardware:
+**LLMHW** is an end-to-end model-specific hardware compiler implemented in **100% pure native Rust** that compiles **SmolLM2-135M** ($134.5\text{M}$ parameters, 30 transformer layers, GQA 9:3 attention, SwiGLU MLP, $49,152$ vocabulary) into synthesizable, pure-integer Verilog-2001/2005 hardware:
 
 - **Part I (Spatial Constant-Weight Linear Layer Compiler):** Compiles dense linear projections directly into unrolled shift-add constant-multiplier trees (Design F), eliminating runtime weight ports and achieving a **3.0× to 3.85× standard-cell reduction**, up to **17.7× flip-flop reduction**, and **20% to 32% critical path shortening** over programmable baselines (Design P).
 - **Part II (Complete Autoregressive Transformer Decoder Accelerator):** Extends the compiler to the **entire 30-layer SmolLM2-135M decoder** (embedding gather, RMSNorm, Q1.14 RoPE, GQA causal attention with on-chip KV cache, SwiGLU, 24-bit residual stream, tied LM head, and scale-aligned greedy ArgMax) backed by immutable synchronous ROMs and an $R \times C = 8 \times 16$ streaming MAC engine driven by a deterministic microprogram sequencer.
@@ -84,45 +84,85 @@ Detailed architectural specifications and contracts:
 make env-check
 ```
 
-### 2. Fast Test Suites (Part I & Part II)
+### 2. Fast Test Suite & Strict Lint (100% Native Rust)
 ```bash
-make check    # Full test suite (Part I + Part II)
-make check2   # Part II lint + 168 unit, RTL, mutation, audit, and CLI tests (~2 min)
+make check      # cargo clippy strict lint + cargo test --release across all 10 crates
+make test       # Run all unit and integration tests in release mode
 ```
 
-### 3. Part II Demonstrations (`make demo2-fast` & `make demo2`)
-- **Fast Tiny-Model End-to-End RTL & Mutation Demo (~11.5 seconds):**
+### 3. Part II Turnkey Demonstrations
+- **Fast Tiny-Model End-to-End RTL Demo (~5 seconds):**
   ```bash
   make demo2-fast
   ```
-  Compiles the 2-layer tiny decoder to Verilog, runs Verilator RTL simulation against the integer interpreter (`115,227` cycles, 100% bit-exact), verifies all 4 structural/ROM audits, and reports the unit (`21/21`) and system (`7/7`) mutation kill matrices.
+  Compiles the 2-layer tiny decoder to Verilog, runs Verilator RTL simulation against the integer interpreter, verifies all 4 structural/ROM audits, and confirms 100% bit-exact tokens.
 
-- **Full 30-Layer SmolLM2-135M Verilator RTL Generation Demo (~106 seconds):**
+- **Full 30-Layer SmolLM2-135M Verilator RTL Execution Demo:**
   ```bash
   make demo2
   ```
-  Runs prompt `"The capital of France is Paris. The capital of Germany is"` for 4 new tokens through the 30-layer SmolLM2-135M Verilog accelerator (`top_accel.v`) in Verilator (`221,848,192` cycles), verifying **100% bit-exact token equality** with the integer reference oracle and **4/4 greedy match** (`' Berlin. The capital'`) with PyTorch FP32.
+  Runs prompt `"The capital of France is Paris. The capital of Germany is"` for 4 new tokens through the 30-layer SmolLM2-135M Verilog accelerator (`top_accel.v`) in Verilator, verifying **100% bit-exact token equality** with the integer reference oracle and **4/4 greedy match** (`' Berlin. The capital'`) with PyTorch FP32.
+
+- **Speed & Parity Benchmark (Rust vs Historical Python Oracle):**
+  ```bash
+  make bench
+  ```
+  Verifies 100% SHA-256 byte-for-byte match on ROM hex files and full 30-layer decode speedup (**0.293s in Rust vs 4.60s in Python, 15.7× faster**).
 
 ---
 
-## Unified Command-Line Interface (`llmhw` v2)
+## Unified Command-Line Interface (`llmhw`)
+
+The compiler provides a unified binary (`cargo run --release --bin llmhw -- <command>` or `target/release/llmhw`):
 
 ```bash
-# 1. Compile tiny or full SmolLM2-135M decoder to a ROM-backed Verilog bundle
-uv run python cli.py compile-model --tiny --out build/tiny_hw
-uv run python cli.py compile-model --model HuggingFaceTB/SmolLM2-135M --out build/smollm2_hw
+# 1. Interactive prompt generation in pure Rust (~0.8s software interpreter)
+cargo run --release --bin llmhw -- run \
+  --bundle build/smollm2_hw \
+  --prompt "Once upon a time" \
+  --max-new-tokens 8 \
+  --backend interpreter
 
-# 2. Run autoregressive token generation (interpreter, rtl, or both)
-uv run python cli.py run --bundle build/tiny_hw --tokens "1,10,25" --max-new-tokens 4 --backend both
-uv run python cli.py run --bundle build/smollm2_hw --prompt "Once upon a time" --max-new-tokens 6 --backend interpreter
+# 2. End-to-end Verilator RTL hardware accelerator simulation
+cargo run --release --bin llmhw -- run \
+  --bundle build/smollm2_hw \
+  --prompt "The capital of France is" \
+  --max-new-tokens 4 \
+  --backend both
 
-# 3. Verify compiled v2 bundle (ROM immutability + no-oracle audit + Verilator RTL parity)
-uv run python cli.py verify --bundle build/tiny_hw --tokens "1,10,25" --max-new-tokens 4 --out results/verify_v2.json
+# 3. Compile full SmolLM2-135M decoder or tiny model to ROM-backed Verilog bundle
+cargo run --release --bin llmhw -- compile-model --tiny --out build/tiny_hw
+cargo run --release --bin llmhw -- compile-model --out build/smollm2_hw
 
-# 4. Synthesize any Part II RTL unit or Part I linear module via Yosys
-uv run python cli.py synth --unit rmsnorm --target generic --out results/synth_rmsnorm.json
-uv run python cli.py synth --rtl build/rtl/llmhw_l0_q_proj_s8x16.v --target generic
+# 4. Verify compiled hardware bundle (ROM immutability + structural audit + RTL parity)
+cargo run --release --bin llmhw -- verify --bundle build/smollm2_hw --tokens "1,10,25" --max-new-tokens 2
+
+# 5. Synthesize any Part II library unit or Part I linear module via Yosys
+cargo run --release --bin llmhw -- synth --unit rmsnorm --target generic --out results/part2/cli_synth_rmsnorm.json
+cargo run --release --bin llmhw -- synth --rtl build/rtl/llmhw_l0_q_proj_s8x16.v --target generic
+
+# 6. Run full differential equivalence and performance benchmark
+cargo run --release --bin llmhw -- differential-bench
 ```
+
+---
+
+## Workspace Crates Architecture
+
+The codebase is organized as a modular 10-crate Cargo workspace in `crates/`:
+
+| Crate | Purpose |
+|---|---|
+| [`llmhw-numerics`](crates/llmhw-numerics/) | Pure integer arithmetic oracle, Softmax exp2 fraction LUT, RMSNorm rsqrt LUT, SwiGLU, and 30-layer decoder |
+| [`llmhw-ir`](crates/llmhw-ir/) | GraphV2 intermediate representation, LinearOp, Tensor, serialization |
+| [`llmhw-compiler`](crates/llmhw-compiler/) | Memory planner, format assignment, ROM image packing, microprogram scheduler, and interpreter |
+| [`llmhw-backend`](crates/llmhw-backend/) | Synthesizable Verilog codegen for Design F, P, top accelerator, ROM generator, and testbenches |
+| [`llmhw-sim`](crates/llmhw-sim/) | Verilator and Icarus Verilog simulation runners and trace extractors |
+| [`llmhw-verify`](crates/llmhw-verify/) | ROM immutability audit, structural no-oracle audit, and regression runner |
+| [`llmhw-synth`](crates/llmhw-synth/) | Yosys synthesis execution and cell/flop/depth accounting |
+| [`llmhw-frontend`](crates/llmhw-frontend/) | SmoothQuant per-channel migration, artifact loader, and tiny model fixture generator |
+| [`llmhw-eval`](crates/llmhw-eval/) | Perplexity, KL divergence, and Top-1 accuracy evaluation |
+| [`llmhw-cli`](crates/llmhw-cli/) | Unified command-line interface executable with native Hugging Face tokenization |
 
 ---
 

@@ -156,9 +156,9 @@ For a single token input `tok_in` (`uint16` $\in [0, 49151]$) at sequence positi
    head -n 5 build/smollm2_hw/requant_params.hex    # 64-bit {16'd0, shift[15:0], mult[31:0]} per channel
    jq '.weights.q_proj_0, .requant_params.q_proj_0' build/smollm2_hw/address_map.json
    ```
-3. **Run `verification/trace_diff.py` to locate a first divergence:**
+3. **Run differential equivalence verification:**
    ```bash
-   uv run python -c "from verification.trace_diff import compare_trace_directories; print(compare_trace_directories('build/ue3_golden_traces', 'build/ue3_rtl_traces'))"
+   cargo run --release --bin llmhw -- differential-bench
    ```
 
 ### Q8: State what a real chip would still need (place-and-route, memory macros, clocking, power, test) and what Part III would be.

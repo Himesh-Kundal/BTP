@@ -26,8 +26,9 @@ Statement and scope: `docs/part2/01_problem_and_scope.md` · Contracts: `docs/pa
 13. **Ask on numerics and interfaces.** A wrong guess there corrupts everything downstream.
 
 ## Commands
-Part I: `make env-check · check · sim · regression · synth · demo`. Part II adds (created in U0.4):
-`make check2` (fast: lint + unit + numerics + tiny-model quick sim) · `make numerics` · `make sim-tiny` · `make sim-full` (long) · `make synth2` · `make demo2-fast` (tiny model) · `make demo2` (full model, short generation) · `make long-<target>` (background jobs with logs)
+Native Rust (Cargo):
+`make env-check` · `make check` (fast: cargo clippy lint + cargo test --release) · `make test` · `make sim` · `make sim-tiny` · `make synth` · `make synth2` · `make demo2-fast` (tiny model) · `make demo2` (full model, short generation) · `make bench` · `make clean`
+Direct CLI: `cargo run --release --bin llmhw -- <command>`
 
 ## Autonomy zones
 - **GREEN:** code, added tests, scripts, docs, experiments within the plan, new results.
@@ -51,5 +52,5 @@ Run in the background with `make long-*`, log to `build/logs/`, set timeouts, wr
 ## Definition of Done / session protocol
 `docs/part2/07_checklists.md` §1–2. Short form: acceptance commands pass → tests first → `make check2` green → docs/STATE/LOG updated → commit `U<id>: <summary>` → verifier pass if tagged `rtl`, `numeric`, `gate`. Start: `git status`, `make check2`, read STATE and task. End: update task, STATE, LOG, commit, write handoff note.
 
-## Repo map (additions to Part I)
-`numerics/` (integer op library and decoder, the oracle) · `eval/` (fp32 reference, datasets, metrics) · `rtl/lib/` (hand-written parameterized units) · `sim/` (testbench generators, Verilator harness) · `results/part2/` · `tasks/` · `docs/part2/`
+## Repo map (Rust Edition)
+`crates/llmhw-{numerics, ir, compiler, backend, sim, verify, synth, frontend, eval, cli}` (10-crate Cargo workspace) · `rtl/lib/` (hand-written parameterized units) · `results/part2/` (experimental results & gate evidence) · `build/smollm2_hw/` (compiled hardware bundle) · `docs/part2/`
