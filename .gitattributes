@@ -1,0 +1,12 @@
+# GitHub Linguist Language Classification
+# Treat documentation and results as non-code so only Rust and Verilog are counted in languages bar
+
+docs/** linguist-documentation=true
+results/** linguist-vendored=true
+artifacts/** linguist-vendored=true
+eval/data/** linguist-vendored=true
+verification/golden/** linguist-vendored=true
+
+crates/**/*.rs linguist-language=Rust
+rtl/lib/*.v linguist-language=Verilog
+scripts/check_env.sh linguist-language=Shell
